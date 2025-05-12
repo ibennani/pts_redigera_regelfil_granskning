@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON-editor för kravlistan</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>JSON-editor för kravlistan</h1>
+
+    <!-- Container för initial uppladdningsvy -->
+    <div id="contentDisplay" class="content-container">
+        <div id="uploadSection">
+            <p>Ladda upp din JSON-fil med kravdata för att börja.</p>
+            <label for="fileInput" class="button-like-label">
+                 <span class="icon" aria-hidden="true">⬆️</span> Ladda upp JSON-fil...
+            </label>
+            <input type="file" id="fileInput" accept=".json" style="display: none;">
+            <p class="field-instruction">Använd en JSON-fil som följer Diggs tillsynsmanuals struktur.</p>
+        </div>
+    </div>
+
+    <!-- Kontroller (utanför contentDisplay) -->
+    <div id="postUploadControlsContainer" class="hidden">
+         <div class="main-controls">
+            <button id="showMetadataButton">
+                <span class="icon" aria-hidden="true">ℹ️</span> Visa metadata
+            </button>
+            <button id="showRequirementsButton">
+                 <span class="icon" aria-hidden="true">📋</span> Visa kontroller
+            </button>
+        </div>
+         <div class="secondary-controls">
+            <!-- Sök- och filterrad (visas bara i kravlistan) -->
+            <div id="filterSortRow" class="hidden filter-sort-row">
+                 <div id="sortControls">
+                     <label for="sortOrderSelect">Sortera:</label>
+                     <select id="sortOrderSelect">
+                         <option value="category-asc" selected>Kategorier (A-Ö)</option>
+                         <option value="category-desc">Kategorier (Ö-A)</option>
+                         <option value="ref-asc">Referens (Stigande)</option>
+                         <option value="ref-desc">Referens (Fallande)</option>
+                         <option value="impact-critical-first">Påverkan (Kritisk först)</option>
+                         <option value="impact-critical-last">Påverkan (Kritisk sist)</option>
+                     </select>
+                 </div>
+                 <div class="search-control">
+                    <label for="searchInput" class="visually-hidden">Sök krav</label>
+                    <input type="search" id="searchInput" placeholder="Sök på titel, ref, text...">
+                    <span class="search-icon" aria-hidden="true">🔍</span>
+                 </div>
+                 <button id="addRequirementButton">
+                      <span class="icon" aria-hidden="true">➕</span> Lägg till krav
+                  </button>
+            </div>
+
+             <!-- Globala spara-knappen -->
+             <button id="saveChangesButton" class="hidden">
+                 <span class="icon" aria-hidden="true">💾</span> Spara ändringar (JSON)
+            </button>
+            <!-- Plats för inline save confirmation (läggs till av JS) -->
+         </div>
+    </div>
+    <hr id="controlsDivider" class="hidden">
+
+    <!-- Dynamiskt innehåll -->
+    <div id="dynamicContentArea" class="hidden">
+        <!-- Innehåll renderas här av JavaScript -->
+    </div>
+
+    <!-- Scripts -->
+
+    <!-- 1. FileSaver.js från CDN med korrekt integrity-hash (hämtad 2024-05-07) -->
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"
+        integrity="sha512-Qlv6VSKh1gDKGoJbnyA5RMXYcvnpIqhO++MhIM2fStMcGT9i2T//tSwYFlcyoRRDcDZ+TYHpH8azBBCyhpSeqw=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer">
+    </script>
+
+    <!-- 2. Ladda huvudapplikationen som en ES-modul -->
+    <script type="module" src="js/main.js"></script>
+
+</body>
+</html>
