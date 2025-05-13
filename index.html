@@ -7,20 +7,22 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <button id="themeToggleButton" aria-live="polite">Byt till mörkt tema</button>
     <h1>JSON-editor för kravlistan</h1>
 
     <!-- Container för initial uppladdningsvy -->
     <div id="contentDisplay" class="content-container">
         <div id="uploadSection">
             <p>Ladda upp din JSON-fil med kravdata för att börja.</p>
-            <label for="fileInput" class="button-like-label">
+            <!-- ÄNDRING HÄR: Från label till button -->
+            <button type="button" id="uploadFileButton" class="button-like-styling"> <!-- Nytt ID och ev. ny klass -->
                  <span class="icon" aria-hidden="true">⬆️</span> Ladda upp JSON-fil...
-            </label>
+            </button>
             <input type="file" id="fileInput" accept=".json" style="display: none;">
             <p class="field-instruction">Använd en JSON-fil som följer Diggs tillsynsmanuals struktur.</p>
         </div>
     </div>
-
+    
     <!-- Kontroller (utanför contentDisplay) -->
     <div id="postUploadControlsContainer" class="hidden">
          <div class="main-controls">

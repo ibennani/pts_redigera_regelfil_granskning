@@ -1,94 +1,125 @@
 :root {
-    /* Ljust tema - Nya färger (blå/turkos bas) */
-    --primary-color: #0077cc; /* Klarare blå */
+    /* LJUST TEMA - GRUNDLÄGGANDE FALLBACK OM INGEN KLASS ÄR SATT PÅ BODY */
+    /* Dessa kommer att skrivas över av body.light-theme eller body.dark-theme */
+    --primary-color: #0077cc;
     --primary-hover: #005fa3;
     --primary-text: #ffffff;
-
-    --secondary-color: #eef7ff; /* Mycket ljus blågrå bakgrund */
-    --secondary-text: #334155; /* Mörkare gråblå text */
-
-    --accent-color: #14b8a6; /* Turkos accent */
+    --secondary-color: #eef7ff;
+    --secondary-text: #334155;
+    --accent-color: #14b8a6;
     --accent-hover: #0d9488;
     --accent-text: #ffffff;
-
-    --danger-color: #dc2626; /* Röd för fara */
+    --danger-color: #dc2626;
     --danger-hover: #b91c1c;
     --danger-text: #ffffff;
-
-    --warning-color: #f59e0b; /* Gul/Orange för varning */
+    --warning-color: #f59e0b;
     --warning-hover: #d97706;
     --warning-text: #1f2937;
-
-    --success-color: #16a34a; /* Grön för framgång/spara */
+    --success-color: #16a34a;
     --success-hover: #15803d;
     --success-text: #ffffff;
-
-    --neutral-color: #64748b; /* Neutral grå */
+    --neutral-color: #64748b;
     --neutral-hover: #475569;
     --neutral-text: #ffffff;
-
-    --border-color: #cbd5e1; /* Ljus gråblå ram */
-    --section-bg: #ffffff; /* Vit sektionsbakgrund */
+    --border-color: #cbd5e1;
+    --section-bg: #ffffff;
     --text-color: var(--secondary-text);
-    --heading-color: #0f172a; /* Mycket mörk blåsvart */
+    --heading-color: #0f172a;
     --link-color: var(--primary-color);
     --link-hover-color: var(--primary-hover);
-    --code-bg: #e0f2fe; /* Ljusblå kod */
+    --code-bg: #e0f2fe;
     --code-border: #bae6fd;
-    --exception-bg: #fffbeb; /* Ljusgul */
+    --exception-bg: #fffbeb;
     --exception-border: #fef3c7;
-    --focus-ring-color: #38bdf8; /* Ljusblå fokusring */
+    --focus-ring-color: #38bdf8;
     --disabled-bg: #e2e8f0;
     --disabled-text: #94a3b8;
     --placeholder-text: #94a3b8;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        /* Mörkt tema */
-        --primary-color: #38bdf8; /* Ljusare blå */
-        --primary-hover: #7dd3fc;
-        --primary-text: #0f172a; /* Mörk text på ljusblå */
+/* LJUST TEMA (sätts med body.light-theme, eller som default om ingen temaklass finns) */
+body.light-theme, :root:not(body.dark-theme) { /* :root:not(body.dark-theme) för default fallback */
+    --primary-color: #0077cc;
+    --primary-hover: #005fa3;
+    --primary-text: #ffffff;
+    --secondary-color: #eef7ff;
+    --secondary-text: #334155;
+    --accent-color: #14b8a6;
+    --accent-hover: #0d9488;
+    --accent-text: #ffffff;
+    --danger-color: #dc2626;
+    --danger-hover: #b91c1c;
+    --danger-text: #ffffff;
+    --warning-color: #f59e0b;
+    --warning-hover: #d97706;
+    --warning-text: #1f2937;
+    --success-color: #16a34a;
+    --success-hover: #15803d;
+    --success-text: #ffffff;
+    --neutral-color: #64748b;
+    --neutral-hover: #475569;
+    --neutral-text: #ffffff;
+    --border-color: #cbd5e1;
+    --section-bg: #ffffff;
+    --text-color: var(--secondary-text);
+    --heading-color: #0f172a;
+    --link-color: var(--primary-color);
+    --link-hover-color: var(--primary-hover);
+    --code-bg: #e0f2fe;
+    --code-border: #bae6fd;
+    --exception-bg: #fffbeb;
+    --exception-border: #fef3c7;
+    --focus-ring-color: #38bdf8;
+    --disabled-bg: #e2e8f0;
+    --disabled-text: #94a3b8;
+    --placeholder-text: #94a3b8;
 
-        --secondary-color: #1e293b; /* Mörk blågrå bakgrund */
-        --secondary-text: #e2e8f0; /* Ljus text */
-
-        --accent-color: #2dd4bf; /* Ljusare turkos */
-        --accent-hover: #5eead4;
-        --accent-text: #0f172a;
-
-        --danger-color: #f87171; /* Ljusare röd */
-        --danger-hover: #fb923c;
-        --danger-text: #1f2937;
-
-        --warning-color: #facc15; /* Ljusare gul */
-        --warning-hover: #fde047;
-        --warning-text: #1f2937;
-
-        --success-color: #4ade80; /* Ljusare grön */
-        --success-hover: #86efac;
-        --success-text: #1f2937;
-
-        --neutral-color: #94a3b8; /* Ljusare grå */
-        --neutral-hover: #cbd5e1;
-        --neutral-text: #1e293b;
-
-        --border-color: #475569; /* Mörkare ram */
-        --section-bg: #334155; /* Mörkare sektionsbakgrund */
-        --heading-color: #f8fafc; /* Nästan vit */
-        --link-color: var(--primary-color);
-        --link-hover-color: var(--primary-hover);
-        --code-bg: #374151; /* Mörkgrå kod */
-        --code-border: #4b5563;
-        --exception-bg: #4f46e5; /* Mörk lila (test) */
-        --exception-border: #4338ca;
-        --focus-ring-color: #7dd3fc; /* Ljusare blå fokusring */
-        --disabled-bg: #475569;
-        --disabled-text: #94a3b8;
-        --placeholder-text: #64748b;
-    }
+    background-color: var(--secondary-color);
+    color: var(--text-color);
 }
 
+/* MÖRKT TEMA (sätts med body.dark-theme) */
+body.dark-theme {
+    --primary-color: #38bdf8;
+    --primary-hover: #7dd3fc;
+    --primary-text: #0f172a;
+    --secondary-color: #1e293b;
+    --secondary-text: #e2e8f0;
+    --accent-color: #2dd4bf;
+    --accent-hover: #5eead4;
+    --accent-text: #0f172a;
+    --danger-color: #f87171;
+    --danger-hover: #fb923c;
+    --danger-text: #1f2937;
+    --warning-color: #facc15;
+    --warning-hover: #fde047;
+    --warning-text: #1f2937;
+    --success-color: #4ade80;
+    --success-hover: #86efac;
+    --success-text: #1f2937;
+    --neutral-color: #94a3b8;
+    --neutral-hover: #cbd5e1;
+    --neutral-text: #1e293b;
+    --border-color: #475569;
+    --section-bg: #334155;
+    --text-color: var(--secondary-text);
+    --heading-color: #f8fafc;
+    --link-color: var(--primary-color);
+    --link-hover-color: var(--primary-hover);
+    --code-bg: #374151;
+    --code-border: #4b5563;
+    --exception-bg: #4f46e5;
+    --exception-border: #4338ca;
+    --focus-ring-color: #7dd3fc;
+    --disabled-bg: #475569;
+    --disabled-text: #94a3b8;
+    --placeholder-text: #64748b;
+
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+}
+
+/* Ta bort @media (prefers-color-scheme: dark) för :root variabeldefinitioner */
 
 * {
     box-sizing: border-box;
@@ -106,10 +137,32 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: var(--secondary-color);
-    color: var(--text-color);
+    /* background-color och color sätts nu av .light-theme / .dark-theme klasserna */
     line-height: 1.6;
     min-height: 100vh;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+#themeToggleButton {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 1000;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--section-bg);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+#themeToggleButton:hover {
+    opacity: 0.8;
+}
+#themeToggleButton:focus-visible {
+    outline: 3px solid var(--focus-ring-color);
+    outline-offset: 2px;
 }
 
 h1, h2, h3, h4 {
@@ -126,17 +179,16 @@ h1 {
     border-bottom: 3px solid var(--primary-color);
     padding-bottom: 0.5rem;
     width: 100%;
-    max-width: 1300px; /* Ökad max-bredd för H1 */
+    max-width: 1300px;
 }
 
-/* Rubriker inuti dynamicContentArea */
 #dynamicContentArea h2 {
     font-size: 1.6rem;
     border-bottom: 2px solid var(--border-color);
     padding-bottom: 0.4rem;
     width: 100%;
     margin-top: 0;
-    margin-bottom: 0.5rem; /* Mindre marginal före filterrad */
+    margin-bottom: 0.5rem;
 }
 #dynamicContentArea h3 {
     font-size: 1.4rem;
@@ -160,16 +212,13 @@ h1 {
     margin-top: 0.5em;
 }
 
-
-/* --- Button Styling --- */
 button, .button-like-label { display: inline-flex; align-items: center; gap: 0.5em; padding: 0.6rem 1.2rem; font-size: 1rem; font-weight: 500; border: none; border-radius: 6px; cursor: pointer; transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease; margin: 0.3rem; text-decoration: none; text-align: center; background-color: var(--neutral-color); color: var(--neutral-text); }
 button:hover, .button-like-label:hover { background-color: var(--neutral-hover); }
 button:active, .button-like-label:active { transform: scale(0.98); }
-button:focus-visible, .button-like-label:focus-visible { outline: 3px solid var(--focus-ring-color); outline-offset: 2px; box-shadow: 0 0 0 4px var(--secondary-color); }
+button:focus-visible, .button-like-label:focus-visible { outline: 3px solid var(--focus-ring-color); outline-offset: 2px; box-shadow: 0 0 0 4px var(--secondary-color); } /* Observera att box-shadow här använder --secondary-color, som byts med temat */
 button:disabled { background-color: var(--disabled-bg); color: var(--disabled-text); cursor: not-allowed; opacity: 0.7; }
 .icon { display: inline-block; font-size: 1.1em; line-height: 1; }
 
-/* Specific button colors */
 .button-like-label, #showMetadataButton, #showRequirementsButton, #backButton,
 #dynamicContentArea .form-view .form-buttons button[type="button"]:not(.button-danger),
 #dynamicContentArea.delete-confirmation-view .form-buttons button[type="button"]:not(.button-danger)
@@ -203,79 +252,33 @@ button:disabled { background-color: var(--disabled-bg); color: var(--disabled-te
 #dynamicContentArea .req-edit-button { background-color: var(--warning-color); color: var(--warning-text); }
 #dynamicContentArea .req-edit-button:hover { background-color: var(--warning-hover); }
 
-
-/* --- Layout Containers --- */
-#postUploadControlsContainer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; margin-bottom: 0; padding: 0.75rem 1.5rem; background-color: var(--section-bg); border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; width: 95%; max-width: 1300px; /* Ökad max-bredd */ box-shadow: 0 2px 5px rgba(0,0,0,0.06); }
+#postUploadControlsContainer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; margin-bottom: 0; padding: 0.75rem 1.5rem; background-color: var(--section-bg); border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; width: 95%; max-width: 1300px; box-shadow: 0 2px 5px rgba(0,0,0,0.06); }
 #postUploadControlsContainer .main-controls, #postUploadControlsContainer .secondary-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
-#controlsDivider { border: none; border-top: 1px solid var(--border-color); margin: 0 auto 0 auto; width: 95%; max-width: 1300px; /* Ökad max-bredd */ }
-
-.content-container { margin-top: 1.5rem; margin-bottom: 2rem; padding: 1.5rem 2rem; border: 1px solid var(--border-color); border-radius: 8px; background-color: var(--section-bg); width: 95%; max-width: 1300px; /* Ökad max-bredd */ text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
-#dynamicContentArea { margin-top: 0; margin-bottom: 2rem; padding: 1.5rem 2rem; border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 8px 8px; background-color: var(--section-bg); width: 95%; max-width: 1300px; /* Ökad max-bredd */ text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.08); overflow-wrap: break-word; position: relative; }
+#controlsDivider { border: none; border-top: 1px solid var(--border-color); margin: 0 auto 0 auto; width: 95%; max-width: 1300px; }
+.content-container { margin-top: 1.5rem; margin-bottom: 2rem; padding: 1.5rem 2rem; border: 1px solid var(--border-color); border-radius: 8px; background-color: var(--section-bg); width: 95%; max-width: 1300px; text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+#dynamicContentArea { margin-top: 0; margin-bottom: 2rem; padding: 1.5rem 2rem; border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 8px 8px; background-color: var(--section-bg); width: 95%; max-width: 1300px; text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.08); overflow-wrap: break-word; position: relative; }
 #dynamicContentArea::after { content: ""; display: table; clear: both; }
-
 .hidden { display: none !important; }
 
-/* --- Initial Upload View --- */
 #uploadSection { text-align: center; padding: 2rem 1rem; }
 #uploadSection p { margin-bottom: 1rem; }
 #uploadSection .field-instruction { font-size: 0.9em; color: var(--neutral-color); margin-top: 0.5rem; }
 label.button-like-label { margin: 0 auto 1rem auto; }
 
-/* --- Funktionsrad (Sök/Filter/Sort) under H2 --- */
-.filter-sort-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 1rem;
-    width: 100%;
-    padding: 0.75rem 0;
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border-color);
-}
-#dynamicContentArea > .filter-sort-row {
-     margin-left: -2rem;
-     margin-right: -2rem;
-     margin-top: -1rem;
-     padding-left: 2rem;
-     padding-right: 2rem;
-     width: calc(100% + 4rem);
-}
-
-
-/* Styling för sökfältet */
-.search-control {
-    display: flex;
-    align-items: center;
-    position: relative;
-    flex-grow: 1;
-    min-width: 200px;
-    max-width: 450px;
-}
+.filter-sort-row { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; width: 100%; padding: 0.75rem 0; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
+#dynamicContentArea > .filter-sort-row { margin-left: -2rem; margin-right: -2rem; margin-top: -1rem; padding-left: 2rem; padding-right: 2rem; width: calc(100% + 4rem); }
+.search-control { display: flex; align-items: center; position: relative; flex-grow: 1; min-width: 200px; max-width: 450px; }
 #searchInput { padding: 0.6rem 0.8rem; padding-left: 2.5rem; border: 1px solid var(--neutral-color); border-radius: 4px; font-size: 0.95em; width: 100%; background-color: var(--section-bg); color: var(--text-color); }
-#searchInput:focus-visible { outline: 2px solid var(--focus-ring-color); outline-offset: 1px; border-color: var(--primary-color); box-shadow: 0 0 0 2px var(--secondary-color); }
-@media (prefers-color-scheme: dark) { #searchInput { border-color: var(--neutral-hover); } #searchInput:focus-visible { box-shadow: 0 0 0 2px var(--section-bg); } }
+#searchInput:focus-visible { outline: 2px solid var(--focus-ring-color); outline-offset: 1px; border-color: var(--primary-color); box-shadow: 0 0 0 2px var(--secondary-color); } /* secondary-color ändras med temat */
 .search-icon { position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); color: var(--neutral-color); font-size: 1.1em; pointer-events: none; }
 .visually-hidden { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px 1px 1px 1px); clip: rect(1px, 1px, 1px, 1px); white-space: nowrap; }
-
-#sortControls {
-    display: flex;
-    align-items: center;
-    gap: 0.5em;
-    flex-shrink: 0;
-    flex-basis: auto;
-}
+#sortControls { display: flex; align-items: center; gap: 0.5em; flex-shrink: 0; flex-basis: auto; }
 #sortControls label { font-size: 0.9em; font-weight: 500; color: var(--text-color); white-space: nowrap; }
 #sortControls select { padding: 0.6rem 0.8rem; border-radius: 4px; border: 1px solid var(--neutral-color); background-color: var(--section-bg); color: var(--text-color); font-size: 0.9em; cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%2364748b%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%20clip-rule%3D%22evenodd%22%20%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.7em top 50%; background-size: 1.2em auto; padding-right: 2.5em; min-width: 180px; }
-@media (prefers-color-scheme: dark) { #sortControls select { background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%23cbd5e1%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%20clip-rule%3D%22evenodd%22%20%2F%3E%3C%2Fsvg%3E'); border-color: var(--neutral-hover); } }
+body.dark-theme #sortControls select { background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%23cbd5e1%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%20clip-rule%3D%22evenodd%22%20%2F%3E%3C%2Fsvg%3E'); }
 #sortControls select:focus-visible { outline: 2px solid var(--focus-ring-color); outline-offset: 1px; border-color: var(--primary-color); }
+.filter-sort-row #addRequirementButton { margin-left: auto; flex-shrink: 0; }
 
-.filter-sort-row #addRequirementButton {
-    margin-left: auto;
-    flex-shrink: 0;
-}
-
-
-/* --- Metadata Display --- */
 #dynamicContentArea .metadata-item { margin-bottom: 1rem; padding: 0.75rem 1rem; border-left: 4px solid var(--accent-color); background-color: var(--secondary-color); border-radius: 4px; }
 #dynamicContentArea .metadata-item strong { color: var(--heading-color); display: block; margin-bottom: 0.3rem; font-size: 1.05em; }
 #dynamicContentArea .metadata-sub-item { margin-left: 1.5rem; font-size: 0.95em; margin-block-start: 0.4em; margin-block-end: 0.4em; }
@@ -283,7 +286,6 @@ label.button-like-label { margin: 0 auto 1rem auto; }
 #dynamicContentArea a { color: var(--link-color); text-decoration: none; font-weight: 500; }
 #dynamicContentArea a:hover { color: var(--link-hover-color); text-decoration: underline; }
 
-/* --- Requirement List Display --- */
 #dynamicContentArea ul.requirement-list { list-style: none; padding-left: 0; margin-top: 0; margin-bottom: 1.5rem; }
 #dynamicContentArea .requirement-item { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 1rem; margin-bottom: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; background-color: var(--section-bg); gap: 1rem; transition: background-color 0.1s ease; }
 #dynamicContentArea .requirement-item .requirement-text { flex-grow: 1; font-weight: 500; padding: 0.2em 0; border-radius: 2px; cursor: default; }
@@ -291,7 +293,6 @@ label.button-like-label { margin: 0 auto 1rem auto; }
 #dynamicContentArea .requirement-item .requirement-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
 #dynamicContentArea .requirement-item .requirement-text:focus { outline: 3px solid var(--focus-ring-color); outline-offset: 2px; background-color: var(--secondary-color); }
 
-/* --- Requirement Detail View --- */
 #dynamicContentArea.requirement-detail { position: relative; }
 #dynamicContentArea.requirement-detail .action-button-container { position: absolute; top: 1.5rem; right: 1.5rem; display: flex; gap: 0.5rem; z-index: 10; }
 #dynamicContentArea.requirement-detail .action-button-container button { padding: 0.4rem 0.8rem; font-size: 0.9rem; }
@@ -316,29 +317,32 @@ label.button-like-label { margin: 0 auto 1rem auto; }
 #dynamicContentArea.requirement-detail .exceptions code { background-color: var(--code-bg); border: 1px solid var(--code-border); color: var(--heading-color); padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.95em;}
 #dynamicContentArea #backButton { margin-top: 2rem; display: block; margin-left: auto; margin-right: auto; }
 
-/* --- Code/Tags --- */
 code, kbd, samp, pre { font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; background-color: var(--code-bg); border: 1px solid var(--code-border); padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.95em; color: var(--heading-color); }
 
-/* --- Form View --- */
-#dynamicContentArea.form-view fieldset { border: 1px solid var(--border-color); border-radius: 5px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; margin-top: 1rem; background-color: rgba(0,0,0,0.02); }
-@media (prefers-color-scheme: dark) { #dynamicContentArea.form-view fieldset { background-color: rgba(255,255,255,0.03); } }
+#dynamicContentArea.form-view fieldset { border: 1px solid var(--border-color); border-radius: 5px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; margin-top: 1rem; background-color: rgba(0,0,0,0.02); } /* Ljus bakgrund för fieldset i ljust tema */
+body.dark-theme #dynamicContentArea.form-view fieldset { background-color: rgba(255,255,255,0.03); } /* Mörkare bakgrund för fieldset i mörkt tema */
 #dynamicContentArea.form-view legend { font-weight: 600; color: var(--heading-color); padding: 0 0.5rem; font-size: 1.1em; background: var(--section-bg); }
 #dynamicContentArea.form-view .form-field { margin-bottom: 1.2rem; }
 #dynamicContentArea.form-view label { display: block; margin-bottom: 0.4rem; font-weight: 500; color: var(--heading-color); opacity: 0.9; font-size: 0.95em; }
 #dynamicContentArea.form-view .field-instruction { font-size: 0.85em; color: var(--neutral-color); margin-top: -0.2em; margin-bottom: 0.5em; }
-#dynamicContentArea.form-view input[type="text"], #dynamicContentArea.form-view input[type="email"], #dynamicContentArea.form-view input[type="url"], #dynamicContentArea.form-view input[type="date"], #dynamicContentArea.form-view input[type="number"], #dynamicContentArea.form-view select, #dynamicContentArea.form-view textarea { width: 100%; padding: 0.7rem 0.9rem; border: 1px solid var(--neutral-color); border-radius: 4px; font-size: 1em; font-family: inherit; background-color: var(--section-bg); color: var(--text-color); transition: border-color 0.2s, box-shadow 0.2s; }
+#dynamicContentArea.form-view input[type="text"], 
+#dynamicContentArea.form-view input[type="email"], 
+#dynamicContentArea.form-view input[type="url"], 
+#dynamicContentArea.form-view input[type="date"], 
+#dynamicContentArea.form-view input[type="number"], 
+#dynamicContentArea.form-view select, 
+#dynamicContentArea.form-view textarea { 
+    width: 100%; padding: 0.7rem 0.9rem; border: 1px solid var(--neutral-color); border-radius: 4px; font-size: 1em; font-family: inherit; background-color: var(--section-bg); color: var(--text-color); transition: border-color 0.2s, box-shadow 0.2s; 
+}
 #dynamicContentArea.form-view .form-field-checkbox { display: flex; align-items: center; gap: 0.5em; }
 #dynamicContentArea.form-view input[type="checkbox"] { width: auto; margin-right: 0; accent-color: var(--primary-color); width: 1.2em; height: 1.2em; cursor: pointer; border: 1px solid var(--neutral-color); background-color: var(--section-bg); appearance: none; -webkit-appearance: none; border-radius: 3px; position: relative; }
 #dynamicContentArea.form-view input[type="checkbox"]:checked::before { content: '✔'; position: absolute; top: -0.1em; left: 0.05em; color: var(--primary-color); font-size: 1.2em; line-height: 1; }
-@media (prefers-color-scheme: dark) { #dynamicContentArea.form-view input[type="checkbox"] { border-color: var(--neutral-hover); background-color: var(--section-bg); } #dynamicContentArea.form-view input[type="checkbox"]:checked::before { color: var(--primary-color); } }
 #dynamicContentArea.form-view .form-field-checkbox label { display: inline-block; margin-bottom: 0; cursor: pointer; font-weight: normal; }
 #dynamicContentArea.form-view input::placeholder, #dynamicContentArea.form-view textarea::placeholder { color: var(--placeholder-text); opacity: 1; }
 #dynamicContentArea.form-view textarea { resize: vertical; min-height: 80px; }
 #dynamicContentArea.form-view select { appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%2364748b%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%20clip-rule%3D%22evenodd%22%20%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.7em top 50%; background-size: 1.2em auto; padding-right: 2.5em; cursor: pointer; }
-@media (prefers-color-scheme: dark) { #dynamicContentArea.form-view select { background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%23cbd5e1%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%20clip-rule%3D%22evenodd%22%20%2F%3E%3C%2Fsvg%3E'); } }
 #dynamicContentArea.form-view input[readonly], #dynamicContentArea.form-view textarea[readonly], #dynamicContentArea.form-view input:disabled, #dynamicContentArea.form-view textarea:disabled, #dynamicContentArea.form-view select:disabled { background-color: var(--disabled-bg); color: var(--disabled-text); cursor: not-allowed; border-color: var(--border-color); opacity: 0.7; }
-#dynamicContentArea.form-view input:focus-visible, #dynamicContentArea.form-view select:focus-visible, #dynamicContentArea.form-view textarea:focus-visible { outline: 2px solid var(--focus-ring-color); outline-offset: 1px; border-color: var(--primary-color); box-shadow: 0 0 0 2px var(--secondary-color); }
-@media (prefers-color-scheme: dark) { #dynamicContentArea.form-view input:focus-visible, #dynamicContentArea.form-view select:focus-visible, #dynamicContentArea.form-view textarea:focus-visible { box-shadow: 0 0 0 2px var(--section-bg); } }
+#dynamicContentArea.form-view input:focus-visible, #dynamicContentArea.form-view select:focus-visible, #dynamicContentArea.form-view textarea:focus-visible { outline: 2px solid var(--focus-ring-color); outline-offset: 1px; border-color: var(--primary-color); box-shadow: 0 0 0 2px var(--secondary-color); } /* secondary-color ändras med temat */
 #dynamicContentArea.form-view .form-buttons { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 0.5rem; }
 #dynamicContentArea.form-view .dynamic-list { list-style: none; padding-left: 0; margin-top: 0.5rem; margin-bottom: 1rem; }
 #dynamicContentArea.form-view .dynamic-list-item { display: flex; align-items: flex-start; margin-bottom: 0.75rem; padding: 0.75rem; border: 1px dashed var(--border-color); border-radius: 4px; background-color: var(--section-bg); gap: 0.5rem; }
@@ -347,85 +351,16 @@ code, kbd, samp, pre { font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mon
 #dynamicContentArea.form-view .remove-item-button { padding: 0.3rem 0.6rem; font-size: 0.85rem; flex-shrink: 0; margin-top: 0.2rem; line-height: 1.4; }
 #dynamicContentArea.form-view .add-item-button { display: block; margin-top: 0.5rem; padding: 0.4rem 0.8rem; font-size: 0.9rem; }
 
+#dynamicContentArea.form-view .check-fieldset { display: flex; flex-direction: column; align-items: stretch; border: 1px solid var(--border-color); margin-bottom: 2rem; padding: 1.5rem; position: relative; background-color: var(--secondary-color); border-radius: 6px; }
+#dynamicContentArea.form-view .check-fieldset > legend { font-size: 1.2em; font-weight: 600; padding: 0 0.5em; background-color: var(--secondary-color); color: var(--heading-color); margin-bottom: 1rem; }
+#dynamicContentArea.form-view .remove-check-button { position: absolute; top: 1rem; right: 1rem; }
+#dynamicContentArea.form-view .check-fieldset .form-field { margin-bottom: 1.5rem; }
+#dynamicContentArea.form-view .criteria-group { box-sizing: border-box; margin-top: 1.5rem; padding: 1rem 1.5rem; background-color: var(--section-bg); border: 1px dotted var(--border-color); border-radius: 4px; }
+#dynamicContentArea.form-view .criteria-group legend { font-size: 1em; font-weight: 500; padding: 0 0.4em; background-color: var(--section-bg); color: var(--neutral-color); margin-bottom: 0.75rem; }
+#dynamicContentArea.form-view .criteria-group .dynamic-list-item textarea { width: 100%; min-height: 50px; }
+#dynamicContentArea.form-view .criteria-group .add-item-button { display: block; margin-top: 1rem; text-align: right; }
+#dynamicContentArea.form-view .criteria-group .remove-item-button { padding: 0.2rem 0.5rem; font-size: 0.8rem; margin-left: 0.5rem; }
 
-/* === JUSTERADE REGLER FÖR KONTROLLPUNKTER (Försök 2) === */
-#dynamicContentArea.form-view .check-fieldset {
-    /* Gör .check-fieldset till en flex-container som staplar sina barn vertikalt */
-    display: flex;
-    flex-direction: column;
-    align-items: stretch; /* Får barnen att ta full bredd om de inte har egen bredd satt */
-    
-    border: 1px solid var(--border-color);
-    margin-bottom: 2rem; 
-    padding: 1.5rem; 
-    position: relative; 
-    background-color: var(--secondary-color); 
-    border-radius: 6px; 
-}
-
-#dynamicContentArea.form-view .check-fieldset > legend {
-    font-size: 1.2em; 
-    font-weight: 600;
-    padding: 0 0.5em;
-    background-color: var(--secondary-color); /* Matcha .check-fieldset bakgrund */
-    color: var(--heading-color);
-    margin-bottom: 1rem; /* Lite extra utrymme under huvud-legend */
-}
-
-#dynamicContentArea.form-view .remove-check-button {
-    position: absolute;
-    top: 1rem; 
-    right: 1rem; 
-}
-
-/* Generella styling för Villkor och Logik inom en kontrollpunkt */
-/* Dessa .form-field kommer nu att sträckas av .check-fieldset (pga align-items: stretch) */
-#dynamicContentArea.form-view .check-fieldset .form-field {
-    margin-bottom: 1.5rem; 
-}
-
-/* Styling för de inre grupperna (Godkänd-kriterier och OmNej-kriterier) */
-/* Dessa är nu direkta barn till .check-fieldset och kommer också sträckas */
-#dynamicContentArea.form-view .criteria-group {
-    /* display: block;  Behövs inte om föräldern är flex och align-items: stretch */
-    /* width: 100%;  Behövs inte om föräldern är flex och align-items: stretch */
-    box-sizing: border-box;
-    margin-top: 1.5rem; 
-    padding: 1rem 1.5rem;
-    background-color: var(--section-bg); 
-    border: 1px dotted var(--border-color);
-    border-radius: 4px;
-}
-
-#dynamicContentArea.form-view .criteria-group legend {
-    font-size: 1em;
-    font-weight: 500;
-    padding: 0 0.4em;
-    background-color: var(--section-bg); /* Matcha sin egen bakgrund */
-    color: var(--neutral-color);
-    margin-bottom: 0.75rem; /* Utrymme under legend för kriteriegrupp */
-}
-
-#dynamicContentArea.form-view .criteria-group .dynamic-list-item textarea {
-    width: 100%; 
-    min-height: 50px; 
-}
-
-#dynamicContentArea.form-view .criteria-group .add-item-button {
-    display: block; 
-    margin-top: 1rem; 
-    text-align: right; 
-}
-
-#dynamicContentArea.form-view .criteria-group .remove-item-button {
-    padding: 0.2rem 0.5rem;
-    font-size: 0.8rem;
-    margin-left: 0.5rem; 
-}
-/* === SLUT PÅ JUSTERADE REGLER FÖR KONTROLLPUNKTER === */
-
-
-/* --- Delete Confirmation View --- */
 #dynamicContentArea.delete-confirmation-view { text-align: center; padding: 2rem; }
 #dynamicContentArea.delete-confirmation-view h2 { color: var(--danger-color); border: none; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.5em; }
 #dynamicContentArea.delete-confirmation-view p { margin-bottom: 1.5rem; font-size: 1.1em; }
@@ -434,69 +369,34 @@ code, kbd, samp, pre { font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mon
 #dynamicContentArea.delete-confirmation-view .form-buttons button { padding: 0.8rem 1.5rem; }
 #dynamicContentArea.delete-confirmation-view .button-danger { font-weight: bold; }
 
-/* --- Error & Confirmation Messages --- */
 .error, .confirmation-message { padding: 0.8em 1.2em; border-radius: 4px; margin: 1rem 0; text-align: center; font-weight: 500; border: 1px solid; }
 .error { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; }
 .save-confirmation { color: #0f5132; background-color: #d1e7dd; border-color: #badbcc; }
 .delete-confirmation { color: #581c87; background-color: #f3e8ff; border-color: #e9d5ff; }
-@media (prefers-color-scheme: dark) { .error { color: #f8d7da; background-color: #721c24; border-color: #f5c6cb; } .save-confirmation { color: #d1e7dd; background-color: #0f5132; border-color: #badbcc; } .delete-confirmation { color: #f3e8ff; background-color: #581c87; border-color: #e9d5ff; } }
+body.dark-theme .error { color: #f8d7da; background-color: #721c24; border-color: #f5c6cb; }
+body.dark-theme .save-confirmation { color: #d1e7dd; background-color: #0f5132; border-color: #badbcc; }
+body.dark-theme .delete-confirmation { color: #f3e8ff; background-color: #581c87; border-color: #e9d5ff; }
 .content-container > .error { margin: 0; border-radius: 8px; }
 
-/* Inline save confirmation */
-.save-confirmation-inline {
-    font-size: 0.9em;
-    /* color defined inline by JS */
-}
+.save-confirmation-inline { font-size: 0.9em; }
 
-/* --- Responsiveness --- */
-@media (max-width: 1200px) { 
-    /* Behåll 1300px för de största, men anpassa för mindre skärmar vid behov */
-    /* #postUploadControlsContainer, #controlsDivider, #dynamicContentArea, .content-container, h1 { max-width: 95%; } */
-}
+@media (max-width: 1200px) { } 
 
 @media (max-width: 768px) {
-    h1 { font-size: 1.8rem; max-width: 95%;} 
+    h1 { font-size: 1.8rem; max-width: 95%;}
     #dynamicContentArea h2 { font-size: 1.5rem; }
     #dynamicContentArea h3 { font-size: 1.2rem; }
     #postUploadControlsContainer { flex-direction: column; align-items: stretch; max-width: 95%;}
     #postUploadControlsContainer .main-controls, #postUploadControlsContainer .secondary-controls { justify-content: center; }
     #postUploadControlsContainer button { width: 100%; margin: 0.3rem 0; justify-content: center;}
     #postUploadControlsContainer .secondary-controls { width: 100%; }
-
     .content-container, #dynamicContentArea, #controlsDivider { max-width: 95%; }
-
-
-    .filter-sort-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.8rem;
-    }
-    .search-control {
-        max-width: none;
-        order: 2;
-    }
-    #sortControls {
-        justify-content: flex-start;
-        order: 1;
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        width: 100%;
-    }
-    #sortControls label {
-        margin-bottom: 0;
-    }
-    #sortControls select {
-        flex-grow: 1;
-        min-width: 150px;
-    }
-    .filter-sort-row #addRequirementButton {
-        margin-left: 0;
-        width: 100%;
-        order: 3;
-        margin-top: 0.5rem;
-    }
-
+    .filter-sort-row { flex-direction: column; align-items: stretch; gap: 0.8rem; }
+    .search-control { max-width: none; order: 2; }
+    #sortControls { justify-content: flex-start; order: 1; flex-direction: row; flex-wrap: wrap; gap: 0.5rem; width: 100%; }
+    #sortControls label { margin-bottom: 0; }
+    #sortControls select { flex-grow: 1; min-width: 150px; }
+    .filter-sort-row #addRequirementButton { margin-left: 0; width: 100%; order: 3; margin-top: 0.5rem; }
     #dynamicContentArea .requirement-item { flex-direction: column; align-items: flex-start; }
     #dynamicContentArea .requirement-item .requirement-actions { margin-top: 0.5rem; align-self: flex-end; }
     #dynamicContentArea.requirement-detail .action-button-container { position: static; margin-bottom: 1rem; justify-content: flex-end; }
@@ -516,54 +416,21 @@ code, kbd, samp, pre { font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mon
     .content-container {margin-top: 1rem;}
     button, .button-like-label { padding: 0.7rem 1rem; font-size: 0.95rem; }
     #postUploadControlsContainer button { width: 100%; margin: 0.3rem 0; justify-content: center; }
-
-    .filter-sort-row {
-        gap: 0.5rem;
-        padding: 0.5rem 0;
-    }
-    #sortControls {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    #sortControls label {
-        text-align: left;
-        margin-bottom: 0.2rem;
-    }
-    #sortControls select {
-        width: 100%;
-        flex-grow: 0;
-    }
-    .filter-sort-row #addRequirementButton {
-        margin-top: 0.5rem;
-    }
-
+    .filter-sort-row { gap: 0.5rem; padding: 0.5rem 0; }
+    #sortControls { flex-direction: column; align-items: stretch; }
+    #sortControls label { text-align: left; margin-bottom: 0.2rem; }
+    #sortControls select { width: 100%; flex-grow: 0; }
+    .filter-sort-row #addRequirementButton { margin-top: 0.5rem; }
     #dynamicContentArea.form-view fieldset { padding: 0.8rem 1rem; }
     #dynamicContentArea.form-view .form-buttons { justify-content: center; }
     #dynamicContentArea.form-view .form-buttons button { width: 90%; }
     #dynamicContentArea.form-view .dynamic-list-item { flex-direction: column; align-items: stretch; }
     #dynamicContentArea.form-view .dynamic-list-item textarea, #dynamicContentArea.form-view .dynamic-list-item select { margin-right: 0; margin-bottom: 0.5rem; }
     #dynamicContentArea.form-view .remove-item-button { align-self: flex-end; margin-top: 0; }
-    
-    /* Justeringar för kontrollpunkter på små skärmar */
-    #dynamicContentArea.form-view .check-fieldset {
-        padding: 1rem; /* Mindre padding */
-        /* Ingen flex-direction ändring behövs här, den är redan column */
-    }
-    #dynamicContentArea.form-view .remove-check-button {
-        position: static; 
-        float: right; 
-        margin-bottom: 0.5rem;
-    }
-    #dynamicContentArea.form-view .check-fieldset::after { 
-        content: "";
-        display: table;
-        clear: both;
-    }
-    #dynamicContentArea.form-view .criteria-group {
-        padding: 0.8rem 1rem;
-    }
-
-
+    #dynamicContentArea.form-view .check-fieldset { padding: 1rem; }
+    #dynamicContentArea.form-view .remove-check-button { position: static; float: right; margin-bottom: 0.5rem; }
+    #dynamicContentArea.form-view .check-fieldset::after { content: ""; display: table; clear: both; }
+    #dynamicContentArea.form-view .criteria-group { padding: 0.8rem 1rem; }
     #dynamicContentArea.requirement-detail .action-button-container { padding: 0; margin-bottom: 1rem;}
     #dynamicContentArea.requirement-detail .action-button-container button { width: calc(50% - 0.25rem); margin: 0; }
 }

@@ -7,6 +7,7 @@
 export const fileInput = document.getElementById('fileInput');
 export const uploadSection = document.getElementById('uploadSection');
 export const contentDisplay = document.getElementById('contentDisplay');
+export const uploadFileButton = document.getElementById('uploadFileButton');
 export const postUploadControlsContainer = document.getElementById('postUploadControlsContainer');
 export const dynamicContentArea = document.getElementById('dynamicContentArea');
 export const controlsDivider = document.getElementById('controlsDivider');
