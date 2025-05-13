@@ -7,13 +7,12 @@ import * as state from './_-----_global_state.js';
 import { escapeHtml, getVal, isValidEmail, generateKeyFromName } from './_-----_utils__helpers.js';
 import { setupContentArea, showError, displayConfirmation } from './_-----_ui_functions.js';
 // Importera den uppdaterade createFormField från krav-modulen
-import { createFormField } from './_---_requirement_functions.js';
-
+import { createFormField } from './_---_requirement_functions.js'; // Antag att denna exporteras korrekt
 
 // Updated displayMetadata: Removed URL param check, added monitoringType display
 // UPPDATERAD:
 // - `monitoringType` visas först.
-// - `pageTypes` visas som en punktlista.
+// - `pageTypes` visas som en punktlista (om det är en array).
 // - `keywords` visas sist.
 export function displayMetadata() { // Hela funktionen från ursprunglig script.js (ca rad 300-395) anpassad
     console.log("Visar metadata (modul)...");
@@ -52,17 +51,16 @@ export function displayMetadata() { // Hela funktionen från ursprunglig script.
         keyStrong.textContent = 'Typ av tillsyn:'; // Custom label
         itemDiv.appendChild(keyStrong);
         const valueSpan = document.createElement('span');
-        // Använd getVal för säker åtkomst till nästlade egenskaper
         valueSpan.textContent = ` ${escapeHtml(getVal(value, 'text', getVal(value, 'type', '(okänd)')))}`;
         itemDiv.appendChild(valueSpan);
         dynamicContentArea.appendChild(itemDiv);
     }
 
     // 2. Loopa genom övriga metadata-nycklar som inte är specialhanterade
-    const specialHandlingKeys = ['contentTypes', 'keywords', 'pageTypes', 'monitoringType'];
+    const specialHandlingKeysDisplay = ['contentTypes', 'keywords', 'pageTypes', 'monitoringType'];
     for (const key in metadata) {
         if (Object.prototype.hasOwnProperty.call(metadata, key)) {
-            if (specialHandlingKeys.includes(key)) continue; // Hoppa över de som hanteras separat
+            if (specialHandlingKeysDisplay.includes(key)) continue;
 
             itemCount++;
             try {
@@ -71,6 +69,7 @@ export function displayMetadata() { // Hela funktionen från ursprunglig script.
                 itemDiv.classList.add('metadata-item');
 
                 const keyStrong = document.createElement('strong');
+                // Gör nyckeln mer läsbar, t.ex. "dateModified" -> "Date Modified"
                 const readableKey = key.replace(/([A-Z]+)/g, " $1").replace(/([A-Z][a-z])/g, " $1").replace(/^./, function(str){ return str.toUpperCase(); });
                 keyStrong.textContent = `${readableKey}:`;
 
@@ -92,7 +91,7 @@ export function displayMetadata() { // Hela funktionen från ursprunglig script.
                     const subList = document.createElement('div');
                      subList.style.marginLeft = '20px';
                      const url = value.url;
-                     const titleText = value.title; // Byt namn för att undvika konflikt med HTML title
+                     const titleText = value.title;
                      let urlDisplayed = false;
                     if (url && String(url).trim() !== '') {
                         const linkText = (titleText && String(titleText).trim() !== '') ? titleText : url;
@@ -106,21 +105,21 @@ export function displayMetadata() { // Hela funktionen från ursprunglig script.
                         }
                     }
                     itemDiv.appendChild(subList);
-                } else if (key === 'language') { // Speciell hantering för språk
+                } else if (key === 'language') {
                     itemDiv.appendChild(keyStrong);
                     const valueSpan = document.createElement('span');
-                    const langName = commonLanguages[value] || value.toUpperCase(); // Hämta fullständigt namn eller använd kod
+                    const langName = commonLanguages[value] || value.toUpperCase();
                     valueSpan.textContent = ` ${escapeHtml(langName)} (${escapeHtml(value)})`;
                     itemDiv.appendChild(valueSpan);
-                } else if (Array.isArray(value)) { // Generisk hantering för andra arrayer
+                } else if (Array.isArray(value)) {
                     itemDiv.appendChild(keyStrong);
                     const valueSpan = document.createElement('span');
                     valueSpan.textContent = ` ${value.map(v => escapeHtml(String(v))).join(', ')}`;
                     itemDiv.appendChild(valueSpan);
-                } else { // Standardhantering för strängar, nummer etc.
+                } else {
                     itemDiv.appendChild(keyStrong);
                     const valueSpan = document.createElement('span');
-                    valueSpan.textContent = ` ${escapeHtml(String(value))}`; // Konvertera value till sträng för säkerhets skull
+                    valueSpan.textContent = ` ${escapeHtml(String(value))}`;
                     itemDiv.appendChild(valueSpan);
                 }
                 dynamicContentArea.appendChild(itemDiv);
@@ -134,20 +133,28 @@ export function displayMetadata() { // Hela funktionen från ursprunglig script.
         }
     }
 
-    // 3. Visa 'pageTypes' som en punktlista
+    // 3. Visa 'pageTypes' som en punktlista (om det är en array)
     if (Object.prototype.hasOwnProperty.call(metadata, 'pageTypes')) {
         itemCount++;
         const ptDiv = document.createElement('div'); ptDiv.classList.add('metadata-item');
         const ptHeading = document.createElement('strong'); ptHeading.textContent = 'Page Types:'; ptHeading.style.display = 'block'; ptDiv.appendChild(ptHeading);
-        const pageTypesValue = metadata.pageTypes;
-        if (typeof pageTypesValue === 'string' && pageTypesValue.trim() !== '') {
-            const pageTypesArray = pageTypesValue.split(',').map(pt => pt.trim()).filter(Boolean);
-            if (pageTypesArray.length > 0) {
+        const pageTypesValue = metadata.pageTypes; // Bör vara en array här om saveMetadata och handleFileUpload fungerar
+        if (Array.isArray(pageTypesValue) && pageTypesValue.length > 0) {
+            const ptList = document.createElement('ul'); ptList.style.listStyle = 'disc'; ptList.style.marginLeft = '20px';
+            pageTypesValue.forEach(pt => {
+                const li = document.createElement('li');
+                li.textContent = escapeHtml(String(pt));
+                ptList.appendChild(li);
+            });
+            ptDiv.appendChild(ptList);
+        } else if (typeof pageTypesValue === 'string' && pageTypesValue.trim() !== '') { // Fallback om det fortfarande är en sträng
+            const pageTypesArray = pageTypesValue.split(',').map(s => s.trim()).filter(Boolean);
+             if (pageTypesArray.length > 0) {
                 const ptList = document.createElement('ul'); ptList.style.listStyle = 'disc'; ptList.style.marginLeft = '20px';
                 pageTypesArray.forEach(pt => { const li = document.createElement('li'); li.textContent = escapeHtml(pt); ptList.appendChild(li); });
                 ptDiv.appendChild(ptList);
             } else {
-                const valueSpan = document.createElement('span'); valueSpan.textContent = ' (inga angivna)'; valueSpan.style.fontStyle = 'italic'; ptDiv.appendChild(valueSpan);
+                 const valueSpan = document.createElement('span'); valueSpan.textContent = ' (inga angivna)'; valueSpan.style.fontStyle = 'italic'; ptDiv.appendChild(valueSpan);
             }
         } else {
             const valueSpan = document.createElement('span'); valueSpan.textContent = ' (inga angivna)'; valueSpan.style.fontStyle = 'italic'; ptDiv.appendChild(valueSpan);
@@ -161,16 +168,15 @@ export function displayMetadata() { // Hela funktionen från ursprunglig script.
         const ctDiv = document.createElement('div');
         ctDiv.classList.add('metadata-item');
         const ctHeading = document.createElement('strong');
-        ctHeading.textContent = 'Innehållstyper:'; // Mer användarvänligt
+        ctHeading.textContent = 'Innehållstyper:';
         ctHeading.style.display = 'block';
         ctDiv.appendChild(ctHeading);
         if (metadata.contentTypes.length > 0) {
             const ctList = document.createElement('ul');
-            ctList.style.listStyle = 'disc'; // Använd punktlista
-            ctList.style.marginLeft = '20px'; // Indrag
+            ctList.style.listStyle = 'disc';
+            ctList.style.marginLeft = '20px';
             metadata.contentTypes.forEach(ct => {
                 const li = document.createElement('li');
-                // Antag att ct är ett objekt med en 'text'-egenskap
                 li.textContent = escapeHtml(getVal(ct, 'text', getVal(ct, 'id', 'Okänd typ')));
                 ctList.appendChild(li);
             });
@@ -192,8 +198,8 @@ export function displayMetadata() { // Hela funktionen från ursprunglig script.
         kwDiv.appendChild(kwHeading);
         if (metadata.keywords.length > 0) {
             const kwList = document.createElement('ul');
-            kwList.style.listStyle = 'disc'; // Använd punktlista
-            kwList.style.marginLeft = '20px'; // Indrag
+            kwList.style.listStyle = 'disc';
+            kwList.style.marginLeft = '20px';
             metadata.keywords.forEach(kw => {
                 const li = document.createElement('li');
                 li.textContent = escapeHtml(kw);
@@ -237,17 +243,13 @@ function createMetadataSubItem(subKey, subValue, linkText = subValue) { // Hela 
     return p;
 }
 
-// Updated renderMetadataForm: Added monitoringType dropdown
-// UPPDATERAD:
-// - `pageTypes` renderas som en textarea.
-// - `keywords` fältet renderas sist bland datafälten.
 export function renderMetadataForm() { // Hela från script.js (ca rad 422-552) anpassad
     if (!state.jsonData || !state.jsonData.metadata) {
         showError("Metadata saknas eller kunde inte laddas.");
         return;
     }
 
-    setupContentArea(true, false); // False för showFilterSort
+    setupContentArea(true, false);
     const targetArea = document.getElementById('dynamicContentArea');
     if (!targetArea) { return; }
     targetArea.classList.add('form-view');
@@ -264,15 +266,12 @@ export function renderMetadataForm() { // Hela från script.js (ca rad 422-552) 
     const metadata = state.jsonData.metadata;
     const explicitHandledKeys = ['version', 'dateCreated', 'dateModified', 'contentTypes', 'monitoringType', 'keywords', 'pageTypes'];
 
-
-    // 1. Monitoring Type (Dropdown) - visas alltid först
     const monitoringTypeContainer = createFormField('Typ av tillsyn*', 'monitoringType', '', 'select');
     const monitoringTypeSelect = document.createElement('select');
     const monitoringTypeId = monitoringTypeContainer.querySelector('label')?.htmlFor || 'monitoringTypeSelect';
     monitoringTypeSelect.id = monitoringTypeId;
     monitoringTypeSelect.name = 'monitoringType';
     monitoringTypeSelect.required = true;
-
     MONITORING_TYPES.forEach(opt => {
         const option = document.createElement('option');
         option.value = opt.type;
@@ -288,21 +287,17 @@ export function renderMetadataForm() { // Hela från script.js (ca rad 422-552) 
     monitoringTypeContainer.appendChild(monitoringTypeSelect);
     form.appendChild(monitoringTypeContainer);
 
-    // 2. Other Metadata Fields (via loop för de som inte hanteras explicit)
     for (const key in metadata) {
         if (Object.prototype.hasOwnProperty.call(metadata, key)) {
             if (explicitHandledKeys.includes(key)) continue;
-
             const value = metadata[key];
             let fieldContainer;
-
             if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
                 fieldContainer = document.createElement('div');
                 const fieldset = document.createElement('fieldset');
                 const legend = document.createElement('legend');
                 legend.textContent = key.replace(/([A-Z]+)/g, " $1").replace(/([A-Z][a-z])/g, " $1").replace(/^./, function(str){ return str.toUpperCase(); });
                 fieldset.appendChild(legend);
-
                 for (const subKey in value) {
                     if (value.hasOwnProperty(subKey)) {
                         const subValue = value[subKey];
@@ -358,29 +353,27 @@ export function renderMetadataForm() { // Hela från script.js (ca rad 422-552) 
         }
     }
 
-    // 3. PageTypes (as textarea)
-    const pageTypesValue = typeof metadata.pageTypes === 'string' ? metadata.pageTypes.split(',').map(pt => pt.trim()).filter(Boolean).join('\n') : '';
-    const ptContainer = createFormField('Page Types', 'pageTypes', pageTypesValue, 'textarea', '', false, 'Ange en sidtyp per rad.');
+    // PageTypes (som textarea, varje typ på ny rad)
+    const pageTypesForTextarea = Array.isArray(metadata.pageTypes) ? metadata.pageTypes.join('\n') : (metadata.pageTypes || '');
+    const ptContainer = createFormField('Page Types', 'pageTypes', pageTypesForTextarea, 'textarea', '', false, 'Ange en sidtyp per rad.');
     const ptTextarea = ptContainer.querySelector('textarea');
     if (ptTextarea) ptTextarea.rows = 10;
     form.appendChild(ptContainer);
 
-     // 4. ContentTypes (as textarea)
-     const ctValue = Array.isArray(metadata.contentTypes) ? metadata.contentTypes.map(ct => ct.text).join('\n') : '';
-     const ctContainer = createFormField('Innehållstyper (Content Types)', 'contentTypes', ctValue, 'textarea', '', false, 'Ange en innehållstyp per rad (t.ex. Webbsida). ID genereras automatiskt.');
-     const ctTextarea = ctContainer.querySelector('textarea');
-     if (ctTextarea) ctTextarea.rows = 10;
-     form.appendChild(ctContainer);
+    // ContentTypes (som textarea, varje text på ny rad)
+    const ctValue = Array.isArray(metadata.contentTypes) ? metadata.contentTypes.map(ct => ct.text).join('\n') : '';
+    const ctContainer = createFormField('Innehållstyper (Content Types)', 'contentTypes', ctValue, 'textarea', '', false, 'Ange en innehållstyp per rad (t.ex. Webbsida). ID genereras automatiskt.');
+    const ctTextarea = ctContainer.querySelector('textarea');
+    if (ctTextarea) ctTextarea.rows = 10;
+    form.appendChild(ctContainer);
 
-    // 5. Keywords (as textarea, visas sist av dessa editerbara fält)
+    // Keywords (som textarea, varje nyckelord på ny rad, visas sist)
     const keywordsValue = Array.isArray(metadata.keywords) ? metadata.keywords.join('\n') : '';
     const kwContainer = createFormField('Nyckelord', 'keywords', keywordsValue, 'textarea', '', false, 'Ange ett nyckelord per rad.');
     const kwTextarea = kwContainer.querySelector('textarea');
     if(kwTextarea) kwTextarea.rows = 10;
     form.appendChild(kwContainer);
 
-
-    // 6. Buttons (Save, Cancel)
     const buttonDiv = document.createElement('div');
     buttonDiv.classList.add('form-buttons');
     const saveBtn = document.createElement('button');
@@ -390,19 +383,13 @@ export function renderMetadataForm() { // Hela från script.js (ca rad 422-552) 
     const cancelBtn = document.createElement('button');
     cancelBtn.type = 'button';
     cancelBtn.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.cancel}</span> Avbryt`;
-    cancelBtn.addEventListener('click', () => displayMetadata()); // Gå tillbaka till displayMetadata
+    cancelBtn.addEventListener('click', () => displayMetadata());
     buttonDiv.appendChild(cancelBtn);
     form.appendChild(buttonDiv);
 
     targetArea.appendChild(form);
-} // Slut på renderMetadataForm
+}
 
-
-// Updated saveMetadata: Handles monitoringType, calls displayMetadata directly
-// UPPDATERAD:
-// - `pageTypes` sparas från textarea (rader) till komma-separerad sträng, bevarar ordning.
-// - `contentTypes` sparas i den ordning de anges i textarean (ingen alfabetisk sortering).
-// - `keywords` sparas i den ordning de anges i textarean.
 export function saveMetadata(event) { // Hela från script.js (ca rad 555-651) anpassad
     event.preventDefault();
     const form = event.target;
@@ -411,26 +398,15 @@ export function saveMetadata(event) { // Hela från script.js (ca rad 555-651) a
 
     if (!state.jsonData || !state.jsonData.metadata) return;
 
-    const originalMetadata = JSON.parse(JSON.stringify(state.jsonData.metadata)); // För att jämföra
+    const originalMetadata = JSON.parse(JSON.stringify(state.jsonData.metadata));
     const originalContentTypes = originalMetadata.contentTypes || [];
-    const updatedMetadata = JSON.parse(JSON.stringify(originalMetadata)); // Skapa en kopia att uppdatera
+    const updatedMetadata = JSON.parse(JSON.stringify(originalMetadata));
 
-    // Uppdatera monitoringType
-    const selectedMonitoringType = formData.get('monitoringType');
-    const monitoringTypeObject = MONITORING_TYPES.find(opt => opt.type === selectedMonitoringType) || MONITORING_TYPES[0];
-    if (JSON.stringify(updatedMetadata.monitoringType) !== JSON.stringify(monitoringTypeObject)) {
-        updatedMetadata.monitoringType = monitoringTypeObject;
-        changed = true;
-    }
-
-    // Nycklar som hanteras explicit (inte i loopen nedan)
     const explicitHandledKeys = ['version', 'dateCreated', 'dateModified', 'contentTypes', 'monitoringType', 'keywords', 'pageTypes'];
 
-    // Uppdatera övriga värden
     for (const key in updatedMetadata) {
         if (updatedMetadata.hasOwnProperty(key)) {
             if (explicitHandledKeys.includes(key)) continue;
-
             if (typeof updatedMetadata[key] === 'object' && !Array.isArray(updatedMetadata[key]) && updatedMetadata[key] !== null) {
                 for (const subKey in updatedMetadata[key]) {
                     if (updatedMetadata[key].hasOwnProperty(subKey)) {
@@ -456,42 +432,45 @@ export function saveMetadata(event) { // Hela från script.js (ca rad 555-651) a
         }
     }
 
-    // Hantera pageTypes (från textarea med rader till komma-separerad sträng, bevarar ordning)
-    const pageTypesStringRaw = formData.get('pageTypes') || '';
-    const newPageTypesArray = pageTypesStringRaw.split(/\r?\n/).map(pt => pt.trim()).filter(Boolean);
-    const newPageTypesString = newPageTypesArray.join(','); // Behåller ordningen från textarean
-    if ((updatedMetadata.pageTypes || '') !== newPageTypesString) {
-        updatedMetadata.pageTypes = newPageTypesString;
+    const selectedMonitoringType = formData.get('monitoringType');
+    const monitoringTypeObject = MONITORING_TYPES.find(opt => opt.type === selectedMonitoringType) || MONITORING_TYPES[0];
+    if (JSON.stringify(updatedMetadata.monitoringType) !== JSON.stringify(monitoringTypeObject)) {
+        updatedMetadata.monitoringType = monitoringTypeObject;
         changed = true;
     }
 
-    // Hantera keywords (från textarea till array, bevarar ordning)
+    // Hantera pageTypes (från textarea med rader till array av strängar)
+    const pageTypesStringRaw = formData.get('pageTypes') || '';
+    const newPageTypesArray = pageTypesStringRaw.split(/\r?\n/).map(pt => pt.trim()).filter(Boolean);
+    if (JSON.stringify(updatedMetadata.pageTypes || []) !== JSON.stringify(newPageTypesArray)) {
+        updatedMetadata.pageTypes = newPageTypesArray; // Spara som array
+        changed = true;
+    }
+
     const keywordsString = formData.get('keywords') || '';
-    const newKeywords = keywordsString.split(/\r?\n/).map(k => k.trim()).filter(Boolean); // Bevarar ordningen
+    const newKeywords = keywordsString.split(/\r?\n/).map(k => k.trim()).filter(Boolean);
     if (JSON.stringify(updatedMetadata.keywords || []) !== JSON.stringify(newKeywords)) {
         updatedMetadata.keywords = newKeywords;
         changed = true;
     }
 
-    // Hantera contentTypes (från textarea till array av objekt, bevarar ordning)
     const contentTypesString = formData.get('contentTypes') || '';
-    const contentTypeTexts = contentTypesString.split(/\r?\n/).map(t => t.trim()).filter(Boolean); // Bevarar ordningen
+    const contentTypeTexts = contentTypesString.split(/\r?\n/).map(t => t.trim()).filter(Boolean);
     const newContentTypes = [];
     const seenIds = new Set();
-    const newIdMap = new Map(); // För synkronisering
-    contentTypeTexts.forEach(text => { // Loopar i den ordning de skrevs
+    const newIdMap = new Map();
+    contentTypeTexts.forEach(text => {
         const id = generateKeyFromName(text);
         if (id && !seenIds.has(id)) {
             newContentTypes.push({ id: id, text: text });
             seenIds.add(id);
-            newIdMap.set(text, id); // För synkning
+            newIdMap.set(text, id);
         } else if (id && seenIds.has(id)) {
             console.warn(`Duplicate content type ID generated for "${text}", skipping.`);
         } else {
             console.warn(`Could not generate valid ID for content type "${text}", skipping.`);
         }
     });
-    // Ingen sortering här: newContentTypes.sort((a, b) => a.text.localeCompare(b.text, 'sv'));
     
     let contentTypesChangedFlag = JSON.stringify(originalContentTypes) !== JSON.stringify(newContentTypes);
     if (contentTypesChangedFlag) {
@@ -509,9 +488,9 @@ export function saveMetadata(event) { // Hela från script.js (ca rad 555-651) a
 
         const idUpdateMap = new Map();
         originalContentTypes.forEach(oldCt => {
-            const newIdForOldText = newIdMap.get(oldCt.text);
-            if (newIdForOldText && newIdForOldText !== oldCt.id) {
-                idUpdateMap.set(oldCt.id, newIdForOldText);
+            const newCtEntry = newContentTypes.find(nc => nc.text === oldCt.text);
+            if (newCtEntry && newCtEntry.id !== oldCt.id) {
+                idUpdateMap.set(oldCt.id, newCtEntry.id);
             }
         });
         if (idUpdateMap.size > 0) console.log("Uppdateringar av innehållstyp-ID (gammalt -> nytt):", idUpdateMap);
@@ -537,13 +516,11 @@ export function saveMetadata(event) { // Hela från script.js (ca rad 555-651) a
          else console.log("Inga krav behövde uppdateras p.g.a ändrade innehållstyper.")
     }
 
-
     if (changed) {
         state.jsonData.metadata = updatedMetadata;
         state.setState('isDataModified', true);
         if (saveChangesButton) saveChangesButton.classList.remove('hidden');
-
-        displayMetadata(); // Re-render metadata view directly
+        displayMetadata();
         const targetArea = document.getElementById('dynamicContentArea');
         if(targetArea) {
             let confMessage = 'Metadata uppdaterad!';
@@ -553,10 +530,11 @@ export function saveMetadata(event) { // Hela från script.js (ca rad 555-651) a
             confMessage += ' Glöm inte att spara ner filen.';
             displayConfirmation(confMessage, 'save', targetArea);
         }
+        console.log("Metadata ändrades och state uppdaterades.");
     } else {
-        displayMetadata(); // No changes detected, just go back to display view
+        displayMetadata();
         console.log("Inga ändringar i metadata upptäcktes.");
     }
-} // Slut på saveMetadata
+}
 
-console.log("Module loaded: metadata_functions (full attempt)");
+console.log("Module loaded: metadata_functions (fuller attempt)");

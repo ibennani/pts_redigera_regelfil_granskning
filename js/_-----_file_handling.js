@@ -8,7 +8,7 @@ import {
 } from './_-----_dom_element_references.js';
 import {
     MONITORING_TYPES, STANDARD_REQUIREMENT_KEYS, REQUIREMENT_KEY_DEFAULTS, ICONS
-} from './_-----_constants.js'; // Will now include expectedObservation constants
+} from './_-----_constants.js';
 import * as state from './_-----_global_state.js';
 import { escapeHtml, getVal, generateKeyFromName, generateRequirementKey } from './_-----_utils__helpers.js';
 import { initializeUI, setupContentArea, showError, resetUI, displayConfirmation } from './_-----_ui_functions.js';
@@ -18,16 +18,15 @@ import { initializeUI, setupContentArea, showError, resetUI, displayConfirmation
 /**
  * Hanterar händelsen när en fil väljs i filuppladdningsfältet.
  */
-export function handleFileUpload(event) { // Exporteras direkt
+export function handleFileUpload(event) {
     const file = event.target.files[0];
-    // Reset state on new file upload
     state.setState('jsonData', null); state.setState('currentRequirementKey', null); state.setState('lastFocusedReqKey', null);
     state.setState('isDataModified', false); state.setState('currentSortOrder', 'category-asc'); state.setState('currentSearchTerm', '');
     if (sortOrderSelect) sortOrderSelect.value = state.currentSortOrder; if (searchInput) searchInput.value = '';
 
     if (!file) { console.log("Ingen fil vald."); resetFileInput(); return; }
     const errorContainer = document.getElementById('uploadSection') || contentDisplay;
-    if (file.type !== 'application/json') { showError(`Felaktig filtyp. Välj en .json-fil.`, errorContainer); resetFileInput(); return; } // More specific error
+    if (file.type !== 'application/json') { showError(`Felaktig filtyp. Välj en .json-fil.`, errorContainer); resetFileInput(); return; }
 
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -37,37 +36,43 @@ export function handleFileUpload(event) { // Exporteras direkt
             if (!parsedJson.metadata || typeof parsedJson.metadata !== 'object') throw new Error('JSON saknar nyckeln "metadata" på toppnivå.');
             if (!parsedJson.requirements || typeof parsedJson.requirements !== 'object') throw new Error('JSON saknar nyckeln "requirements" på toppnivå.');
 
-            // Add default monitoringType if missing (good practice)
             if (!parsedJson.metadata.monitoringType) {
                 console.warn("Metadata saknar 'monitoringType'. Lägger till default.");
                 const defaultType = MONITORING_TYPES.find(t => t.type === 'web') || MONITORING_TYPES[0];
                 parsedJson.metadata.monitoringType = defaultType ? { ...defaultType } : { type: "unknown", text: "Okänd" };
             }
+            // Konvertera pageTypes från sträng till array om den finns som sträng vid inladdning
+            if (parsedJson.metadata.pageTypes && typeof parsedJson.metadata.pageTypes === 'string') {
+                console.log("Konverterar metadata.pageTypes från sträng till array vid inladdning.");
+                parsedJson.metadata.pageTypes = parsedJson.metadata.pageTypes.split(',').map(pt => pt.trim()).filter(Boolean);
+            } else if (!parsedJson.metadata.pageTypes) {
+                parsedJson.metadata.pageTypes = []; // Säkerställ att det är en array om det saknas
+            }
+
+
             state.setState('jsonData', parsedJson);
             console.log("JSON-fil parsades framgångsrikt:", state.jsonData);
-            state.setState('isDataModified', false); // Reset modification flag on successful load
+            state.setState('isDataModified', false);
 
-            // Update UI
             if (contentDisplay) contentDisplay.classList.add('hidden');
             if (postUploadControlsContainer) postUploadControlsContainer.classList.remove('hidden');
             if (controlsDivider) controlsDivider.classList.remove('hidden');
-            if (saveChangesButton) saveChangesButton.classList.add('hidden'); // Hide save initially
-            if (filterSortRow) filterSortRow.classList.add('hidden'); // Hide filter/sort initially
+            if (saveChangesButton) saveChangesButton.classList.add('hidden');
+            if (filterSortRow) filterSortRow.classList.add('hidden');
 
             if (dynamicContentArea) {
-                setupContentArea(true, false); // Clear area, don't show filter/sort yet
-                dynamicContentArea.innerHTML = `<p>Regelfil <strong>${escapeHtml(file.name)}</strong> laddades upp.</p><p>Version: ${escapeHtml(state.jsonData?.metadata?.version || 'okänd')}.</p><p>Välj vad du vill visa med knapparna ovan.</p>`; // More guidance
+                setupContentArea(true, false);
+                dynamicContentArea.innerHTML = `<p>Regelfil <strong>${escapeHtml(file.name)}</strong> laddades upp.</p><p>Version: ${escapeHtml(state.jsonData?.metadata?.version || 'okänd')}.</p><p>Välj vad du vill visa med knapparna ovan.</p>`;
             } else { console.error("Dynamic content area not found!"); alert("Kunde inte visa innehållsområdet."); }
             console.log("UI uppdaterat efter lyckad filuppladdning.");
 
         } catch (error) {
             console.error("Fel vid parsning av JSON:", error);
-            resetUI(); // Reset entire UI on parse error
-            // Show error in the initial upload area if possible
+            resetUI();
             showError(`Kunde inte läsa JSON-filen. Kontrollera att filen är korrekt formaterad. Fel: ${escapeHtml(error.message)}`, uploadSection || contentDisplay);
         }
         finally {
-            resetFileInput(); // Always reset file input
+            resetFileInput();
         }
     };
     reader.onerror = (e) => {
@@ -82,9 +87,9 @@ export function handleFileUpload(event) { // Exporteras direkt
 /**
  * Återställer filinput-fältet.
  */
-export function resetFileInput() { // Exporteras direkt
+export function resetFileInput() {
     if (fileInput) {
-        fileInput.value = ''; // Clear the selected file
+        fileInput.value = '';
     }
 }
 
@@ -93,60 +98,36 @@ export function resetFileInput() { // Exporteras direkt
  */
 function updateVersion() {
     if (!state.jsonData?.metadata) return;
-
     const now = new Date();
     const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth() + 1; // Månader är 1-12
-
-    const existingVersion = state.jsonData.metadata.version || '0.0.r0'; // Fallback med nya formatet
-    let existingYear = 0;
-    let existingMonth = 0;
-    let existingSeq = 0;
-
-    // Försök tolka befintlig version (ÅÅÅÅ.M.rSeq) med regex
+    const currentMonth = now.getMonth() + 1;
+    const existingVersion = state.jsonData.metadata.version || '0.0.r0';
+    let existingYear = 0, existingMonth = 0, existingSeq = 0;
     const versionRegex = /^(\d{4})\.(\d{1,2})\.r(\d+)$/;
     const match = existingVersion.match(versionRegex);
-
     if (match) {
         const yearPart = parseInt(match[1], 10);
         const monthPart = parseInt(match[2], 10);
         const seqPart = parseInt(match[3], 10);
-
-        // Check if parts are valid numbers and month is within range
         if (!isNaN(yearPart) && !isNaN(monthPart) && !isNaN(seqPart) && monthPart >= 1 && monthPart <= 12) {
-            existingYear = yearPart;
-            existingMonth = monthPart;
-            existingSeq = seqPart;
+            existingYear = yearPart; existingMonth = monthPart; existingSeq = seqPart;
         } else {
             console.warn(`Ogiltigt värde i befintligt versionsformat: "${existingVersion}". Återställer sekvens.`);
-            existingYear = 0; existingMonth = 0; // Force reset
+            existingYear = 0; existingMonth = 0;
         }
     } else {
         console.warn(`Oväntat befintligt versionsformat: "${existingVersion}". Försöker inte återanvända, återställer sekvens.`);
-        existingYear = 0; existingMonth = 0; // Force reset
+        existingYear = 0; existingMonth = 0;
     }
-
-    let newSeq;
-    // Jämför med nuvarande år och månad
-    if (currentYear === existingYear && currentMonth === existingMonth) {
-        // Samma år och månad: öka sekvens
-        newSeq = existingSeq + 1;
-    } else {
-        // Nytt år eller månad: återställ sekvens till 1
-        newSeq = 1;
-    }
-
-    // Skapa ny versionsträng med det nya formatet
-    const newVersion = `${currentYear}.${currentMonth}.r${newSeq}`;
-    state.jsonData.metadata.version = newVersion; // Uppdatera state
+    let newSeq = (currentYear === existingYear && currentMonth === existingMonth) ? existingSeq + 1 : 1;
+    state.jsonData.metadata.version = `${currentYear}.${currentMonth}.r${newSeq}`;
     console.log(`Version uppdaterad till: ${state.jsonData.metadata.version}`);
 }
-
 
 /**
  * Uppdaterar datumet för senaste ändring i metadata till dagens datum (YYYY-MM-DD).
  */
-function updateDateModified() { // Ingen ändring här
+function updateDateModified() {
     if (!state.jsonData?.metadata) return;
     const now = new Date();
     const year = now.getFullYear();
@@ -159,145 +140,175 @@ function updateDateModified() { // Ingen ändring här
 /**
  * Förbereder JSON-datan för nedladdning, säkerställer att alla standardnycklar finns,
  * uppdaterar version/datum, och triggar nedladdningen.
- * Implicit uppdaterad genom ändrade konstanter.
+ * UPPDATERAD för att följa de nya kraven på JSON-struktur.
  */
-export function downloadJsonFile() { // Exporteras direkt
+export function downloadJsonFile() {
     if (!state.jsonData) { showError("Ingen data att spara.", dynamicContentArea || contentDisplay); return; }
 
     try {
-        updateVersion(); // Update version number
-        updateDateModified(); // Update modification date
+        updateVersion();
+        updateDateModified();
 
         const currentVersion = state.jsonData.metadata.version || 'okänd-version';
         const title = state.jsonData.metadata?.title || 'kravdata';
-
-        // Create safe filename parts
         let safeTitle = title.toLowerCase().replace(/[åä]/g, 'a').replace(/ö/g, 'o');
         safeTitle = safeTitle.replace(/[^a-z0-9_\-]/g, '_').replace(/_+/g, '_').replace(/^_+|_+$/g, '');
-        safeTitle = safeTitle || 'kravdata'; // Fallback if title becomes empty
-        const safeVersion = String(currentVersion).replace(/\./g, '_'); // Replace dots with underscores
-
+        safeTitle = safeTitle || 'kravdata';
+        const safeVersion = String(currentVersion).replace(/\./g, '_');
         const filename = `${safeTitle}_${safeVersion}.json`;
         console.log(`Förbereder nedladdning. Filnamn: ${filename}`);
 
-        // Process requirements to ensure all standard keys exist and have defaults if missing
+        // Skapa en djup kopia av jsonData för att modifiera inför sparande
+        const dataToSave = JSON.parse(JSON.stringify(state.jsonData));
+
+        // 1. Säkerställ att metadata.pageTypes är en array av strängar
+        if (dataToSave.metadata.pageTypes && typeof dataToSave.metadata.pageTypes === 'string') {
+            // Om det fortfarande är en sträng, konvertera (detta bör hanteras av saveMetadata nu)
+            dataToSave.metadata.pageTypes = dataToSave.metadata.pageTypes.split(/\r?\n|,/) // Hantera både newline och komma
+                .map(pt => pt.trim()).filter(Boolean);
+        } else if (!Array.isArray(dataToSave.metadata.pageTypes)) {
+            dataToSave.metadata.pageTypes = []; // Default till tom array om fel typ eller saknas
+        }
+        // Säkerställ att varje element är en sträng
+        dataToSave.metadata.pageTypes = dataToSave.metadata.pageTypes.map(pt => String(pt).trim()).filter(Boolean);
+
+
+        // 2. Säkerställ att metadata.contentTypes har korrekt struktur
+        if (Array.isArray(dataToSave.metadata.contentTypes)) {
+            dataToSave.metadata.contentTypes = dataToSave.metadata.contentTypes.map(ct => {
+                let text = '';
+                let id = '';
+                if (typeof ct === 'object' && ct !== null) {
+                    text = String(ct.text || '').trim();
+                    id = String(ct.id || '').trim();
+                } else if (typeof ct === 'string') { // Om det av misstag är en sträng
+                    text = ct.trim();
+                }
+
+                if (!text) return null; // Hoppa över om text saknas
+
+                // Korrigera text till stor begynnelsebokstav (förenklad)
+                text = text.charAt(0).toUpperCase() + text.slice(1);
+                
+                // Generera id om den saknas eller är felaktig
+                if (!id || id !== generateKeyFromName(text)) {
+                    id = generateKeyFromName(text);
+                }
+                
+                return { id: id, text: text };
+            }).filter(Boolean); // Ta bort null-värden
+        } else {
+            dataToSave.metadata.contentTypes = []; // Default till tom array
+        }
+
+        // 3. Kontrollera metadata.monitoringType
+        if (!dataToSave.metadata.monitoringType ||
+            typeof dataToSave.metadata.monitoringType.type !== 'string' ||
+            typeof dataToSave.metadata.monitoringType.text !== 'string') {
+            console.warn("metadata.monitoringType har felaktig struktur eller saknas. Sätter default.");
+            const defaultMonType = MONITORING_TYPES.find(t => t.type === 'web') || MONITORING_TYPES[0] || {type: "unknown", text: "Okänd"};
+            dataToSave.metadata.monitoringType = { ...defaultMonType };
+        }
+
+        // 4. Bearbeta requirements för att säkerställa obligatoriska fält och standardstruktur
         const processedRequirements = {};
-        if (state.jsonData.requirements && typeof state.jsonData.requirements === 'object') {
-            for (const key in state.jsonData.requirements) {
-                if (Object.prototype.hasOwnProperty.call(state.jsonData.requirements, key)) {
-                    const originalReq = state.jsonData.requirements[key];
-                    // Skip if requirement is not a valid object
+        if (dataToSave.requirements && typeof dataToSave.requirements === 'object') {
+            for (const key in dataToSave.requirements) {
+                if (Object.prototype.hasOwnProperty.call(dataToSave.requirements, key)) {
+                    const originalReq = dataToSave.requirements[key];
                     if (typeof originalReq !== 'object' || originalReq === null) {
-                        console.warn(`Requirement with key "${key}" is not an object, skipping.`);
+                        console.warn(`Requirement with key "${key}" är inte ett objekt, skippar.`);
                         continue;
                     }
 
-                    const processedReq = {};
-                    // Ensure all STANDARD keys are present
-                    STANDARD_REQUIREMENT_KEYS.forEach(stdKey => {
-                        // Check if the key exists and has a non-null/undefined value in the original
-                        if (Object.prototype.hasOwnProperty.call(originalReq, stdKey) && originalReq[stdKey] !== null && originalReq[stdKey] !== undefined) {
-                             // Specific handling for complex nested structures (metadata, standardReference)
-                            if (stdKey === 'metadata') {
-                                const origMeta = originalReq.metadata || {};
-                                const defaultMeta = REQUIREMENT_KEY_DEFAULTS.metadata;
-                                // Deep clone default impact first
-                                processedReq.metadata = {
-                                    // Ensure category objects exist or use defaults
-                                    mainCategory: {},
-                                    subCategory: {},
-                                    impact: JSON.parse(JSON.stringify(defaultMeta.impact)) // Start with default impact
-                                };
-                                // Populate impact from original if it exists and is an object
-                                if(origMeta.impact && typeof origMeta.impact === 'object') {
-                                    processedReq.metadata.impact.isCritical = origMeta.impact.isCritical ?? defaultMeta.impact.isCritical;
-                                    processedReq.metadata.impact.primaryScore = origMeta.impact.primaryScore ?? defaultMeta.impact.primaryScore;
-                                    processedReq.metadata.impact.secondaryScore = origMeta.impact.secondaryScore ?? defaultMeta.impact.secondaryScore;
-                                    processedReq.metadata.impact.assumedCompliance = origMeta.impact.assumedCompliance ?? defaultMeta.impact.assumedCompliance;
-                                }
-                                 // Handle categories (ensure object format {text, key})
-                                ['mainCategory', 'subCategory'].forEach(catKey => {
-                                    let catValue = origMeta[catKey];
-                                    const defaultCat = defaultMeta[catKey]; // {text:"", key:""}
-                                     if (typeof catValue === 'string') {
-                                         // Convert string to object format
-                                        processedReq.metadata[catKey] = { text: catValue, key: generateKeyFromName(catValue) || "" };
-                                     } else if (typeof catValue === 'object' && catValue !== null) {
-                                         // Ensure text and key exist in the object
-                                         processedReq.metadata[catKey] = {
-                                            text: catValue.text ?? "",
-                                            key: catValue.key ?? (catValue.text ? generateKeyFromName(catValue.text) : "")
-                                        };
-                                    } else {
-                                        // Use default if missing or invalid type
-                                         processedReq.metadata[catKey] = JSON.parse(JSON.stringify(defaultCat));
-                                    }
-                                     // Special case: subCategory object with empty text should become ""
-                                     if (catKey === 'subCategory' && !processedReq.metadata.subCategory?.text) {
-                                         processedReq.metadata.subCategory = "";
-                                     }
-                                });
+                    const processedReq = { ...originalReq }; // Börja med en kopia
 
-                            } else if (stdKey === 'standardReference') {
-                                // Handle potential string or object format
-                                if (typeof originalReq.standardReference === 'object' && originalReq.standardReference !== null) {
-                                    processedReq.standardReference = {
-                                        text: originalReq.standardReference.text ?? "",
-                                        url: originalReq.standardReference.url ?? ""
-                                    };
-                                    // If both are empty, save as empty string instead of empty object
-                                    if (!processedReq.standardReference.text && !processedReq.standardReference.url) {
-                                        processedReq.standardReference = "";
-                                    }
-                                } else if (typeof originalReq.standardReference === 'string') {
-                                    // Keep string if it was originally a string
-                                    processedReq.standardReference = originalReq.standardReference;
-                                } else {
-                                    // Default to empty string if missing or invalid
-                                    processedReq.standardReference = "";
-                                }
-                             } else if (Array.isArray(originalReq[stdKey])) {
-                                // Deep clone arrays
-                                processedReq[stdKey] = JSON.parse(JSON.stringify(originalReq[stdKey]));
-                            } else if (typeof originalReq[stdKey] === 'object' && originalReq[stdKey] !== null) {
-                                // Deep clone other objects
-                                processedReq[stdKey] = JSON.parse(JSON.stringify(originalReq[stdKey]));
-                            } else {
-                                // Copy primitive values directly
-                                processedReq[stdKey] = originalReq[stdKey];
-                            }
-                        } else {
-                            // Key does not exist or is null/undefined in original, use default
+                    // Säkerställ metadata och dess underfält
+                    processedReq.metadata = processedReq.metadata || {};
+                    processedReq.metadata.mainCategory = processedReq.metadata.mainCategory || REQUIREMENT_KEY_DEFAULTS.metadata.mainCategory;
+                    // (subCategory och impact hanteras av STANDARD_REQUIREMENT_KEYS nedan om de saknas helt)
+
+                    // Säkerställ titel
+                    processedReq.title = processedReq.title || REQUIREMENT_KEY_DEFAULTS.title;
+                    if (!processedReq.title) console.warn(`Krav ${key} saknar titel.`);
+
+                    // Säkerställ standardReference struktur
+                    if (typeof processedReq.standardReference !== 'object' || processedReq.standardReference === null) {
+                        processedReq.standardReference = { text: "", url: "" };
+                    }
+                    processedReq.standardReference.text = processedReq.standardReference.text || "";
+                    processedReq.standardReference.url = processedReq.standardReference.url || "";
+                    if (!processedReq.standardReference.text) console.warn(`Krav ${key} saknar standardReference.text.`);
+
+
+                    // Säkerställ instructions (array av objekt med id och text)
+                    processedReq.instructions = Array.isArray(processedReq.instructions) ? processedReq.instructions : [];
+                    processedReq.instructions = processedReq.instructions.map((instr, idx) => {
+                        if (typeof instr === 'object' && instr !== null) {
+                            return { id: String(instr.id || idx + 1), text: String(instr.text || '') };
+                        }
+                        return { id: String(idx + 1), text: String(instr || '') }; // Om det bara är en sträng
+                    });
+                    if (processedReq.instructions.length === 0) console.warn(`Krav ${key} saknar instruktioner.`);
+
+
+                    // Säkerställ checks (array av objekt med condition och passCriteria)
+                    processedReq.checks = Array.isArray(processedReq.checks) ? processedReq.checks : [];
+                    processedReq.checks = processedReq.checks.map((chk, idx) => {
+                        let condition = "", passCriteria = [];
+                        if (typeof chk === 'object' && chk !== null) {
+                            condition = String(chk.condition || '');
+                            passCriteria = Array.isArray(chk.passCriteria) ? chk.passCriteria : [];
+                        }
+                        passCriteria = passCriteria.map((crit, cIdx) => {
+                             if (typeof crit === 'object' && crit !== null) {
+                                 return { id: String(crit.id || `${idx+1}.${cIdx+1}`), requirement: String(crit.requirement || '')};
+                             }
+                             return {id: String(`${idx+1}.${cIdx+1}`), requirement: String(crit || '')};
+                        });
+                        return { ...chk, id: String(chk.id || idx + 1), condition, passCriteria };
+                    });
+                     if (processedReq.checks.length === 0) console.warn(`Krav ${key} saknar checks.`);
+                     else if (processedReq.checks.some(c => !c.condition || c.passCriteria.length === 0)) {
+                         console.warn(`Krav ${key} har checks med saknad condition eller passCriteria.`);
+                     }
+
+
+                    // Säkerställ contentType (array av ID-strängar)
+                    processedReq.contentType = Array.isArray(processedReq.contentType) ? processedReq.contentType : [];
+                    processedReq.contentType = processedReq.contentType.map(ct => String(ct)).filter(Boolean);
+                    // Ytterligare validering: säkerställ att ID:n finns i metadata.contentTypes
+                    const validContentTypeIds = new Set(dataToSave.metadata.contentTypes.map(ct => ct.id));
+                    processedReq.contentType = processedReq.contentType.filter(id => {
+                        if (!validContentTypeIds.has(id)) {
+                            console.warn(`Krav ${key} refererar till ogiltigt contentType ID: ${id}. Tas bort.`);
+                            return false;
+                        }
+                        return true;
+                    });
+                     if (processedReq.contentType.length === 0) console.warn(`Krav ${key} saknar giltiga contentType.`);
+
+                    // Säkerställ att alla STANDARD_REQUIREMENT_KEYS finns (använder defaults)
+                    STANDARD_REQUIREMENT_KEYS.forEach(stdKey => {
+                        if (!Object.prototype.hasOwnProperty.call(processedReq, stdKey) || processedReq[stdKey] === null || processedReq[stdKey] === undefined) {
+                            console.log(`Lägger till defaultvärde för saknad nyckel '${stdKey}' i krav '${key}'`);
                             const defaultValue = REQUIREMENT_KEY_DEFAULTS[stdKey];
-                            // Deep clone default if it's an object/array to avoid reference issues
                             processedReq[stdKey] = (typeof defaultValue === 'object' && defaultValue !== null)
-                                ? JSON.parse(JSON.stringify(defaultValue))
+                                ? JSON.parse(JSON.stringify(defaultValue)) // Djup kopia för objekt/arrayer
                                 : defaultValue;
                         }
                     });
-
-                    // Copy any non-standard keys from the original requirement
-                     for (const originalKey in originalReq) {
-                         if (Object.prototype.hasOwnProperty.call(originalReq, originalKey) &&
-                             !Object.prototype.hasOwnProperty.call(processedReq, originalKey)) {
-                            // Deep clone if object/array
-                            processedReq[originalKey] = (typeof originalReq[originalKey] === 'object' && originalReq[originalKey] !== null)
-                                ? JSON.parse(JSON.stringify(originalReq[originalKey]))
-                                : originalReq[originalKey];
-                         }
-                    }
-
                     processedRequirements[key] = processedReq;
                 }
             }
         }
+        dataToSave.requirements = processedRequirements;
 
-        // Create the final data object to save
-        const dataToSave = { ...state.jsonData, requirements: processedRequirements };
-        const jsonString = JSON.stringify(dataToSave, null, 2); // Pretty print JSON
+
+        // 5. Skapa JSON-sträng och trigga nedladdning
+        const jsonString = JSON.stringify(dataToSave, null, 2);
         const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
 
-        // Trigger download using FileSaver.js if available, else fallback
         if (typeof saveAs === 'function') {
             saveAs(blob, filename);
             console.log(`FileSaver.js: Nedladdning av "${filename}" initierad.`);
@@ -314,42 +325,29 @@ export function downloadJsonFile() { // Exporteras direkt
             console.log(`Fallback Link Method: Nedladdning av "${filename}" initierad.`);
         }
 
-        // Reset modification flag and UI after successful save attempt
         state.setState('isDataModified', false);
         if (saveChangesButton) saveChangesButton.classList.add('hidden');
 
-        // Display inline confirmation message near the save button
         const controlsContainer = postUploadControlsContainer;
         if (controlsContainer) {
-             // Remove any existing inline confirmation first
             const existingSpan = controlsContainer.querySelector('.save-confirmation-inline');
             if(existingSpan) existingSpan.remove();
-
             const confirmationSpan = document.createElement('span');
             confirmationSpan.innerHTML = `${ICONS.confirm} Fil sparad (v ${escapeHtml(currentVersion)})!`;
             confirmationSpan.style.color = 'var(--success-color)';
             confirmationSpan.style.fontWeight = 'bold';
             confirmationSpan.style.marginLeft = '1em';
-            confirmationSpan.classList.add('save-confirmation-inline'); // Add class for potential removal
-
-            // Try to insert after the save button within the secondary controls
+            confirmationSpan.classList.add('save-confirmation-inline');
             const secondaryControls = controlsContainer.querySelector('.secondary-controls');
              if (secondaryControls && saveChangesButton && secondaryControls.contains(saveChangesButton)) {
-                 // Insert after save button if it's inside secondary controls
                  saveChangesButton.parentNode.insertBefore(confirmationSpan, saveChangesButton.nextSibling);
              } else if (saveChangesButton && controlsContainer.contains(saveChangesButton)) {
-                 // Fallback: insert after save button if it's directly under the main container
                  saveChangesButton.parentNode.insertBefore(confirmationSpan, saveChangesButton.nextSibling);
              } else {
-                 // Fallback: append to the main container if save button isn't found or positioned weirdly
                  controlsContainer.appendChild(confirmationSpan);
              }
-            // Remove the confirmation after a delay
-            setTimeout(() => {
-                confirmationSpan.remove();
-            }, 4000); // 4 seconds
+            setTimeout(() => { confirmationSpan.remove(); }, 4000);
         } else {
-            // Fallback alert if the container isn't found
              alert(`Filen sparades med version ${escapeHtml(currentVersion)}!`);
         }
 
@@ -358,9 +356,5 @@ export function downloadJsonFile() { // Exporteras direkt
         showError(`Kunde inte skapa filen för nedladdning. Fel: ${escapeHtml(error.message)}`, dynamicContentArea || contentDisplay);
     }
 }
-
-// INGEN export { ... } här eftersom alla exporterade funktioner
-// (handleFileUpload, resetFileInput, downloadJsonFile)
-// redan har 'export' vid sin definition.
 
 console.log("Module loaded: file_handling");
