@@ -132,48 +132,98 @@ function createInstructionListItem(text, index) {
 // createCheckFieldset (använder createFormField utan instruktionstext, oförändrad)
 function createCheckFieldset(checkData, index) {
     const fieldset = document.createElement('fieldset');
-    fieldset.classList.add('check-fieldset', 'dynamic-list-item'); fieldset.dataset.index = index;
-    const legend = document.createElement('legend'); legend.textContent = `Kontrollpunkt ${index + 1}`; fieldset.appendChild(legend);
-    const removeCheckButton = createDynamicListButton('Ta bort Kontrollpunkt', (e) => { e.target.closest('fieldset.check-fieldset')?.remove(); }, ['remove-item-button', 'remove-check-button', 'button-danger']);
-    removeCheckButton.setAttribute('aria-label', `Ta bort kontrollpunkt ${index + 1}`); fieldset.appendChild(removeCheckButton);
+    fieldset.classList.add('check-fieldset', 'dynamic-list-item');
+    fieldset.dataset.index = index;
 
-    // Notera: Ingen instruktionstext skickas med till createFormField här
-    const conditionContainer = createFormField(`Villkor*`, `check-${index}-condition`, checkData.condition || '', 'textarea', 'Beskriv när kontrollen ska utföras...');
+    const legend = document.createElement('legend');
+    legend.textContent = `Kontrollpunkt ${index + 1}`;
+    fieldset.appendChild(legend);
+
+    const removeCheckButton = createDynamicListButton(
+        'Ta bort Kontrollpunkt',
+        (e) => { e.target.closest('fieldset.check-fieldset')?.remove(); },
+        ['remove-item-button', 'remove-check-button', 'button-danger']
+    );
+    removeCheckButton.setAttribute('aria-label', `Ta bort kontrollpunkt ${index + 1}`);
+    fieldset.appendChild(removeCheckButton); // Placeras ofta uppe till höger i fieldset
+
+    // Villkor (som tidigare)
+    const conditionContainer = createFormField(
+        `Villkor*`,
+        `check-${index}-condition`,
+        checkData.condition || '',
+        'textarea',
+        'Beskriv när kontrollen ska utföras...'
+    );
     const conditionTextarea = conditionContainer.querySelector('textarea');
-    if (conditionTextarea) { conditionTextarea.rows = 2; conditionTextarea.required = true; }
+    if (conditionTextarea) {
+        conditionTextarea.rows = 2; // Kan justeras efter behov
+        conditionTextarea.required = true;
+    }
     fieldset.appendChild(conditionContainer);
 
-    const logicContainer = createFormField(`Logik för Godkänd-kriterier`, `check-${index}-logic`, '', 'select');
+    // Logik för Godkänd-kriterier (som tidigare)
+    const logicContainer = createFormField(
+        `Logik för Godkänd-kriterier`,
+        `check-${index}-logic`,
+        '', // Värdet sätts nedan
+        'select'
+    );
     const logicSelect = document.createElement('select');
     const logicId = logicContainer.querySelector('label')?.htmlFor || `check-${index}-logic-select`;
-    logicSelect.id = logicId; logicSelect.name = `check-${index}-logic`;
-    const optionAnd = document.createElement('option'); optionAnd.value = 'AND'; optionAnd.textContent = 'ALLA kriterier måste uppfyllas (AND)';
-    const optionOr = document.createElement('option'); optionOr.value = 'OR'; optionOr.textContent = 'Minst ETT kriterium måste uppfyllas (OR)';
-    logicSelect.appendChild(optionAnd); logicSelect.appendChild(optionOr);
-    logicSelect.value = checkData.logic || 'AND';
+    logicSelect.id = logicId;
+    logicSelect.name = `check-${index}-logic`;
+    const optionAnd = document.createElement('option');
+    optionAnd.value = 'AND';
+    optionAnd.textContent = 'ALLA kriterier måste uppfyllas (AND)';
+    const optionOr = document.createElement('option');
+    optionOr.value = 'OR';
+    optionOr.textContent = 'Minst ETT kriterium måste uppfyllas (OR)';
+    logicSelect.appendChild(optionAnd);
+    logicSelect.appendChild(optionOr);
+    logicSelect.value = checkData.logic || 'AND'; // Default till AND
     logicContainer.appendChild(logicSelect);
     fieldset.appendChild(logicContainer);
 
-    const passFieldset = document.createElement('fieldset'); passFieldset.classList.add('criteria-group');
-    const passLegend = document.createElement('legend'); passLegend.textContent = 'Godkänd-kriterier'; passFieldset.appendChild(passLegend);
-    const passList = document.createElement('ul'); passList.classList.add('pass-criteria-list', 'dynamic-list');
-    (checkData.passCriteria || []).forEach((crit, critIndex) => { passList.appendChild(createCriterionListItem(crit.requirement || '', index, 'pass', critIndex)); });
+    // Godkänd-kriterier (renderas nu direkt under logik)
+    const passFieldset = document.createElement('fieldset');
+    passFieldset.classList.add('criteria-group', 'pass-criteria-group'); // Ny klass för specifik styling
+    const passLegend = document.createElement('legend');
+    passLegend.textContent = 'Godkänd-kriterier';
+    passFieldset.appendChild(passLegend);
+    const passList = document.createElement('ul');
+    passList.classList.add('pass-criteria-list', 'dynamic-list');
+    (checkData.passCriteria || []).forEach((crit, critIndex) => {
+        passList.appendChild(createCriterionListItem(crit.requirement || '', index, 'pass', critIndex));
+    });
     passFieldset.appendChild(passList);
-    const addPassButton = createDynamicListButton('+ Lägg till Godkänd-kriterium', () => { passList.appendChild(createCriterionListItem('', index, 'pass', passList.children.length)); });
+    const addPassButton = createDynamicListButton('+ Lägg till Godkänd-kriterium', () => {
+        passList.appendChild(createCriterionListItem('', index, 'pass', passList.children.length));
+    });
     passFieldset.appendChild(addPassButton);
-    fieldset.appendChild(passFieldset);
+    fieldset.appendChild(passFieldset); // Lägg till i huvud-fieldset
 
-    const ifNoFieldset = document.createElement('fieldset'); ifNoFieldset.classList.add('criteria-group');
-    const ifNoLegend = document.createElement('legend'); ifNoLegend.textContent = '"Om Nej"-kriterier (Alternativ om ovan ej uppfylls)'; ifNoFieldset.appendChild(ifNoLegend);
-    const ifNoList = document.createElement('ul'); ifNoList.classList.add('if-no-criteria-list', 'dynamic-list');
-    (checkData.ifNo || []).forEach((crit, critIndex) => { ifNoList.appendChild(createCriterionListItem(crit.requirement || '', index, 'ifNo', critIndex)); });
+    // "Om Nej"-kriterier (renderas nu direkt under Godkänd-kriterier)
+    const ifNoFieldset = document.createElement('fieldset');
+    ifNoFieldset.classList.add('criteria-group', 'if-no-criteria-group'); // Ny klass för specifik styling
+    const ifNoLegend = document.createElement('legend');
+    ifNoLegend.textContent = '"Om Nej"-kriterier (Alternativ om ovan ej uppfylls)';
+    ifNoFieldset.appendChild(ifNoLegend);
+    const ifNoList = document.createElement('ul');
+    ifNoList.classList.add('if-no-criteria-list', 'dynamic-list');
+    (checkData.ifNo || []).forEach((crit, critIndex) => {
+        ifNoList.appendChild(createCriterionListItem(crit.requirement || '', index, 'ifNo', critIndex));
+    });
     ifNoFieldset.appendChild(ifNoList);
-    const addIfNoButton = createDynamicListButton('+ Lägg till "Om Nej"-kriterium', () => { ifNoList.appendChild(createCriterionListItem('', index, 'ifNo', ifNoList.children.length)); });
+    const addIfNoButton = createDynamicListButton('+ Lägg till "Om Nej"-kriterium', () => {
+        ifNoList.appendChild(createCriterionListItem('', index, 'ifNo', ifNoList.children.length));
+    });
     ifNoFieldset.appendChild(addIfNoButton);
-    fieldset.appendChild(ifNoFieldset);
+    fieldset.appendChild(ifNoFieldset); // Lägg till i huvud-fieldset
 
     return fieldset;
 }
+
 
 // createCriterionListItem (oförändrad)
 function createCriterionListItem(text, checkIndex, type, critIndex) {

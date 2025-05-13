@@ -126,7 +126,7 @@ h1 {
     border-bottom: 3px solid var(--primary-color);
     padding-bottom: 0.5rem;
     width: 100%;
-    max-width: 1100px;
+    max-width: 1300px; /* Ökad max-bredd för H1 */
 }
 
 /* Rubriker inuti dynamicContentArea */
@@ -205,12 +205,12 @@ button:disabled { background-color: var(--disabled-bg); color: var(--disabled-te
 
 
 /* --- Layout Containers --- */
-#postUploadControlsContainer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; margin-bottom: 0; padding: 0.75rem 1.5rem; background-color: var(--section-bg); border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; width: 95%; max-width: 1100px; box-shadow: 0 2px 5px rgba(0,0,0,0.06); }
+#postUploadControlsContainer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; margin-bottom: 0; padding: 0.75rem 1.5rem; background-color: var(--section-bg); border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; width: 95%; max-width: 1300px; /* Ökad max-bredd */ box-shadow: 0 2px 5px rgba(0,0,0,0.06); }
 #postUploadControlsContainer .main-controls, #postUploadControlsContainer .secondary-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
-#controlsDivider { border: none; border-top: 1px solid var(--border-color); margin: 0 auto 0 auto; width: 95%; max-width: 1100px; }
+#controlsDivider { border: none; border-top: 1px solid var(--border-color); margin: 0 auto 0 auto; width: 95%; max-width: 1300px; /* Ökad max-bredd */ }
 
-.content-container { margin-top: 1.5rem; margin-bottom: 2rem; padding: 1.5rem 2rem; border: 1px solid var(--border-color); border-radius: 8px; background-color: var(--section-bg); width: 95%; max-width: 1100px; text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
-#dynamicContentArea { margin-top: 0; margin-bottom: 2rem; padding: 1.5rem 2rem; border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 8px 8px; background-color: var(--section-bg); width: 95%; max-width: 1100px; text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.08); overflow-wrap: break-word; position: relative; }
+.content-container { margin-top: 1.5rem; margin-bottom: 2rem; padding: 1.5rem 2rem; border: 1px solid var(--border-color); border-radius: 8px; background-color: var(--section-bg); width: 95%; max-width: 1300px; /* Ökad max-bredd */ text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+#dynamicContentArea { margin-top: 0; margin-bottom: 2rem; padding: 1.5rem 2rem; border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 8px 8px; background-color: var(--section-bg); width: 95%; max-width: 1300px; /* Ökad max-bredd */ text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.08); overflow-wrap: break-word; position: relative; }
 #dynamicContentArea::after { content: ""; display: table; clear: both; }
 
 .hidden { display: none !important; }
@@ -222,25 +222,23 @@ button:disabled { background-color: var(--disabled-bg); color: var(--disabled-te
 label.button-like-label { margin: 0 auto 1rem auto; }
 
 /* --- Funktionsrad (Sök/Filter/Sort) under H2 --- */
-/* Denna ska finnas i index.html, men stylas här */
 .filter-sort-row {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 1rem; /* Behåll generellt gap */
+    gap: 1rem;
     width: 100%;
-    padding: 0.75rem 0; /* Luft runt */
+    padding: 0.75rem 0;
     margin-bottom: 1.5rem;
     border-bottom: 1px solid var(--border-color);
 }
-/* Anpassa så den visas INUTI #dynamicContentArea */
 #dynamicContentArea > .filter-sort-row {
-     margin-left: -2rem; /* Justera för padding i dynamicContentArea */
+     margin-left: -2rem;
      margin-right: -2rem;
-     margin-top: -1rem; /* Närmre H2 */
+     margin-top: -1rem;
      padding-left: 2rem;
      padding-right: 2rem;
-     width: calc(100% + 4rem); /* Kompensera för negativ marginal */
+     width: calc(100% + 4rem);
 }
 
 
@@ -249,9 +247,9 @@ label.button-like-label { margin: 0 auto 1rem auto; }
     display: flex;
     align-items: center;
     position: relative;
-    flex-grow: 1; /* Låt sökfältet växa */
-    min-width: 200px; /* Ge det lite minsta bredd */
-    max-width: 450px; /* Ge lite mer maxbredd */
+    flex-grow: 1;
+    min-width: 200px;
+    max-width: 450px;
 }
 #searchInput { padding: 0.6rem 0.8rem; padding-left: 2.5rem; border: 1px solid var(--neutral-color); border-radius: 4px; font-size: 0.95em; width: 100%; background-color: var(--section-bg); color: var(--text-color); }
 #searchInput:focus-visible { outline: 2px solid var(--focus-ring-color); outline-offset: 1px; border-color: var(--primary-color); box-shadow: 0 0 0 2px var(--secondary-color); }
@@ -259,22 +257,20 @@ label.button-like-label { margin: 0 auto 1rem auto; }
 .search-icon { position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); color: var(--neutral-color); font-size: 1.1em; pointer-events: none; }
 .visually-hidden { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px 1px 1px 1px); clip: rect(1px, 1px, 1px, 1px); white-space: nowrap; }
 
-/* Justering för sorteringskontrollerna inom raden */
 #sortControls {
     display: flex;
     align-items: center;
     gap: 0.5em;
-    flex-shrink: 0; /* Låt inte sorteringen krympa ihop */
-    flex-basis: auto; /* Låt den ta den bredd den behöver */
+    flex-shrink: 0;
+    flex-basis: auto;
 }
 #sortControls label { font-size: 0.9em; font-weight: 500; color: var(--text-color); white-space: nowrap; }
-#sortControls select { padding: 0.6rem 0.8rem; border-radius: 4px; border: 1px solid var(--neutral-color); background-color: var(--section-bg); color: var(--text-color); font-size: 0.9em; cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%2364748b%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%20clip-rule%3D%22evenodd%22%20%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.7em top 50%; background-size: 1.2em auto; padding-right: 2.5em; min-width: 180px; /* Ge dropdown lite utrymme */ }
+#sortControls select { padding: 0.6rem 0.8rem; border-radius: 4px; border: 1px solid var(--neutral-color); background-color: var(--section-bg); color: var(--text-color); font-size: 0.9em; cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%2364748b%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%20clip-rule%3D%22evenodd%22%20%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.7em top 50%; background-size: 1.2em auto; padding-right: 2.5em; min-width: 180px; }
 @media (prefers-color-scheme: dark) { #sortControls select { background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%23cbd5e1%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%20clip-rule%3D%22evenodd%22%20%2F%3E%3C%2Fsvg%3E'); border-color: var(--neutral-hover); } }
 #sortControls select:focus-visible { outline: 2px solid var(--focus-ring-color); outline-offset: 1px; border-color: var(--primary-color); }
 
-/* Flytta Lägg till-knappen (inom filterSortRow) */
 .filter-sort-row #addRequirementButton {
-    margin-left: auto; /* Tryck knappen till höger */
+    margin-left: auto;
     flex-shrink: 0;
 }
 
@@ -289,8 +285,6 @@ label.button-like-label { margin: 0 auto 1rem auto; }
 
 /* --- Requirement List Display --- */
 #dynamicContentArea ul.requirement-list { list-style: none; padding-left: 0; margin-top: 0; margin-bottom: 1.5rem; }
-/* Ta bort extra marginal för platt lista, hanteras av filterraden */
-/* #dynamicContentArea.flat-list-view > h2 + ul.requirement-list { margin-top: 1.5rem; } */
 #dynamicContentArea .requirement-item { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 1rem; margin-bottom: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; background-color: var(--section-bg); gap: 1rem; transition: background-color 0.1s ease; }
 #dynamicContentArea .requirement-item .requirement-text { flex-grow: 1; font-weight: 500; padding: 0.2em 0; border-radius: 2px; cursor: default; }
 #dynamicContentArea .requirement-item .requirement-text strong { color: var(--primary-color); margin-right: 0.5em; }
@@ -334,9 +328,9 @@ code, kbd, samp, pre { font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mon
 #dynamicContentArea.form-view .field-instruction { font-size: 0.85em; color: var(--neutral-color); margin-top: -0.2em; margin-bottom: 0.5em; }
 #dynamicContentArea.form-view input[type="text"], #dynamicContentArea.form-view input[type="email"], #dynamicContentArea.form-view input[type="url"], #dynamicContentArea.form-view input[type="date"], #dynamicContentArea.form-view input[type="number"], #dynamicContentArea.form-view select, #dynamicContentArea.form-view textarea { width: 100%; padding: 0.7rem 0.9rem; border: 1px solid var(--neutral-color); border-radius: 4px; font-size: 1em; font-family: inherit; background-color: var(--section-bg); color: var(--text-color); transition: border-color 0.2s, box-shadow 0.2s; }
 #dynamicContentArea.form-view .form-field-checkbox { display: flex; align-items: center; gap: 0.5em; }
-#dynamicContentArea.form-view input[type="checkbox"] { width: auto; margin-right: 0; accent-color: var(--primary-color); width: 1.2em; height: 1.2em; cursor: pointer; border: 1px solid var(--neutral-color); /* Lägg till ram för tydlighet */ background-color: var(--section-bg); appearance: none; -webkit-appearance: none; border-radius: 3px; position: relative; }
+#dynamicContentArea.form-view input[type="checkbox"] { width: auto; margin-right: 0; accent-color: var(--primary-color); width: 1.2em; height: 1.2em; cursor: pointer; border: 1px solid var(--neutral-color); background-color: var(--section-bg); appearance: none; -webkit-appearance: none; border-radius: 3px; position: relative; }
 #dynamicContentArea.form-view input[type="checkbox"]:checked::before { content: '✔'; position: absolute; top: -0.1em; left: 0.05em; color: var(--primary-color); font-size: 1.2em; line-height: 1; }
-@media (prefers-color-scheme: dark) { #dynamicContentArea.form-view input[type="checkbox"] { border-color: var(--neutral-hover); background-color: var(--section-bg); } #dynamicContentArea.form-view input[type="checkbox"]:checked::before { color: var(--primary-color); /* Behåll ljus bock */ } }
+@media (prefers-color-scheme: dark) { #dynamicContentArea.form-view input[type="checkbox"] { border-color: var(--neutral-hover); background-color: var(--section-bg); } #dynamicContentArea.form-view input[type="checkbox"]:checked::before { color: var(--primary-color); } }
 #dynamicContentArea.form-view .form-field-checkbox label { display: inline-block; margin-bottom: 0; cursor: pointer; font-weight: normal; }
 #dynamicContentArea.form-view input::placeholder, #dynamicContentArea.form-view textarea::placeholder { color: var(--placeholder-text); opacity: 1; }
 #dynamicContentArea.form-view textarea { resize: vertical; min-height: 80px; }
@@ -352,13 +346,84 @@ code, kbd, samp, pre { font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mon
 #dynamicContentArea.form-view .dynamic-list-item textarea { min-height: 40px; }
 #dynamicContentArea.form-view .remove-item-button { padding: 0.3rem 0.6rem; font-size: 0.85rem; flex-shrink: 0; margin-top: 0.2rem; line-height: 1.4; }
 #dynamicContentArea.form-view .add-item-button { display: block; margin-top: 0.5rem; padding: 0.4rem 0.8rem; font-size: 0.9rem; }
-#dynamicContentArea.form-view .check-fieldset { border: 1px solid var(--border-color); margin-bottom: 1.5rem; padding: 1rem 1.5rem; position: relative; background-color: var(--secondary-color); }
-#dynamicContentArea.form-view .check-fieldset > legend { background-color: var(--secondary-color); color: var(--heading-color); }
-#dynamicContentArea.form-view .remove-check-button { position: absolute; top: 0.5rem; right: 0.5rem; }
-#dynamicContentArea.form-view .criteria-group { border: 1px dotted var(--border-color); margin-top: 1rem; padding: 0.8rem 1rem; background-color: var(--section-bg); }
-#dynamicContentArea.form-view .criteria-group legend { font-size: 1em; font-weight: normal; color: var(--neutral-color); background-color: var(--section-bg); padding: 0 0.3em; }
-#dynamicContentArea.form-view .criteria-group .dynamic-list { margin-top: 0.3rem; margin-bottom: 0.5rem; }
-#dynamicContentArea.form-view .criteria-group .dynamic-list-item { border-style: solid; border-color: var(--border-color); background-color: var(--secondary-color); padding: 0.5rem 0.75rem; }
+
+
+/* === JUSTERADE REGLER FÖR KONTROLLPUNKTER (Försök 2) === */
+#dynamicContentArea.form-view .check-fieldset {
+    /* Gör .check-fieldset till en flex-container som staplar sina barn vertikalt */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* Får barnen att ta full bredd om de inte har egen bredd satt */
+    
+    border: 1px solid var(--border-color);
+    margin-bottom: 2rem; 
+    padding: 1.5rem; 
+    position: relative; 
+    background-color: var(--secondary-color); 
+    border-radius: 6px; 
+}
+
+#dynamicContentArea.form-view .check-fieldset > legend {
+    font-size: 1.2em; 
+    font-weight: 600;
+    padding: 0 0.5em;
+    background-color: var(--secondary-color); /* Matcha .check-fieldset bakgrund */
+    color: var(--heading-color);
+    margin-bottom: 1rem; /* Lite extra utrymme under huvud-legend */
+}
+
+#dynamicContentArea.form-view .remove-check-button {
+    position: absolute;
+    top: 1rem; 
+    right: 1rem; 
+}
+
+/* Generella styling för Villkor och Logik inom en kontrollpunkt */
+/* Dessa .form-field kommer nu att sträckas av .check-fieldset (pga align-items: stretch) */
+#dynamicContentArea.form-view .check-fieldset .form-field {
+    margin-bottom: 1.5rem; 
+}
+
+/* Styling för de inre grupperna (Godkänd-kriterier och OmNej-kriterier) */
+/* Dessa är nu direkta barn till .check-fieldset och kommer också sträckas */
+#dynamicContentArea.form-view .criteria-group {
+    /* display: block;  Behövs inte om föräldern är flex och align-items: stretch */
+    /* width: 100%;  Behövs inte om föräldern är flex och align-items: stretch */
+    box-sizing: border-box;
+    margin-top: 1.5rem; 
+    padding: 1rem 1.5rem;
+    background-color: var(--section-bg); 
+    border: 1px dotted var(--border-color);
+    border-radius: 4px;
+}
+
+#dynamicContentArea.form-view .criteria-group legend {
+    font-size: 1em;
+    font-weight: 500;
+    padding: 0 0.4em;
+    background-color: var(--section-bg); /* Matcha sin egen bakgrund */
+    color: var(--neutral-color);
+    margin-bottom: 0.75rem; /* Utrymme under legend för kriteriegrupp */
+}
+
+#dynamicContentArea.form-view .criteria-group .dynamic-list-item textarea {
+    width: 100%; 
+    min-height: 50px; 
+}
+
+#dynamicContentArea.form-view .criteria-group .add-item-button {
+    display: block; 
+    margin-top: 1rem; 
+    text-align: right; 
+}
+
+#dynamicContentArea.form-view .criteria-group .remove-item-button {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.8rem;
+    margin-left: 0.5rem; 
+}
+/* === SLUT PÅ JUSTERADE REGLER FÖR KONTROLLPUNKTER === */
+
 
 /* --- Delete Confirmation View --- */
 #dynamicContentArea.delete-confirmation-view { text-align: center; padding: 2rem; }
@@ -384,46 +449,52 @@ code, kbd, samp, pre { font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mon
 }
 
 /* --- Responsiveness --- */
-@media (max-width: 1200px) { #postUploadControlsContainer, #controlsDivider, #dynamicContentArea, .content-container { max-width: 95%; } h1 { max-width: 95%; } }
+@media (max-width: 1200px) { 
+    /* Behåll 1300px för de största, men anpassa för mindre skärmar vid behov */
+    /* #postUploadControlsContainer, #controlsDivider, #dynamicContentArea, .content-container, h1 { max-width: 95%; } */
+}
 
 @media (max-width: 768px) {
-    h1 { font-size: 1.8rem; }
+    h1 { font-size: 1.8rem; max-width: 95%;} 
     #dynamicContentArea h2 { font-size: 1.5rem; }
     #dynamicContentArea h3 { font-size: 1.2rem; }
-    #postUploadControlsContainer { flex-direction: column; align-items: stretch; }
+    #postUploadControlsContainer { flex-direction: column; align-items: stretch; max-width: 95%;}
     #postUploadControlsContainer .main-controls, #postUploadControlsContainer .secondary-controls { justify-content: center; }
     #postUploadControlsContainer button { width: 100%; margin: 0.3rem 0; justify-content: center;}
     #postUploadControlsContainer .secondary-controls { width: 100%; }
 
+    .content-container, #dynamicContentArea, #controlsDivider { max-width: 95%; }
+
+
     .filter-sort-row {
         flex-direction: column;
         align-items: stretch;
-        gap: 0.8rem; /* Lite mer luft när de staplas */
+        gap: 0.8rem;
     }
     .search-control {
-        max-width: none; /* Låt sök ta full bredd */
-        order: 2; /* Se till att sök kommer efter sortering */
+        max-width: none;
+        order: 2;
     }
     #sortControls {
-        justify-content: flex-start; /* Vänsterställ i mobil */
-        order: 1; /* Se till att sortering kommer först */
-        flex-direction: row; /* Behåll radlayout för label+select */
-        flex-wrap: wrap; /* Tillåt wrap om för trångt */
-        gap: 0.5rem; /* Återställ gap */
+        justify-content: flex-start;
+        order: 1;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem;
         width: 100%;
     }
     #sortControls label {
-        margin-bottom: 0; /* Ta bort ev. marginal */
+        margin-bottom: 0;
     }
     #sortControls select {
-        flex-grow: 1; /* Låt select ta upp resten av bredden */
-        min-width: 150px; /* Se till att den inte blir för smal */
+        flex-grow: 1;
+        min-width: 150px;
     }
     .filter-sort-row #addRequirementButton {
-        margin-left: 0; /* Ta bort automatisk marginal */
+        margin-left: 0;
         width: 100%;
-        order: 3; /* Lägg till-knapp sist */
-        margin-top: 0.5rem; /* Lite luft ovanför */
+        order: 3;
+        margin-top: 0.5rem;
     }
 
     #dynamicContentArea .requirement-item { flex-direction: column; align-items: flex-start; }
@@ -447,23 +518,23 @@ code, kbd, samp, pre { font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mon
     #postUploadControlsContainer button { width: 100%; margin: 0.3rem 0; justify-content: center; }
 
     .filter-sort-row {
-        gap: 0.5rem; /* Justera gap för minsta skärmar */
+        gap: 0.5rem;
         padding: 0.5rem 0;
     }
     #sortControls {
-        flex-direction: column; /* Stapla label och select */
+        flex-direction: column;
         align-items: stretch;
     }
     #sortControls label {
-        text-align: left; /* Vänsterställ label */
+        text-align: left;
         margin-bottom: 0.2rem;
     }
     #sortControls select {
-        width: 100%; /* Full bredd för select */
-        flex-grow: 0; /* Återställ grow */
+        width: 100%;
+        flex-grow: 0;
     }
     .filter-sort-row #addRequirementButton {
-        margin-top: 0.5rem; /* Behåll luft */
+        margin-top: 0.5rem;
     }
 
     #dynamicContentArea.form-view fieldset { padding: 0.8rem 1rem; }
@@ -472,8 +543,27 @@ code, kbd, samp, pre { font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mon
     #dynamicContentArea.form-view .dynamic-list-item { flex-direction: column; align-items: stretch; }
     #dynamicContentArea.form-view .dynamic-list-item textarea, #dynamicContentArea.form-view .dynamic-list-item select { margin-right: 0; margin-bottom: 0.5rem; }
     #dynamicContentArea.form-view .remove-item-button { align-self: flex-end; margin-top: 0; }
-    #dynamicContentArea.form-view .remove-check-button { position: static; float: right; margin-bottom: 0.5rem; }
-    #dynamicContentArea.form-view .check-fieldset::after { content: ""; display: table; clear: both; }
+    
+    /* Justeringar för kontrollpunkter på små skärmar */
+    #dynamicContentArea.form-view .check-fieldset {
+        padding: 1rem; /* Mindre padding */
+        /* Ingen flex-direction ändring behövs här, den är redan column */
+    }
+    #dynamicContentArea.form-view .remove-check-button {
+        position: static; 
+        float: right; 
+        margin-bottom: 0.5rem;
+    }
+    #dynamicContentArea.form-view .check-fieldset::after { 
+        content: "";
+        display: table;
+        clear: both;
+    }
+    #dynamicContentArea.form-view .criteria-group {
+        padding: 0.8rem 1rem;
+    }
+
+
     #dynamicContentArea.requirement-detail .action-button-container { padding: 0; margin-bottom: 1rem;}
     #dynamicContentArea.requirement-detail .action-button-container button { width: calc(50% - 0.25rem); margin: 0; }
 }
