@@ -119,8 +119,6 @@ body.dark-theme {
     color: var(--text-color);
 }
 
-/* Ta bort @media (prefers-color-scheme: dark) för :root variabeldefinitioner */
-
 * {
     box-sizing: border-box;
     margin: 0;
@@ -137,7 +135,6 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* background-color och color sätts nu av .light-theme / .dark-theme klasserna */
     line-height: 1.6;
     min-height: 100vh;
     transition: background-color 0.2s ease, color 0.2s ease;
@@ -182,12 +179,13 @@ h1 {
     max-width: 1300px;
 }
 
+/* Anpassade rubriker för #dynamicContentArea */
 #dynamicContentArea h2 {
     font-size: 1.6rem;
     border-bottom: 2px solid var(--border-color);
     padding-bottom: 0.4rem;
     width: 100%;
-    margin-top: 0;
+    margin-top: 0; /* Ta bort default top margin för första h2 i dynamicContentArea */
     margin-bottom: 0.5rem;
 }
 #dynamicContentArea h3 {
@@ -196,7 +194,7 @@ h1 {
     opacity: 0.9;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 0.3rem;
-    margin-top: 2rem;
+    margin-top: 2rem; /* Mer space ovanför H3 */
     margin-bottom: 1rem;
 }
 #dynamicContentArea h4 {
@@ -208,123 +206,576 @@ h1 {
     font-weight: 500;
 }
 
+/* Justering om action-knappar finns ovanför H2 i detaljvyn */
 #dynamicContentArea.requirement-detail .action-button-container + h2 {
-    margin-top: 0.5em;
+    margin-top: 0.5em; /* Minska space om knappar är ovanför */
 }
 
-button, .button-like-label { display: inline-flex; align-items: center; gap: 0.5em; padding: 0.6rem 1.2rem; font-size: 1rem; font-weight: 500; border: none; border-radius: 6px; cursor: pointer; transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease; margin: 0.3rem; text-decoration: none; text-align: center; background-color: var(--neutral-color); color: var(--neutral-text); }
-button:hover, .button-like-label:hover { background-color: var(--neutral-hover); }
-button:active, .button-like-label:active { transform: scale(0.98); }
-button:focus-visible, .button-like-label:focus-visible { outline: 3px solid var(--focus-ring-color); outline-offset: 2px; box-shadow: 0 0 0 4px var(--secondary-color); } /* Observera att box-shadow här använder --secondary-color, som byts med temat */
-button:disabled { background-color: var(--disabled-bg); color: var(--disabled-text); cursor: not-allowed; opacity: 0.7; }
-.icon { display: inline-block; font-size: 1.1em; line-height: 1; }
+/* Generella knappstilar */
+button, .button-like-styling { 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 0.5em; 
+    padding: 0.6rem 1.2rem; 
+    font-size: 1rem; 
+    font-weight: 500; 
+    border: none; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease; 
+    margin: 0.3rem; 
+    text-decoration: none; 
+    text-align: center; 
+    background-color: var(--neutral-color); 
+    color: var(--neutral-text); 
+}
+button:hover, .button-like-styling:hover { 
+    background-color: var(--neutral-hover); 
+}
+button:active, .button-like-styling:active { 
+    transform: scale(0.98); 
+}
+button:focus-visible, .button-like-styling:focus-visible { 
+    outline: 3px solid var(--focus-ring-color); 
+    outline-offset: 2px; 
+    box-shadow: 0 0 0 4px var(--secondary-color); 
+}
+button:disabled { 
+    background-color: var(--disabled-bg); 
+    color: var(--disabled-text); 
+    cursor: not-allowed; 
+    opacity: 0.7; 
+}
+.icon { 
+    display: inline-block; 
+    font-size: 1.1em; 
+    line-height: 1; 
+}
 
-.button-like-label, #showMetadataButton, #showRequirementsButton, #backButton,
+/* Specifika knappfärger */
+#uploadFileButton, #showMetadataButton, #showRequirementsButton, #backButton,
 #dynamicContentArea .form-view .form-buttons button[type="button"]:not(.button-danger),
 #dynamicContentArea.delete-confirmation-view .form-buttons button[type="button"]:not(.button-danger)
- { background-color: var(--neutral-color); color: var(--neutral-text); }
-.button-like-label:hover, #showMetadataButton:hover, #showRequirementsButton:hover, #backButton:hover,
+ { 
+    background-color: var(--neutral-color); 
+    color: var(--neutral-text); 
+}
+#uploadFileButton:hover, #showMetadataButton:hover, #showRequirementsButton:hover, #backButton:hover,
 #dynamicContentArea .form-view .form-buttons button[type="button"]:not(.button-danger):hover,
 #dynamicContentArea.delete-confirmation-view .form-buttons button[type="button"]:not(.button-danger):hover
-{ background-color: var(--neutral-hover); }
+{ 
+    background-color: var(--neutral-hover); 
+}
 
-#saveChangesButton, #dynamicContentArea.form-view .form-buttons button[type="submit"]
-{ background-color: var(--success-color); color: var(--success-text); }
-#saveChangesButton:hover, #dynamicContentArea.form-view .form-buttons button[type="submit"]:hover
-{ background-color: var(--success-hover); }
+#saveChangesButton, 
+#dynamicContentArea.form-view .form-buttons button[type="submit"]
+{ 
+    background-color: var(--success-color); 
+    color: var(--success-text); 
+}
+#saveChangesButton:hover, 
+#dynamicContentArea.form-view .form-buttons button[type="submit"]:hover
+{ 
+    background-color: var(--success-hover); 
+}
 
-#addRequirementButton, #dynamicContentArea .add-item-button {
-    background-color: var(--accent-color); color: var(--accent-text); }
-#addRequirementButton:hover, #dynamicContentArea .add-item-button:hover
-{ background-color: var(--accent-hover); }
+#addRequirementButton, 
+#dynamicContentArea .add-item-button { /* Gäller även knappar för att lägga till instruktioner/kriterier */
+    background-color: var(--accent-color); 
+    color: var(--accent-text); 
+}
+#addRequirementButton:hover, 
+#dynamicContentArea .add-item-button:hover
+{ 
+    background-color: var(--accent-hover); 
+}
 
-.button-danger, #dynamicContentArea .remove-item-button,
-#dynamicContentArea.delete-confirmation-view .button-danger
-{ background-color: var(--danger-color); color: var(--danger-text); }
-.button-danger:hover, #dynamicContentArea .remove-item-button:hover,
+.button-danger, 
+#dynamicContentArea .remove-item-button, /* Gäller alla ta-bort knappar i listor */
+#dynamicContentArea.delete-confirmation-view .button-danger /* Bekräfta radering */
+{ 
+    background-color: var(--danger-color); 
+    color: var(--danger-text); 
+}
+.button-danger:hover, 
+#dynamicContentArea .remove-item-button:hover,
 #dynamicContentArea.delete-confirmation-view .button-danger:hover
-{ background-color: var(--danger-hover); }
+{ 
+    background-color: var(--danger-hover); 
+}
 
-#dynamicContentArea .requirement-actions button { padding: 0.3rem 0.6rem; font-size: 0.85rem; gap: 0.3em; }
-#dynamicContentArea .requirement-actions button .icon { font-size: 1em; }
-#dynamicContentArea .req-view-button { background-color: var(--primary-color); color: var(--primary-text); }
-#dynamicContentArea .req-view-button:hover { background-color: var(--primary-hover); }
-#dynamicContentArea .req-edit-button { background-color: var(--warning-color); color: var(--warning-text); }
-#dynamicContentArea .req-edit-button:hover { background-color: var(--warning-hover); }
+/* Knappar i kravlistan (Visa, Redigera) */
+#dynamicContentArea .requirement-actions button { 
+    padding: 0.3rem 0.6rem; 
+    font-size: 0.85rem; 
+    gap: 0.3em; 
+}
+#dynamicContentArea .requirement-actions button .icon { 
+    font-size: 1em; 
+}
+#dynamicContentArea .req-view-button { 
+    background-color: var(--primary-color); 
+    color: var(--primary-text); 
+}
+#dynamicContentArea .req-view-button:hover { 
+    background-color: var(--primary-hover); 
+}
+#dynamicContentArea .req-edit-button { 
+    background-color: var(--warning-color); 
+    color: var(--warning-text); 
+}
+#dynamicContentArea .req-edit-button:hover { 
+    background-color: var(--warning-hover); 
+}
 
-#postUploadControlsContainer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; margin-bottom: 0; padding: 0.75rem 1.5rem; background-color: var(--section-bg); border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; width: 95%; max-width: 1300px; box-shadow: 0 2px 5px rgba(0,0,0,0.06); }
-#postUploadControlsContainer .main-controls, #postUploadControlsContainer .secondary-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
-#controlsDivider { border: none; border-top: 1px solid var(--border-color); margin: 0 auto 0 auto; width: 95%; max-width: 1300px; }
-.content-container { margin-top: 1.5rem; margin-bottom: 2rem; padding: 1.5rem 2rem; border: 1px solid var(--border-color); border-radius: 8px; background-color: var(--section-bg); width: 95%; max-width: 1300px; text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
-#dynamicContentArea { margin-top: 0; margin-bottom: 2rem; padding: 1.5rem 2rem; border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 8px 8px; background-color: var(--section-bg); width: 95%; max-width: 1300px; text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.08); overflow-wrap: break-word; position: relative; }
-#dynamicContentArea::after { content: ""; display: table; clear: both; }
-.hidden { display: none !important; }
+/* Layout för kontroller och innehållsområden */
+#postUploadControlsContainer { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    flex-wrap: wrap; 
+    gap: 1rem; 
+    margin-top: 1.5rem; 
+    margin-bottom: 0; /* Ingen marginal nertill */
+    padding: 0.75rem 1.5rem; 
+    background-color: var(--section-bg); 
+    border: 1px solid var(--border-color); 
+    border-bottom: none; /* Ingen border nertill, den tas av hr eller dynamicContentArea */
+    border-radius: 8px 8px 0 0; 
+    width: 95%; 
+    max-width: 1300px; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.06); 
+}
+#postUploadControlsContainer .main-controls, 
+#postUploadControlsContainer .secondary-controls { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 0.5rem; 
+    align-items: center; 
+}
+#controlsDivider { 
+    border: none; 
+    border-top: 1px solid var(--border-color); 
+    margin: 0 auto 0 auto; 
+    width: 95%; 
+    max-width: 1300px; 
+}
+.content-container { /* För initial uppladdningsvy */
+    margin-top: 1.5rem; 
+    margin-bottom: 2rem; 
+    padding: 1.5rem 2rem; 
+    border: 1px solid var(--border-color); 
+    border-radius: 8px; 
+    background-color: var(--section-bg); 
+    width: 95%; 
+    max-width: 1300px; 
+    text-align: left; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08); 
+}
+#dynamicContentArea { 
+    margin-top: 0; /* Ingen top-margin då den följer controlsDivider */
+    margin-bottom: 2rem; 
+    padding: 1.5rem 2rem; 
+    border: 1px solid var(--border-color); 
+    border-top: none; /* Ingen top-border om controlsDivider syns */
+    border-radius: 0 0 8px 8px; /* Rundade hörn bara nertill */
+    background-color: var(--section-bg); 
+    width: 95%; 
+    max-width: 1300px; 
+    text-align: left; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08); 
+    overflow-wrap: break-word; /* Förhindra overflow av långa ord */
+    position: relative; /* För positionering av interna element */
+}
+#dynamicContentArea::after { /* Clearfix för floats inuti (om det skulle behövas) */
+    content: ""; 
+    display: table; 
+    clear: both; 
+}
+.hidden { 
+    display: none !important; 
+}
 
-#uploadSection { text-align: center; padding: 2rem 1rem; }
-#uploadSection p { margin-bottom: 1rem; }
-#uploadSection .field-instruction { font-size: 0.9em; color: var(--neutral-color); margin-top: 0.5rem; }
-label.button-like-label { margin: 0 auto 1rem auto; }
+/* Uppladdningssektion */
+#uploadSection { 
+    text-align: center; 
+    padding: 2rem 1rem; 
+}
+#uploadSection p { 
+    margin-bottom: 1rem; 
+}
+#uploadSection .field-instruction { 
+    font-size: 0.9em; 
+    color: var(--neutral-color); 
+    margin-top: 0.5rem; 
+}
+#uploadFileButton { /* Används istället för label */
+    margin: 0 auto 1rem auto; 
+}
 
-.filter-sort-row { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; width: 100%; padding: 0.75rem 0; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
-#dynamicContentArea > .filter-sort-row { margin-left: -2rem; margin-right: -2rem; margin-top: -1rem; padding-left: 2rem; padding-right: 2rem; width: calc(100% + 4rem); }
-.search-control { display: flex; align-items: center; position: relative; flex-grow: 1; min-width: 200px; max-width: 450px; }
-#searchInput { padding: 0.6rem 0.8rem; padding-left: 2.5rem; border: 1px solid var(--neutral-color); border-radius: 4px; font-size: 0.95em; width: 100%; background-color: var(--section-bg); color: var(--text-color); }
-#searchInput:focus-visible { outline: 2px solid var(--focus-ring-color); outline-offset: 1px; border-color: var(--primary-color); box-shadow: 0 0 0 2px var(--secondary-color); } /* secondary-color ändras med temat */
-.search-icon { position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); color: var(--neutral-color); font-size: 1.1em; pointer-events: none; }
-.visually-hidden { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px 1px 1px 1px); clip: rect(1px, 1px, 1px, 1px); white-space: nowrap; }
-#sortControls { display: flex; align-items: center; gap: 0.5em; flex-shrink: 0; flex-basis: auto; }
-#sortControls label { font-size: 0.9em; font-weight: 500; color: var(--text-color); white-space: nowrap; }
-#sortControls select { padding: 0.6rem 0.8rem; border-radius: 4px; border: 1px solid var(--neutral-color); background-color: var(--section-bg); color: var(--text-color); font-size: 0.9em; cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%2364748b%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%20clip-rule%3D%22evenodd%22%20%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.7em top 50%; background-size: 1.2em auto; padding-right: 2.5em; min-width: 180px; }
-body.dark-theme #sortControls select { background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%23cbd5e1%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%20clip-rule%3D%22evenodd%22%20%2F%3E%3C%2Fsvg%3E'); }
-#sortControls select:focus-visible { outline: 2px solid var(--focus-ring-color); outline-offset: 1px; border-color: var(--primary-color); }
-.filter-sort-row #addRequirementButton { margin-left: auto; flex-shrink: 0; }
 
-#dynamicContentArea .metadata-item { margin-bottom: 1rem; padding: 0.75rem 1rem; border-left: 4px solid var(--accent-color); background-color: var(--secondary-color); border-radius: 4px; }
-#dynamicContentArea .metadata-item strong { color: var(--heading-color); display: block; margin-bottom: 0.3rem; font-size: 1.05em; }
-#dynamicContentArea .metadata-sub-item { margin-left: 1.5rem; font-size: 0.95em; margin-block-start: 0.4em; margin-block-end: 0.4em; }
-#dynamicContentArea .metadata-sub-item strong { display: inline; margin-right: 0.3rem; font-size: 1em; color: var(--heading-color); opacity: 0.8; }
-#dynamicContentArea a { color: var(--link-color); text-decoration: none; font-weight: 500; }
-#dynamicContentArea a:hover { color: var(--link-hover-color); text-decoration: underline; }
+/* Filter, Sortering, Sök-rad */
+.filter-sort-row { 
+    display: flex; 
+    flex-wrap: wrap; 
+    align-items: center; 
+    gap: 1rem; 
+    width: 100%; 
+    padding: 0.75rem 0; 
+    margin-bottom: 1.5rem; 
+    border-bottom: 1px solid var(--border-color); 
+}
+/* Om filter-sort-row är direkt barn till dynamicContentArea, justera padding */
+#dynamicContentArea > .filter-sort-row {
+    margin-left: -2rem; /* Kompensera för padding i dynamicContentArea */
+    margin-right: -2rem;
+    margin-top: -1rem; /* Kompensera för padding i dynamicContentArea */
+    padding-left: 2rem;
+    padding-right: 2rem;
+    width: calc(100% + 4rem); /* Full bredd inuti dynamicContentArea */
+}
+.search-control { 
+    display: flex; 
+    align-items: center; 
+    position: relative; 
+    flex-grow: 1; 
+    min-width: 200px; 
+    max-width: 450px; 
+}
+#searchInput { 
+    padding: 0.6rem 0.8rem; 
+    padding-left: 2.5rem; /* Plats för ikon */
+    border: 1px solid var(--neutral-color); 
+    border-radius: 4px; 
+    font-size: 0.95em; 
+    width: 100%; 
+    background-color: var(--section-bg); 
+    color: var(--text-color); 
+}
+#searchInput:focus-visible { 
+    outline: 2px solid var(--focus-ring-color); 
+    outline-offset: 1px; 
+    border-color: var(--primary-color); 
+    box-shadow: 0 0 0 2px var(--secondary-color); 
+}
+.search-icon { 
+    position: absolute; 
+    left: 0.8rem; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    color: var(--neutral-color); 
+    font-size: 1.1em; 
+    pointer-events: none; /* Ikonen ska inte vara klickbar */
+}
+.visually-hidden { /* För skärmläsare-labels */
+    position: absolute !important; 
+    height: 1px; width: 1px; 
+    overflow: hidden; 
+    clip: rect(1px 1px 1px 1px); 
+    clip: rect(1px, 1px, 1px, 1px); 
+    white-space: nowrap; 
+}
+#sortControls { 
+    display: flex; 
+    align-items: center; 
+    gap: 0.5em; 
+    flex-shrink: 0; 
+    flex-basis: auto; 
+}
+#sortControls label { 
+    font-size: 0.9em; 
+    font-weight: 500; 
+    color: var(--text-color); 
+    white-space: nowrap; 
+}
+#sortControls select { 
+    padding: 0.6rem 0.8rem; 
+    border-radius: 4px; 
+    border: 1px solid var(--neutral-color); 
+    background-color: var(--section-bg); 
+    color: var(--text-color); 
+    font-size: 0.9em; 
+    cursor: pointer; 
+    appearance: none; 
+    -webkit-appearance: none; 
+    -moz-appearance: none; 
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%2364748b%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%20clip-rule%3D%22evenodd%22%20%2F%3E%3C%2Fsvg%3E'); 
+    background-repeat: no-repeat; 
+    background-position: right 0.7em top 50%; 
+    background-size: 1.2em auto; 
+    padding-right: 2.5em; /* Plats för pilen */
+    min-width: 180px; 
+}
+body.dark-theme #sortControls select { /* Pil för mörkt tema */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%23cbd5e1%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%20clip-rule%3D%22evenodd%22%20%2F%3E%3C%2Fsvg%3E'); 
+}
+#sortControls select:focus-visible { 
+    outline: 2px solid var(--focus-ring-color); 
+    outline-offset: 1px; 
+    border-color: var(--primary-color); 
+}
+.filter-sort-row #addRequirementButton { 
+    margin-left: auto; /* Skjut knappen till höger */
+    flex-shrink: 0; 
+}
 
-#dynamicContentArea ul.requirement-list { list-style: none; padding-left: 0; margin-top: 0; margin-bottom: 1.5rem; }
-#dynamicContentArea .requirement-item { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 1rem; margin-bottom: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; background-color: var(--section-bg); gap: 1rem; transition: background-color 0.1s ease; }
-#dynamicContentArea .requirement-item .requirement-text { flex-grow: 1; font-weight: 500; padding: 0.2em 0; border-radius: 2px; cursor: default; }
-#dynamicContentArea .requirement-item .requirement-text strong { color: var(--primary-color); margin-right: 0.5em; }
-#dynamicContentArea .requirement-item .requirement-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
-#dynamicContentArea .requirement-item .requirement-text:focus { outline: 3px solid var(--focus-ring-color); outline-offset: 2px; background-color: var(--secondary-color); }
+/* Metadata visningsläge */
+#dynamicContentArea .metadata-item { 
+    margin-bottom: 1rem; 
+    padding: 0.75rem 1rem; 
+    border-left: 4px solid var(--accent-color); 
+    background-color: var(--secondary-color); 
+    border-radius: 4px; 
+}
+#dynamicContentArea .metadata-item strong { 
+    color: var(--heading-color); 
+    display: block; 
+    margin-bottom: 0.3rem; 
+    font-size: 1.05em; 
+}
+#dynamicContentArea .metadata-sub-item { 
+    margin-left: 1.5rem; 
+    font-size: 0.95em; 
+    margin-block-start: 0.4em; 
+    margin-block-end: 0.4em; 
+}
+#dynamicContentArea .metadata-sub-item strong { 
+    display: inline; 
+    margin-right: 0.3rem; 
+    font-size: 1em; 
+    color: var(--heading-color); 
+    opacity: 0.8; 
+}
+#dynamicContentArea a { 
+    color: var(--link-color); 
+    text-decoration: none; 
+    font-weight: 500; 
+}
+#dynamicContentArea a:hover { 
+    color: var(--link-hover-color); 
+    text-decoration: underline; 
+}
 
-#dynamicContentArea.requirement-detail { position: relative; }
-#dynamicContentArea.requirement-detail .action-button-container { position: absolute; top: 1.5rem; right: 1.5rem; display: flex; gap: 0.5rem; z-index: 10; }
-#dynamicContentArea.requirement-detail .action-button-container button { padding: 0.4rem 0.8rem; font-size: 0.9rem; }
-#dynamicContentArea.requirement-detail .category-info { font-style: italic; color: var(--neutral-color); margin-bottom: 0.5rem; font-size: 0.9em; }
-#dynamicContentArea.requirement-detail .impact-info { font-size: 0.9em; color: var(--neutral-color); margin-top: -0.5em; margin-bottom: 1rem; }
-#dynamicContentArea.requirement-detail .standard-ref { font-style: normal; color: var(--text-color); margin-bottom: 1.5rem; display: block; font-size: 0.95em; }
-#dynamicContentArea.requirement-detail .standard-ref strong { font-weight: 600; color: var(--heading-color); opacity: 1; margin-right: 0.3em; }
-#dynamicContentArea.requirement-detail .detail-section { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color); }
-#dynamicContentArea.requirement-detail .detail-section h3 { border: none; margin-bottom: 0.5rem; padding-bottom: 0; font-size: 1.2rem; color: var(--heading-color); }
-#dynamicContentArea.requirement-detail ol, #dynamicContentArea.requirement-detail ul { margin-left: 1.5rem; padding-left: 1rem; margin-bottom: 1rem; }
+/* Kravlistan (generell) */
+#dynamicContentArea ul.requirement-list { 
+    list-style: none; 
+    padding-left: 0; 
+    margin-top: 0; 
+    margin-bottom: 1.5rem; 
+}
+#dynamicContentArea .requirement-item { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 0.8rem 1rem; 
+    margin-bottom: 0.5rem; 
+    border: 1px solid var(--border-color); 
+    border-radius: 4px; 
+    background-color: var(--section-bg); 
+    gap: 1rem; 
+    transition: background-color 0.1s ease; 
+}
+#dynamicContentArea .requirement-item .requirement-text { 
+    flex-grow: 1; 
+    font-weight: 500; 
+    padding: 0.2em 0; 
+    border-radius: 2px; 
+    cursor: default; /* Ändra om texten ska vara klickbar */
+}
+#dynamicContentArea .requirement-item .requirement-text strong { 
+    color: var(--primary-color); 
+    margin-right: 0.5em; 
+}
+#dynamicContentArea .requirement-item .requirement-actions { 
+    display: flex; 
+    gap: 0.4rem; 
+    flex-shrink: 0; 
+}
+#dynamicContentArea .requirement-item .requirement-text:focus { /* För a11y */
+    outline: 3px solid var(--focus-ring-color); 
+    outline-offset: 2px; 
+    background-color: var(--secondary-color); 
+}
+
+/* Detaljvy för krav */
+#dynamicContentArea.requirement-detail { 
+    position: relative; /* För action-knappar */
+}
+#dynamicContentArea.requirement-detail .action-button-container { 
+    position: absolute; 
+    top: 1.5rem; 
+    right: 1.5rem; 
+    display: flex; 
+    gap: 0.5rem; 
+    z-index: 10; 
+}
+#dynamicContentArea.requirement-detail .action-button-container button { 
+    padding: 0.4rem 0.8rem; 
+    font-size: 0.9rem; 
+}
+#dynamicContentArea.requirement-detail .category-info { 
+    font-style: italic; 
+    color: var(--neutral-color); 
+    margin-bottom: 0.5rem; 
+    font-size: 0.9em; 
+}
+#dynamicContentArea.requirement-detail .impact-info { 
+    font-size: 0.9em; 
+    color: var(--neutral-color); 
+    margin-top: -0.5em; /* Dra upp lite närmare category-info */
+    margin-bottom: 1rem; 
+}
+#dynamicContentArea.requirement-detail .standard-ref { 
+    font-style: normal; 
+    color: var(--text-color); 
+    margin-bottom: 1.5rem; 
+    display: block; 
+    font-size: 0.95em; 
+}
+#dynamicContentArea.requirement-detail .standard-ref strong { 
+    font-weight: 600; 
+    color: var(--heading-color); 
+    opacity: 1; 
+    margin-right: 0.3em; 
+}
+#dynamicContentArea.requirement-detail .detail-section { 
+    margin-top: 1.5rem; 
+    padding-top: 1rem; 
+    border-top: 1px solid var(--border-color); 
+}
+#dynamicContentArea.requirement-detail .detail-section h3 { /* Rubriker inom sektioner */
+    border: none; 
+    margin-bottom: 0.5rem; 
+    padding-bottom: 0; 
+    font-size: 1.2rem; 
+    color: var(--heading-color); 
+}
+#dynamicContentArea.requirement-detail ol, 
+#dynamicContentArea.requirement-detail ul { 
+    margin-left: 1.5rem; /* Indrag för listor */
+    padding-left: 1rem; 
+    margin-bottom: 1rem; 
+}
 #dynamicContentArea.requirement-detail ul { list-style: disc; }
 #dynamicContentArea.requirement-detail ol { list-style: decimal; }
 #dynamicContentArea.requirement-detail li { margin-bottom: 0.5rem; }
-#dynamicContentArea.requirement-detail .check-item { margin-bottom: 1.5rem; padding: 1rem; border: 1px solid var(--border-color); border-radius: 4px; background-color: var(--secondary-color); }
+
+#dynamicContentArea.requirement-detail .check-item { 
+    margin-bottom: 1.5rem; 
+    padding: 1rem; 
+    border: 1px solid var(--border-color); 
+    border-radius: 4px; 
+    background-color: var(--secondary-color); 
+}
 #dynamicContentArea.requirement-detail .check-item:last-child { margin-bottom: 0; }
-#dynamicContentArea.requirement-detail .check-condition { font-weight: 600; margin-top: 0; margin-bottom: 0.75rem; display: block; background-color: var(--section-bg); padding: 0.6rem 1rem; border-radius: 3px; border-left: 4px solid var(--accent-color); }
-#dynamicContentArea.requirement-detail .check-logic { font-style: italic; color: var(--neutral-color); margin-left: 0; display: block; margin-top: -0.5rem; margin-bottom: 0.75rem; font-size: 0.9em; }
-#dynamicContentArea.requirement-detail .pass-criteria-list { margin-top: 0.5rem; margin-left: 1.5rem; list-style: disc; }
-#dynamicContentArea.requirement-detail .exceptions { background-color: var(--exception-bg); border: 1px solid var(--exception-border); padding: 1rem 1.5rem; border-radius: 4px; margin-top: 1.5rem; font-size: 0.95em; }
-#dynamicContentArea.requirement-detail .exceptions h3 { margin-top: 0; margin-bottom: 0.5rem; font-size: 1.2rem; color: var(--warning-hover); }
+#dynamicContentArea.requirement-detail .check-condition { 
+    font-weight: 600; 
+    margin-top: 0; 
+    margin-bottom: 0.75rem; 
+    display: block; 
+    background-color: var(--section-bg); 
+    padding: 0.6rem 1rem; 
+    border-radius: 3px; 
+    border-left: 4px solid var(--accent-color); 
+}
+#dynamicContentArea.requirement-detail .check-logic { 
+    font-style: italic; 
+    color: var(--neutral-color); 
+    margin-left: 0; 
+    display: block; 
+    margin-top: -0.5rem; /* Dra upp närmare condition */
+    margin-bottom: 0.75rem; 
+    font-size: 0.9em; 
+}
+#dynamicContentArea.requirement-detail .pass-criteria-list { 
+    margin-top: 0.5rem; 
+    margin-left: 1.5rem; /* Indrag för kriterielista */
+    list-style: disc; 
+}
+
+#dynamicContentArea.requirement-detail .exceptions { 
+    background-color: var(--exception-bg); 
+    border: 1px solid var(--exception-border); 
+    padding: 1rem 1.5rem; 
+    border-radius: 4px; 
+    margin-top: 1.5rem; 
+    font-size: 0.95em; 
+}
+#dynamicContentArea.requirement-detail .exceptions h3 { 
+    margin-top: 0; 
+    margin-bottom: 0.5rem; 
+    font-size: 1.2rem; 
+    color: var(--warning-hover); 
+}
 #dynamicContentArea.requirement-detail .exceptions p { margin: 0; line-height: 1.6; }
-#dynamicContentArea.requirement-detail .exceptions code { background-color: var(--code-bg); border: 1px solid var(--code-border); color: var(--heading-color); padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.95em;}
-#dynamicContentArea #backButton { margin-top: 2rem; display: block; margin-left: auto; margin-right: auto; }
+#dynamicContentArea.requirement-detail .exceptions code { 
+    background-color: var(--code-bg); 
+    border: 1px solid var(--code-border); 
+    color: var(--heading-color); 
+    padding: 0.1em 0.3em; 
+    border-radius: 3px; 
+    font-size: 0.95em;
+}
+#dynamicContentArea #backButton { 
+    margin-top: 2rem; 
+    display: block; 
+    margin-left: auto; 
+    margin-right: auto; 
+}
 
-code, kbd, samp, pre { font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; background-color: var(--code-bg); border: 1px solid var(--code-border); padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.95em; color: var(--heading-color); }
+/* Kod-block och inline kod */
+code, kbd, samp, pre { 
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; 
+    background-color: var(--code-bg); 
+    border: 1px solid var(--code-border); 
+    padding: 0.1em 0.3em; 
+    border-radius: 3px; 
+    font-size: 0.95em; 
+    color: var(--heading-color); 
+}
+pre {
+    padding: 0.75rem 1rem;
+    overflow-x: auto;
+    white-space: pre-wrap; /* Radbrytning i pre, men behåll whitespace */
+    word-wrap: break-word;
+}
 
-#dynamicContentArea.form-view fieldset { border: 1px solid var(--border-color); border-radius: 5px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; margin-top: 1rem; background-color: rgba(0,0,0,0.02); } /* Ljus bakgrund för fieldset i ljust tema */
-body.dark-theme #dynamicContentArea.form-view fieldset { background-color: rgba(255,255,255,0.03); } /* Mörkare bakgrund för fieldset i mörkt tema */
-#dynamicContentArea.form-view legend { font-weight: 600; color: var(--heading-color); padding: 0 0.5rem; font-size: 1.1em; background: var(--section-bg); }
-#dynamicContentArea.form-view .form-field { margin-bottom: 1.2rem; }
-#dynamicContentArea.form-view label { display: block; margin-bottom: 0.4rem; font-weight: 500; color: var(--heading-color); opacity: 0.9; font-size: 0.95em; }
-#dynamicContentArea.form-view .field-instruction { font-size: 0.85em; color: var(--neutral-color); margin-top: -0.2em; margin-bottom: 0.5em; }
+/* Formulärvyer (generellt) */
+#dynamicContentArea.form-view fieldset { 
+    border: 1px solid var(--border-color); 
+    border-radius: 5px; 
+    padding: 1rem 1.5rem; 
+    margin-bottom: 1.5rem; 
+    margin-top: 1rem; 
+    background-color: rgba(0,0,0,0.02); 
+}
+body.dark-theme #dynamicContentArea.form-view fieldset { 
+    background-color: rgba(255,255,255,0.03); 
+}
+#dynamicContentArea.form-view legend { 
+    font-weight: 600; 
+    color: var(--heading-color); 
+    padding: 0 0.5rem; 
+    font-size: 1.1em; 
+    background: var(--section-bg); /* Så att bakgrunden inte skiner igenom */
+}
+#dynamicContentArea.form-view .form-field { 
+    margin-bottom: 1.2rem; 
+}
+#dynamicContentArea.form-view label { 
+    display: block; 
+    margin-bottom: 0.4rem; 
+    font-weight: 500; 
+    color: var(--heading-color); 
+    opacity: 0.9; 
+    font-size: 0.95em; 
+}
+#dynamicContentArea.form-view .field-instruction { 
+    font-size: 0.85em; 
+    color: var(--neutral-color); 
+    margin-top: -0.2em; /* Dra upp närmare label */
+    margin-bottom: 0.5em; 
+}
 #dynamicContentArea.form-view input[type="text"], 
 #dynamicContentArea.form-view input[type="email"], 
 #dynamicContentArea.form-view input[type="url"], 
@@ -332,75 +783,478 @@ body.dark-theme #dynamicContentArea.form-view fieldset { background-color: rgba(
 #dynamicContentArea.form-view input[type="number"], 
 #dynamicContentArea.form-view select, 
 #dynamicContentArea.form-view textarea { 
-    width: 100%; padding: 0.7rem 0.9rem; border: 1px solid var(--neutral-color); border-radius: 4px; font-size: 1em; font-family: inherit; background-color: var(--section-bg); color: var(--text-color); transition: border-color 0.2s, box-shadow 0.2s; 
+    width: 100%; 
+    padding: 0.7rem 0.9rem; 
+    border: 1px solid var(--neutral-color); 
+    border-radius: 4px; 
+    font-size: 1em; 
+    font-family: inherit; 
+    background-color: var(--section-bg); 
+    color: var(--text-color); 
+    transition: border-color 0.2s, box-shadow 0.2s; 
 }
-#dynamicContentArea.form-view .form-field-checkbox { display: flex; align-items: center; gap: 0.5em; }
-#dynamicContentArea.form-view input[type="checkbox"] { width: auto; margin-right: 0; accent-color: var(--primary-color); width: 1.2em; height: 1.2em; cursor: pointer; border: 1px solid var(--neutral-color); background-color: var(--section-bg); appearance: none; -webkit-appearance: none; border-radius: 3px; position: relative; }
-#dynamicContentArea.form-view input[type="checkbox"]:checked::before { content: '✔'; position: absolute; top: -0.1em; left: 0.05em; color: var(--primary-color); font-size: 1.2em; line-height: 1; }
-#dynamicContentArea.form-view .form-field-checkbox label { display: inline-block; margin-bottom: 0; cursor: pointer; font-weight: normal; }
-#dynamicContentArea.form-view input::placeholder, #dynamicContentArea.form-view textarea::placeholder { color: var(--placeholder-text); opacity: 1; }
-#dynamicContentArea.form-view textarea { resize: vertical; min-height: 80px; }
-#dynamicContentArea.form-view select { appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%2364748b%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%20clip-rule%3D%22evenodd%22%20%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.7em top 50%; background-size: 1.2em auto; padding-right: 2.5em; cursor: pointer; }
-#dynamicContentArea.form-view input[readonly], #dynamicContentArea.form-view textarea[readonly], #dynamicContentArea.form-view input:disabled, #dynamicContentArea.form-view textarea:disabled, #dynamicContentArea.form-view select:disabled { background-color: var(--disabled-bg); color: var(--disabled-text); cursor: not-allowed; border-color: var(--border-color); opacity: 0.7; }
-#dynamicContentArea.form-view input:focus-visible, #dynamicContentArea.form-view select:focus-visible, #dynamicContentArea.form-view textarea:focus-visible { outline: 2px solid var(--focus-ring-color); outline-offset: 1px; border-color: var(--primary-color); box-shadow: 0 0 0 2px var(--secondary-color); } /* secondary-color ändras med temat */
-#dynamicContentArea.form-view .form-buttons { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 0.5rem; }
-#dynamicContentArea.form-view .dynamic-list { list-style: none; padding-left: 0; margin-top: 0.5rem; margin-bottom: 1rem; }
-#dynamicContentArea.form-view .dynamic-list-item { display: flex; align-items: flex-start; margin-bottom: 0.75rem; padding: 0.75rem; border: 1px dashed var(--border-color); border-radius: 4px; background-color: var(--section-bg); gap: 0.5rem; }
-#dynamicContentArea.form-view .dynamic-list-item textarea, #dynamicContentArea.form-view .dynamic-list-item select { flex-grow: 1; }
-#dynamicContentArea.form-view .dynamic-list-item textarea { min-height: 40px; }
-#dynamicContentArea.form-view .remove-item-button { padding: 0.3rem 0.6rem; font-size: 0.85rem; flex-shrink: 0; margin-top: 0.2rem; line-height: 1.4; }
-#dynamicContentArea.form-view .add-item-button { display: block; margin-top: 0.5rem; padding: 0.4rem 0.8rem; font-size: 0.9rem; }
+#dynamicContentArea.form-view .form-field-checkbox { 
+    display: flex; 
+    align-items: center; 
+    gap: 0.5em; 
+}
+#dynamicContentArea.form-view input[type="checkbox"] { 
+    width: auto; /* Låt checkboxen bestämma sin bredd */
+    margin-right: 0; /* Ingen extra marginal om gap används */
+    accent-color: var(--primary-color); /* Modernare sätt att färga checkbox */
+    width: 1.2em; /* Standardstorlek */
+    height: 1.2em; 
+    cursor: pointer; 
+    /* För fallback om accent-color inte stöds fullt ut: */
+    border: 1px solid var(--neutral-color);
+    background-color: var(--section-bg);
+    appearance: none; /* Ta bort default utseende för egen styling */
+    -webkit-appearance: none;
+    border-radius: 3px;
+    position: relative; /* För :checked::before */
+}
+#dynamicContentArea.form-view input[type="checkbox"]:checked::before { 
+    content: '✔'; 
+    position: absolute; 
+    top: -0.1em; /* Justera position för bocken */
+    left: 0.05em;
+    color: var(--primary-color); 
+    font-size: 1.2em; /* Storlek på bocken */
+    line-height: 1;
+}
 
-#dynamicContentArea.form-view .check-fieldset { display: flex; flex-direction: column; align-items: stretch; border: 1px solid var(--border-color); margin-bottom: 2rem; padding: 1.5rem; position: relative; background-color: var(--secondary-color); border-radius: 6px; }
-#dynamicContentArea.form-view .check-fieldset > legend { font-size: 1.2em; font-weight: 600; padding: 0 0.5em; background-color: var(--secondary-color); color: var(--heading-color); margin-bottom: 1rem; }
-#dynamicContentArea.form-view .remove-check-button { position: absolute; top: 1rem; right: 1rem; }
-#dynamicContentArea.form-view .check-fieldset .form-field { margin-bottom: 1.5rem; }
-#dynamicContentArea.form-view .criteria-group { box-sizing: border-box; margin-top: 1.5rem; padding: 1rem 1.5rem; background-color: var(--section-bg); border: 1px dotted var(--border-color); border-radius: 4px; }
-#dynamicContentArea.form-view .criteria-group legend { font-size: 1em; font-weight: 500; padding: 0 0.4em; background-color: var(--section-bg); color: var(--neutral-color); margin-bottom: 0.75rem; }
-#dynamicContentArea.form-view .criteria-group .dynamic-list-item textarea { width: 100%; min-height: 50px; }
-#dynamicContentArea.form-view .criteria-group .add-item-button { display: block; margin-top: 1rem; text-align: right; }
-#dynamicContentArea.form-view .criteria-group .remove-item-button { padding: 0.2rem 0.5rem; font-size: 0.8rem; margin-left: 0.5rem; }
+#dynamicContentArea.form-view .form-field-checkbox label { /* Label för checkbox */
+    display: inline-block; 
+    margin-bottom: 0; 
+    cursor: pointer; 
+    font-weight: normal; /* Inte fetstilt som andra labels */
+}
+#dynamicContentArea.form-view input::placeholder, 
+#dynamicContentArea.form-view textarea::placeholder { 
+    color: var(--placeholder-text); 
+    opacity: 1; 
+}
+#dynamicContentArea.form-view textarea { 
+    resize: vertical; 
+    min-height: 80px; 
+}
+#dynamicContentArea.form-view select { 
+    appearance: none; 
+    -webkit-appearance: none; 
+    -moz-appearance: none; 
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%2364748b%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%20clip-rule%3D%22evenodd%22%20%2F%3E%3C%2Fsvg%3E'); 
+    background-repeat: no-repeat; 
+    background-position: right 0.7em top 50%; 
+    background-size: 1.2em auto; 
+    padding-right: 2.5em; 
+    cursor: pointer; 
+}
+#dynamicContentArea.form-view input[readonly], 
+#dynamicContentArea.form-view textarea[readonly], 
+#dynamicContentArea.form-view input:disabled, 
+#dynamicContentArea.form-view textarea:disabled, 
+#dynamicContentArea.form-view select:disabled { 
+    background-color: var(--disabled-bg); 
+    color: var(--disabled-text); 
+    cursor: not-allowed; 
+    border-color: var(--border-color); 
+    opacity: 0.7; 
+}
+#dynamicContentArea.form-view input:focus-visible, 
+#dynamicContentArea.form-view select:focus-visible, 
+#dynamicContentArea.form-view textarea:focus-visible { 
+    outline: 2px solid var(--focus-ring-color); 
+    outline-offset: 1px; 
+    border-color: var(--primary-color); 
+    box-shadow: 0 0 0 2px var(--secondary-color); 
+}
+#dynamicContentArea.form-view .form-buttons { 
+    margin-top: 2rem; 
+    padding-top: 1.5rem; 
+    border-top: 1px solid var(--border-color); 
+    display: flex; 
+    justify-content: flex-end; 
+    flex-wrap: wrap; 
+    gap: 0.5rem; 
+}
+#dynamicContentArea.form-view .dynamic-list { 
+    list-style: none; 
+    padding-left: 0; 
+    margin-top: 0.5rem; 
+    margin-bottom: 1rem; 
+}
+#dynamicContentArea.form-view .dynamic-list-item { 
+    display: flex; 
+    align-items: flex-start; /* För att ta-bort-knappen ska linjera med textarea */
+    margin-bottom: 0.75rem; 
+    padding: 0.75rem; 
+    border: 1px dashed var(--border-color); 
+    border-radius: 4px; 
+    background-color: var(--section-bg); 
+    gap: 0.5rem; 
+}
+#dynamicContentArea.form-view .dynamic-list-item textarea, 
+#dynamicContentArea.form-view .dynamic-list-item select { 
+    flex-grow: 1; 
+}
+#dynamicContentArea.form-view .dynamic-list-item textarea { 
+    min-height: 40px; /* Liten höjd för korta instruktioner/kriterier */
+}
+#dynamicContentArea.form-view .remove-item-button { 
+    padding: 0.3rem 0.6rem; 
+    font-size: 0.85rem; 
+    flex-shrink: 0; 
+    margin-top: 0.2rem; /* Liten justering för linjering */
+    line-height: 1.4; /* För att ikonen ska få plats */
+}
+#dynamicContentArea.form-view .add-item-button { 
+    display: block; /* För att den ska ta full bredd om den är ensam */
+    margin-top: 0.5rem; 
+    padding: 0.4rem 0.8rem; 
+    font-size: 0.9rem; 
+}
 
-#dynamicContentArea.delete-confirmation-view { text-align: center; padding: 2rem; }
-#dynamicContentArea.delete-confirmation-view h2 { color: var(--danger-color); border: none; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.5em; }
-#dynamicContentArea.delete-confirmation-view p { margin-bottom: 1.5rem; font-size: 1.1em; }
-#dynamicContentArea.delete-confirmation-view strong { font-weight: 600; color: var(--heading-color); }
-#dynamicContentArea.delete-confirmation-view .form-buttons { justify-content: center; border: none; padding-top: 0; gap: 1rem; }
-#dynamicContentArea.delete-confirmation-view .form-buttons button { padding: 0.8rem 1.5rem; }
-#dynamicContentArea.delete-confirmation-view .button-danger { font-weight: bold; }
+/* Specifik styling för Check-fieldsets */
+#dynamicContentArea.form-view .check-fieldset { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: stretch; 
+    border: 1px solid var(--border-color); 
+    margin-bottom: 2rem; 
+    padding: 1.5rem; 
+    position: relative; /* För ta-bort-knappen */
+    background-color: var(--secondary-color); /* Lätt avvikande bakgrund */
+    border-radius: 6px; 
+}
+#dynamicContentArea.form-view .check-fieldset > legend { 
+    font-size: 1.2em; 
+    font-weight: 600; 
+    padding: 0 0.5em; 
+    background-color: var(--secondary-color); /* Samma som fieldset för att inte störa */
+    color: var(--heading-color); 
+    margin-bottom: 1rem; 
+}
+#dynamicContentArea.form-view .remove-check-button { /* För hela kontrollpunkten */
+    position: absolute; 
+    top: 1rem; 
+    right: 1rem; 
+}
+#dynamicContentArea.form-view .check-fieldset .form-field { 
+    margin-bottom: 1.5rem; 
+}
+#dynamicContentArea.form-view .criteria-group { /* Fieldset inuti check-fieldset */
+    box-sizing: border-box; 
+    margin-top: 1.5rem; 
+    padding: 1rem 1.5rem; 
+    background-color: var(--section-bg); /* Tillbaka till normal sektionsbakgrund */
+    border: 1px dotted var(--border-color); 
+    border-radius: 4px; 
+}
+#dynamicContentArea.form-view .criteria-group legend { 
+    font-size: 1em; 
+    font-weight: 500; 
+    padding: 0 0.4em; 
+    background-color: var(--section-bg); 
+    color: var(--neutral-color); 
+    margin-bottom: 0.75rem; 
+}
+#dynamicContentArea.form-view .criteria-group .dynamic-list-item textarea { 
+    width: 100%; 
+    min-height: 50px; 
+}
+#dynamicContentArea.form-view .criteria-group .add-item-button { 
+    display: block; 
+    margin-top: 1rem; 
+    text-align: right; /* Knappen till höger */
+}
+#dynamicContentArea.form-view .criteria-group .remove-item-button { 
+    padding: 0.2rem 0.5rem; 
+    font-size: 0.8rem; 
+    margin-left: 0.5rem; 
+}
 
-.error, .confirmation-message { padding: 0.8em 1.2em; border-radius: 4px; margin: 1rem 0; text-align: center; font-weight: 500; border: 1px solid; }
-.error { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; }
-.save-confirmation { color: #0f5132; background-color: #d1e7dd; border-color: #badbcc; }
-.delete-confirmation { color: #581c87; background-color: #f3e8ff; border-color: #e9d5ff; }
-body.dark-theme .error { color: #f8d7da; background-color: #721c24; border-color: #f5c6cb; }
-body.dark-theme .save-confirmation { color: #d1e7dd; background-color: #0f5132; border-color: #badbcc; }
-body.dark-theme .delete-confirmation { color: #f3e8ff; background-color: #581c87; border-color: #e9d5ff; }
-.content-container > .error { margin: 0; border-radius: 8px; }
+/* Raderingsbekräftelse */
+#dynamicContentArea.delete-confirmation-view { 
+    text-align: center; 
+    padding: 2rem; 
+}
+#dynamicContentArea.delete-confirmation-view h2 { 
+    color: var(--danger-color); 
+    border: none; 
+    margin-bottom: 1rem; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 0.5em; 
+}
+#dynamicContentArea.delete-confirmation-view p { 
+    margin-bottom: 1.5rem; 
+    font-size: 1.1em; 
+}
+#dynamicContentArea.delete-confirmation-view strong { 
+    font-weight: 600; 
+    color: var(--heading-color); 
+}
+#dynamicContentArea.delete-confirmation-view .form-buttons { 
+    justify-content: center; 
+    border: none; 
+    padding-top: 0; 
+    gap: 1rem; 
+}
+#dynamicContentArea.delete-confirmation-view .form-buttons button { 
+    padding: 0.8rem 1.5rem; 
+}
+#dynamicContentArea.delete-confirmation-view .button-danger { 
+    font-weight: bold; 
+}
 
-.save-confirmation-inline { font-size: 0.9em; }
+/* Fel- och bekräftelsemeddelanden */
+.error, .confirmation-message { 
+    padding: 0.8em 1.2em; 
+    border-radius: 4px; 
+    margin: 1rem 0; 
+    text-align: center; 
+    font-weight: 500; 
+    border: 1px solid; 
+}
+.error { 
+    color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; 
+}
+.confirmation-message.save-confirmation { /* Specifik klass för spara */
+    color: #0f5132; background-color: #d1e7dd; border-color: #badbcc; 
+}
+.confirmation-message.delete-confirmation { /* Specifik klass för radera */
+    color: #581c87; background-color: #f3e8ff; border-color: #e9d5ff; 
+}
+.confirmation-message.info-confirmation { /* Specifik klass för info */
+    color: #055160; background-color: #cff4fc; border-color: #b6effb;
+}
 
-@media (max-width: 1200px) { } 
+body.dark-theme .error { 
+    color: #f8d7da; background-color: #721c24; border-color: #f5c6cb; 
+}
+body.dark-theme .confirmation-message.save-confirmation { 
+    color: #d1e7dd; background-color: #0f5132; border-color: #badbcc; 
+}
+body.dark-theme .confirmation-message.delete-confirmation { 
+    color: #f3e8ff; background-color: #581c87; border-color: #e9d5ff; 
+}
+body.dark-theme .confirmation-message.info-confirmation {
+    color: #cff4fc; background-color: #055160; border-color: #b6effb;
+}
+
+/* Om fel visas i .content-container (t.ex. vid filuppladdning) */
+.content-container > .error { 
+    margin: 0; /* Ta bort default marginal om den är direkt barn */
+    border-radius: 8px; /* Matcha containerns rundning */
+}
+
+/* Inline spara-bekräftelse (bredvid spara-knappen) */
+.save-confirmation-inline { 
+    font-size: 0.9em; 
+}
+
+
+/* --- Styling för Hantera Innehållstyp-kopplingar vyn --- */
+#dynamicContentArea.manage-ct-associations-view h2 {
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem; 
+}
+#dynamicContentArea.manage-ct-associations-view > p { /* Beskrivningen */
+    margin-bottom: 1.5rem;
+    font-size: 0.95em;
+    background-color: var(--secondary-color); 
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    border-left: 3px solid var(--accent-color);
+}
+
+/* Rubriker för kategorier i denna vy */
+#dynamicContentArea.manage-ct-associations-view h3 {
+    font-size: 1.3rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+#dynamicContentArea.manage-ct-associations-view h4 {
+    font-size: 1.1rem;
+    margin-top: 1rem;
+    margin-bottom: 0.3rem;
+    color: var(--heading-color);
+    opacity: 0.8;
+    font-weight: 500;
+}
+
+/* Listan med krav och checkboxes */
+.manage-ct-assoc-list { 
+    list-style: none;
+    padding-left: 0;
+    margin-top: 0.5rem;
+}
+.manage-ct-assoc-list .requirement-item { /* LI-elementet */
+    display: flex;
+    align-items: center; 
+    padding: 0.6rem 0.5rem; 
+    margin-bottom: 0.3rem;
+    border-bottom: 1px dotted var(--border-color); 
+}
+.manage-ct-assoc-list .requirement-item:last-child {
+    border-bottom: none;
+}
+
+.manage-ct-assoc-list .checkbox-container {
+    display: flex;
+    align-items: center;
+    min-width: 0; 
+}
+
+.manage-ct-assoc-list input[type="checkbox"] {
+    width: 1.2em; 
+    height: 1.2em;
+    margin-right: 0.3em; 
+    accent-color: var(--primary-color);
+    cursor: pointer;
+    flex-shrink: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--section-bg); 
+    border: 1px solid var(--neutral-color);
+    border-radius: 3px;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+}
+.manage-ct-assoc-list input[type="checkbox"]:checked::before {
+    content: '✔';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--primary-color);
+    font-size: 1em; 
+    line-height: 1;
+}
+
+
+.manage-ct-assoc-list label {
+    flex-grow: 1;
+    min-width: 0; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; 
+    padding-left: 0.3em; 
+}
+
+.manage-ct-assoc-list .requirement-text-brief strong {
+    color: var(--primary-color);
+    margin-right: 0.3em;
+}
+
+/* Knappar längst ner i denna vy */
+.manage-ct-view-buttons {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end; 
+    gap: 1rem;
+}
+
+.manage-ct-view-buttons .save-ct-view-changes-button {
+    background-color: var(--success-color);
+    color: var(--success-text);
+}
+.manage-ct-view-buttons .save-ct-view-changes-button:hover {
+    background-color: var(--success-hover);
+}
+.manage-ct-view-buttons .save-ct-view-changes-button:disabled {
+    background-color: var(--disabled-bg);
+    color: var(--disabled-text);
+    cursor: not-allowed;
+}
+
+
+/* Media Queries (behåll dina befintliga, detta är bara ett exempel på var de kan vara) */
+@media (max-width: 1200px) { 
+    /* Eventuella justeringar för större tablets/mindre desktops */
+} 
 
 @media (max-width: 768px) {
     h1 { font-size: 1.8rem; max-width: 95%;}
     #dynamicContentArea h2 { font-size: 1.5rem; }
     #dynamicContentArea h3 { font-size: 1.2rem; }
-    #postUploadControlsContainer { flex-direction: column; align-items: stretch; max-width: 95%;}
-    #postUploadControlsContainer .main-controls, #postUploadControlsContainer .secondary-controls { justify-content: center; }
-    #postUploadControlsContainer button { width: 100%; margin: 0.3rem 0; justify-content: center;}
-    #postUploadControlsContainer .secondary-controls { width: 100%; }
-    .content-container, #dynamicContentArea, #controlsDivider { max-width: 95%; }
-    .filter-sort-row { flex-direction: column; align-items: stretch; gap: 0.8rem; }
-    .search-control { max-width: none; order: 2; }
-    #sortControls { justify-content: flex-start; order: 1; flex-direction: row; flex-wrap: wrap; gap: 0.5rem; width: 100%; }
-    #sortControls label { margin-bottom: 0; }
-    #sortControls select { flex-grow: 1; min-width: 150px; }
-    .filter-sort-row #addRequirementButton { margin-left: 0; width: 100%; order: 3; margin-top: 0.5rem; }
-    #dynamicContentArea .requirement-item { flex-direction: column; align-items: flex-start; }
-    #dynamicContentArea .requirement-item .requirement-actions { margin-top: 0.5rem; align-self: flex-end; }
-    #dynamicContentArea.requirement-detail .action-button-container { position: static; margin-bottom: 1rem; justify-content: flex-end; }
-    #dynamicContentArea.requirement-detail .action-button-container + h2 { margin-top: 1.5em; }
+
+    #postUploadControlsContainer { 
+        flex-direction: column; 
+        align-items: stretch; 
+        max-width: 95%;
+    }
+    #postUploadControlsContainer .main-controls, 
+    #postUploadControlsContainer .secondary-controls { 
+        justify-content: center; 
+    }
+    #postUploadControlsContainer button { /* Gäller alla knappar direkt under */
+        width: 100%; 
+        margin: 0.3rem 0; 
+        justify-content: center;
+    }
+    #postUploadControlsContainer .secondary-controls { 
+        width: 100%; 
+    }
+    .content-container, #dynamicContentArea, #controlsDivider { 
+        max-width: 95%; 
+    }
+
+    /* Filter/sort raden i mindre skärmar */
+    .filter-sort-row { 
+        flex-direction: column; 
+        align-items: stretch; 
+        gap: 0.8rem; 
+    }
+    .search-control { 
+        max-width: none; 
+        order: 2; /* Sökfältet efter sortering */
+    }
+    #sortControls { 
+        justify-content: flex-start; 
+        order: 1; 
+        flex-direction: row; /* Behåll på rad om möjligt */
+        flex-wrap: wrap; /* Tillåt radbrytning */
+        gap: 0.5rem;
+        width: 100%;
+    }
+    #sortControls label { margin-bottom: 0; } /* Ingen extra marginal om de är på samma rad */
+    #sortControls select { 
+        flex-grow: 1; /* Ta upp tillgängligt utrymme */
+        min-width: 150px; /* Minsta bredd */
+    }
+    .filter-sort-row #addRequirementButton { 
+        margin-left: 0; /* Ta bort auto-marginal */
+        width: 100%; 
+        order: 3; 
+        margin-top: 0.5rem; 
+    }
+
+    /* Kravlistan i mindre skärmar */
+    #dynamicContentArea .requirement-item { 
+        flex-direction: column; 
+        align-items: flex-start; 
+    }
+    #dynamicContentArea .requirement-item .requirement-actions { 
+        margin-top: 0.5rem; 
+        align-self: flex-end; /* Knappar till höger */
+    }
+
+    /* Detaljvy knappar */
+    #dynamicContentArea.requirement-detail .action-button-container { 
+        position: static; /* Ta bort absolut positionering */
+        margin-bottom: 1rem; 
+        justify-content: flex-end; /* Knappar till höger */
+    }
+    #dynamicContentArea.requirement-detail .action-button-container + h2 { 
+        margin-top: 1.5em; /* Återställ marginal om knappar är ovanför */
+    }
 }
 
 @media (max-width: 600px) {
@@ -408,29 +1262,115 @@ body.dark-theme .delete-confirmation { color: #f3e8ff; background-color: #581c87
     h1 { font-size: 1.5rem; max-width: 100%; border-bottom-width: 2px; }
     #dynamicContentArea h2 { font-size: 1.3rem; }
     #dynamicContentArea h3 { font-size: 1.15rem; margin-top: 1.5rem;}
-    .content-container, #postUploadControlsContainer, #controlsDivider, #dynamicContentArea { width: 100%; padding: 1rem; max-width: 100%; border-radius: 0; border-left: none; border-right: none; box-shadow: none; border-top: none; border-bottom: 1px solid var(--border-color); margin-bottom: 0; }
-    body > *:last-child { border-bottom: none; margin-bottom: 1rem; }
+
+    /* Gör containers fullbredd och ta bort vissa borders/shadows */
+    .content-container, 
+    #postUploadControlsContainer, 
+    #controlsDivider, 
+    #dynamicContentArea { 
+        width: 100%; 
+        padding: 1rem; 
+        max-width: 100%; 
+        border-radius: 0; 
+        border-left: none; 
+        border-right: none; 
+        box-shadow: none; 
+        border-top: none; /* Tas bort från kontroller, visas av divider/contentArea */
+        border-bottom: 1px solid var(--border-color); /* Alla får en bottom border */
+        margin-bottom: 0; /* Ingen marginal mellan dem */
+    }
+    body > *:last-child { /* Sista elementet i body ska inte ha bottom-border */
+        border-bottom: none; 
+        margin-bottom: 1rem; /* Lite space längst ner */
+    }
     #postUploadControlsContainer { margin-top: 1rem; padding-bottom: 1rem;}
-    #controlsDivider { margin: 0 auto; width: 100%; border-top-width: 1px;}
+    #controlsDivider { margin: 0 auto; width: 100%; border-top-width: 1px;} /* Återställ om den ska synas */
     #dynamicContentArea { margin-top: 0; padding-top: 1.5rem;}
     .content-container {margin-top: 1rem;}
-    button, .button-like-label { padding: 0.7rem 1rem; font-size: 0.95rem; }
-    #postUploadControlsContainer button { width: 100%; margin: 0.3rem 0; justify-content: center; }
-    .filter-sort-row { gap: 0.5rem; padding: 0.5rem 0; }
-    #sortControls { flex-direction: column; align-items: stretch; }
-    #sortControls label { text-align: left; margin-bottom: 0.2rem; }
-    #sortControls select { width: 100%; flex-grow: 0; }
-    .filter-sort-row #addRequirementButton { margin-top: 0.5rem; }
-    #dynamicContentArea.form-view fieldset { padding: 0.8rem 1rem; }
-    #dynamicContentArea.form-view .form-buttons { justify-content: center; }
-    #dynamicContentArea.form-view .form-buttons button { width: 90%; }
-    #dynamicContentArea.form-view .dynamic-list-item { flex-direction: column; align-items: stretch; }
-    #dynamicContentArea.form-view .dynamic-list-item textarea, #dynamicContentArea.form-view .dynamic-list-item select { margin-right: 0; margin-bottom: 0.5rem; }
-    #dynamicContentArea.form-view .remove-item-button { align-self: flex-end; margin-top: 0; }
+
+
+    button, .button-like-styling { 
+        padding: 0.7rem 1rem; 
+        font-size: 0.95rem; 
+    }
+    #postUploadControlsContainer button { /* Gäller alla knappar direkt under */
+        width: 100%; 
+        margin: 0.3rem 0; 
+        justify-content: center;
+    }
+
+    .filter-sort-row { 
+        gap: 0.5rem; 
+        padding: 0.5rem 0; /* Mindre padding */
+    }
+    #sortControls { 
+        flex-direction: column; /* Stacka label och select */
+        align-items: stretch; 
+    }
+    #sortControls label { 
+        text-align: left; 
+        margin-bottom: 0.2rem; 
+    }
+    #sortControls select { 
+        width: 100%; 
+        flex-grow: 0; 
+    }
+    .filter-sort-row #addRequirementButton { 
+        margin-top: 0.5rem; 
+    }
+
+    /* Formulär i små skärmar */
+    #dynamicContentArea.form-view fieldset { 
+        padding: 0.8rem 1rem; 
+    }
+    #dynamicContentArea.form-view .form-buttons { 
+        justify-content: center; 
+    }
+    #dynamicContentArea.form-view .form-buttons button { 
+        width: 90%; /* Nästan full bredd */
+    }
+    #dynamicContentArea.form-view .dynamic-list-item { 
+        flex-direction: column; 
+        align-items: stretch; 
+    }
+    #dynamicContentArea.form-view .dynamic-list-item textarea, 
+    #dynamicContentArea.form-view .dynamic-list-item select { 
+        margin-right: 0; 
+        margin-bottom: 0.5rem; 
+    }
+    #dynamicContentArea.form-view .remove-item-button { 
+        align-self: flex-end; 
+        margin-top: 0; 
+    }
     #dynamicContentArea.form-view .check-fieldset { padding: 1rem; }
-    #dynamicContentArea.form-view .remove-check-button { position: static; float: right; margin-bottom: 0.5rem; }
-    #dynamicContentArea.form-view .check-fieldset::after { content: ""; display: table; clear: both; }
-    #dynamicContentArea.form-view .criteria-group { padding: 0.8rem 1rem; }
-    #dynamicContentArea.requirement-detail .action-button-container { padding: 0; margin-bottom: 1rem;}
-    #dynamicContentArea.requirement-detail .action-button-container button { width: calc(50% - 0.25rem); margin: 0; }
+    #dynamicContentArea.form-view .remove-check-button { 
+        position: static; /* Ta bort absolut positionering */
+        float: right; /* Flytta till höger */
+        margin-bottom: 0.5rem; 
+    }
+    #dynamicContentArea.form-view .check-fieldset::after { /* Clearfix för float */
+        content: ""; 
+        display: table; 
+        clear: both; 
+    }
+    #dynamicContentArea.form-view .criteria-group { 
+        padding: 0.8rem 1rem; 
+    }
+
+    #dynamicContentArea.requirement-detail .action-button-container { 
+        padding: 0; 
+        margin-bottom: 1rem;
+    }
+    #dynamicContentArea.requirement-detail .action-button-container button { 
+        width: calc(50% - 0.25rem); /* Två knappar på en rad */
+        margin: 0; 
+    }
+
+    /* Hantera innehållstyp-kopplingar vyn på små skärmar */
+    #dynamicContentArea.manage-ct-associations-view h3 { font-size: 1.2rem; }
+    #dynamicContentArea.manage-ct-associations-view h4 { font-size: 1.05rem; }
+    .manage-ct-assoc-list .requirement-item { flex-wrap: wrap; } /* Tillåt radbrytning */
+    .manage-ct-assoc-list .checkbox-container { margin-bottom: 0.3rem; }
+    .manage-ct-view-buttons { flex-direction: column; }
+    .manage-ct-view-buttons button { width: 100%; }
 }

@@ -1,16 +1,18 @@
 // js/_---_requirement_functions.js
 
-// Importer (som tidigare)
+// ... (befintliga importer, inklusive de från _dom_element_references.js) ...
 import {
-    dynamicContentArea, filterSortRow, sortOrderSelect, searchInput, saveChangesButton
+    dynamicContentArea, filterSortRow, sortOrderSelect, searchInput, saveChangesButton,
+    postUploadControlsContainer, showMetadataButton, showRequirementsButton
 } from './_-----_dom_element_references.js';
 import { ICONS } from './_-----_constants.js';
 import * as state from './_-----_global_state.js';
 import { escapeHtml, parseSimpleMarkdown, getVal, generateKeyFromName, generateRequirementKey } from './_-----_utils__helpers.js';
 import { setupContentArea, showError, displayConfirmation } from './_-----_ui_functions.js';
 
-// ----- Form Field Creation Helpers -----
 
+// ... (createFormField och andra hjälpfunktioner förblir desamma som tidigare) ...
+// Kopiera in dem här om du vill ha hela filen på en gång. Jag utelämnar dem för korthetens skull i detta svar.
 export function createFormField(labelText, name, value, type = 'text', placeholder = '', readonly = false, instructionText = null) {
     const container = document.createElement('div');
     container.classList.add('form-field');
@@ -34,33 +36,32 @@ export function createFormField(labelText, name, value, type = 'text', placehold
     let inputElement;
 
     if (type === 'checkbox') {
-        container.innerHTML = '';
-        container.classList.add('form-field-checkbox');
+        container.innerHTML = ''; 
+        container.classList.add('form-field-checkbox'); 
 
         inputElement = document.createElement('input');
         inputElement.type = 'checkbox';
         inputElement.id = inputId;
         inputElement.name = name;
-        inputElement.value = value;
-        // checked status sätts av anropande kod
-
+        inputElement.value = value; 
+        
         const checkboxLabel = document.createElement('label');
         checkboxLabel.htmlFor = inputId;
-        checkboxLabel.textContent = labelText.replace('*','').trim();
-
+        checkboxLabel.textContent = labelText.replace('*','').trim(); 
+        
         if (instructionText && !container.querySelector('.field-instruction')) {
-            // Redan hanterat
+            // Hanteras redan
         }
-
+        
         container.appendChild(inputElement);
-        container.appendChild(checkboxLabel);
+        container.appendChild(checkboxLabel); 
 
     } else if (type === 'select') {
         return container;
     } else {
         if (type === 'textarea') {
             inputElement = document.createElement('textarea');
-            inputElement.rows = 3;
+            inputElement.rows = 3; 
         } else {
             inputElement = document.createElement('input');
             inputElement.type = type;
@@ -69,7 +70,7 @@ export function createFormField(labelText, name, value, type = 'text', placehold
 
         inputElement.id = inputId;
         inputElement.name = name;
-        inputElement.value = value ?? '';
+        inputElement.value = value ?? ''; 
         if (placeholder) inputElement.placeholder = placeholder;
         if (readonly) {
             inputElement.readOnly = true;
@@ -113,24 +114,24 @@ function createCheckFieldset(checkData, index) {
     fieldset.appendChild(removeCheckButton);
 
     const conditionContainer = createFormField(
-        `Villkor*`,
-        `check-${index}-condition`,
-        checkData.condition || '',
-        'textarea',
+        `Villkor*`, 
+        `check-${index}-condition`, 
+        checkData.condition || '', 
+        'textarea', 
         'Beskriv när kontrollen ska utföras...'
     );
     const conditionTextarea = conditionContainer.querySelector('textarea');
     if (conditionTextarea) {
         conditionTextarea.rows = 2;
-        conditionTextarea.required = true;
+        conditionTextarea.required = true; 
     }
     fieldset.appendChild(conditionContainer);
 
     const logicContainer = createFormField(
-        `Logik för Godkänd-kriterier`,
-        `check-${index}-logic`,
-        '',
-        'select'
+        `Logik för Godkänd-kriterier`, 
+        `check-${index}-logic`, 
+        '', 
+        'select' 
     );
     const logicSelect = document.createElement('select');
     const logicId = logicContainer.querySelector('label')?.htmlFor || `check-${index}-logic-select`;
@@ -212,6 +213,13 @@ function createDynamicListButton(text, onClick, classNames = 'add-item-button') 
     button.addEventListener('click', onClick);
     return button;
 }
+
+// ... (displayRequirements och dess hjälpfunktioner förblir desamma) ...
+// (renderGroupedRequirements, renderFlatRequirements, renderRequirementListItem, getSortFunction)
+// ... (displayRequirementDetail förblir detsamma) ...
+// ... (renderRequirementForm och dess hjälpfunktioner createCategorySelect, getCategoryValue förblir desamma) ...
+// ... (saveRequirement, extractCategories, confirmDeleteRequirement, deleteRequirement förblir desamma) ...
+// Dessa funktioner kan kopieras in från föregående svar för en komplett fil. Jag utelämnar dem här för att fokusera på ändringarna.
 
 export function displayRequirements() {
     console.log(`Visar krav. Sortering: ${state.currentSortOrder}, Sökterm: "${state.currentSearchTerm}"`);
@@ -501,7 +509,7 @@ function getSortFunction(sortOrder) {
                     return valA.localeCompare(valB, 'sv', { numeric: true, sensitivity: 'base' });
                 case 'category-asc':
                 case 'category-desc':
-                default:
+                default: 
                     const mainCatAObj = getVal(a, 'metadata.mainCategory', {});
                     const mainCatBObj = getVal(b, 'metadata.mainCategory', {});
                     const subCatAObj = getVal(a, 'metadata.subCategory', {});
@@ -529,7 +537,6 @@ function getSortFunction(sortOrder) {
     };
 }
 
-// Ersätt hela din befintliga displayRequirementDetail med denna:
 export function displayRequirementDetail(reqKey) {
     const requirement = state.jsonData?.requirements?.[reqKey];
     if (!requirement) {
@@ -538,18 +545,21 @@ export function displayRequirementDetail(reqKey) {
         return;
     }
     state.setState('currentRequirementKey', reqKey);
-    state.setState('lastFocusedReqKey', reqKey);
-    setupContentArea(true, false);
+    state.setState('lastFocusedReqKey', reqKey); 
+    setupContentArea(true, false); 
     if (!dynamicContentArea) return;
     dynamicContentArea.classList.add('requirement-detail');
+
     const actionButtonContainer = document.createElement('div');
     actionButtonContainer.className = 'action-button-container';
+
     const editButton = document.createElement('button');
     editButton.className = 'req-edit-button';
     editButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.edit}</span> Redigera`;
     editButton.setAttribute('aria-label', `Redigera ${escapeHtml(requirement.title)}`);
     editButton.addEventListener('click', () => renderRequirementForm(reqKey));
     actionButtonContainer.appendChild(editButton);
+
     const deleteButton = document.createElement('button');
     deleteButton.className = 'button-danger req-delete-button';
     deleteButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.delete}</span> Radera`;
@@ -557,10 +567,12 @@ export function displayRequirementDetail(reqKey) {
     deleteButton.addEventListener('click', () => confirmDeleteRequirement(reqKey));
     actionButtonContainer.appendChild(deleteButton);
     dynamicContentArea.appendChild(actionButtonContainer);
+
     const title = document.createElement('h2');
     title.textContent = requirement.title || "[Titel saknas]";
-    title.tabIndex = -1;
+    title.tabIndex = -1; 
     dynamicContentArea.appendChild(title);
+
     const stdRefP = document.createElement('p');
     stdRefP.classList.add('standard-ref');
     if (requirement.standardReference) {
@@ -576,7 +588,7 @@ export function displayRequirementDetail(reqKey) {
         }
         if (refUrl && refUrl.trim() !== '') {
             try {
-                const urlObj = new URL(refUrl);
+                const urlObj = new URL(refUrl); 
                 const refLink = document.createElement('a');
                 refLink.href = urlObj.href;
                 refLink.textContent = escapeHtml(refText || refUrl);
@@ -593,6 +605,7 @@ export function displayRequirementDetail(reqKey) {
         stdRefP.innerHTML = '<strong>Referens:</strong> <em>(saknas)</em>';
     }
     dynamicContentArea.appendChild(stdRefP);
+
     if (Array.isArray(requirement.instructions) && requirement.instructions.length > 0) {
         const instrSection = document.createElement('div');
         instrSection.classList.add('detail-section');
@@ -608,6 +621,7 @@ export function displayRequirementDetail(reqKey) {
         instrSection.appendChild(ol);
         dynamicContentArea.appendChild(instrSection);
     }
+    
     if (requirement.expectedObservation) {
         const obsSection = document.createElement('div');
         obsSection.classList.add('detail-section');
@@ -619,6 +633,7 @@ export function displayRequirementDetail(reqKey) {
         obsSection.appendChild(obsP);
         dynamicContentArea.appendChild(obsSection);
     }
+
     const optionalSections = { examples: 'Exempel', exceptions: 'Undantag', commonErrors: 'Vanliga Fel', tips: 'Tips' };
     for (const key in optionalSections) {
         if (Object.prototype.hasOwnProperty.call(requirement, key) && requirement[key]) {
@@ -634,6 +649,7 @@ export function displayRequirementDetail(reqKey) {
             dynamicContentArea.appendChild(section);
         }
     }
+
     if (Array.isArray(requirement.checks) && requirement.checks.length > 0) {
         const checkSection = document.createElement('div');
         checkSection.classList.add('detail-section');
@@ -643,19 +659,22 @@ export function displayRequirementDetail(reqKey) {
         requirement.checks.forEach((check, index) => {
             const checkItemDiv = document.createElement('div');
             checkItemDiv.classList.add('check-item');
-            checkItemDiv.id = `check-${reqKey}-${index + 1}`;
+            checkItemDiv.id = `check-${reqKey}-${index + 1}`; 
+
             const conditionP = document.createElement('p');
             conditionP.classList.add('check-condition');
             conditionP.innerHTML = parseSimpleMarkdown(getVal(check, 'condition', '<em>Villkor saknas</em>'));
             checkItemDiv.appendChild(conditionP);
+
             const passCriteriaCount = getVal(check, 'passCriteria.length', 0);
-            const logic = getVal(check, 'logic', 'AND');
-            if (passCriteriaCount > 1) {
+            const logic = getVal(check, 'logic', 'AND'); 
+            if (passCriteriaCount > 1) { 
                  const logicP = document.createElement('p');
                  logicP.classList.add('check-logic');
                  logicP.textContent = `(${logic === 'OR' ? 'Minst ett av följande krävs:' : 'Alla följande krävs:'})`;
                  checkItemDiv.appendChild(logicP);
             }
+
              if (passCriteriaCount > 0) {
                 const ul = document.createElement('ul');
                 ul.classList.add('pass-criteria-list');
@@ -666,6 +685,7 @@ export function displayRequirementDetail(reqKey) {
                 });
                 checkItemDiv.appendChild(ul);
             }
+
             const ifNoCriteria = getVal(check, 'ifNo', []);
             if (Array.isArray(ifNoCriteria) && ifNoCriteria.length > 0) {
                 const noHeading = document.createElement('p');
@@ -673,8 +693,9 @@ export function displayRequirementDetail(reqKey) {
                 noHeading.style.fontWeight = 'bold';
                 noHeading.style.marginTop = '0.75em';
                 checkItemDiv.appendChild(noHeading);
+
                 const noUl = document.createElement('ul');
-                noUl.classList.add('pass-criteria-list');
+                noUl.classList.add('pass-criteria-list'); 
                 ifNoCriteria.forEach(criterion => {
                     const li = document.createElement('li');
                     li.innerHTML = parseSimpleMarkdown(getVal(criterion, 'requirement', ''));
@@ -687,9 +708,8 @@ export function displayRequirementDetail(reqKey) {
         dynamicContentArea.appendChild(checkSection);
     }
 
-    // *** NYTT/UPPDATERAT: Visa Relevanta Innehållstyper för kravet ***
-    const reqContentTypes = getVal(requirement, 'contentType', []); // Array av ID:n
-    const masterContentTypes = getVal(state.jsonData, 'metadata.contentTypes', []); // Array av {id, text} från metadata
+    const reqContentTypes = getVal(requirement, 'contentType', []); 
+    const masterContentTypes = getVal(state.jsonData, 'metadata.contentTypes', []); 
 
     if (Array.isArray(reqContentTypes) && reqContentTypes.length > 0 && Array.isArray(masterContentTypes) && masterContentTypes.length > 0) {
         const ctSection = document.createElement('div');
@@ -699,11 +719,11 @@ export function displayRequirementDetail(reqKey) {
         ctSection.appendChild(ctHeading);
 
         const ctUL = document.createElement('ul');
-        ctUL.style.listStyle = 'disc';
+        ctUL.style.listStyle = 'disc'; 
 
         const masterTypesMap = masterContentTypes.reduce((acc, type) => {
             if (type && type.id) {
-                acc[type.id] = type.text || type.id;
+                acc[type.id] = type.text || type.id; 
             }
             return acc;
         }, {});
@@ -724,13 +744,12 @@ export function displayRequirementDetail(reqKey) {
             ctSection.appendChild(ctUL);
             dynamicContentArea.appendChild(ctSection);
         } else {
-             ctHeading.remove();
+             ctHeading.remove(); 
              ctSection.remove();
              console.log("Inga matchande (eller inga alls) relevanta innehållstyper att visa för detta krav.");
         }
     }
-    // *** SLUT PÅ NYTT/UPPDATERAT AVSNITT ***
-
+    
     const metaSection = document.createElement('div');
     metaSection.classList.add('detail-section', 'metadata-info');
     const catInfo = document.createElement('p');
@@ -747,17 +766,19 @@ export function displayRequirementDetail(reqKey) {
         const primaryScore = impact.primaryScore ?? 0;
         const secondaryScore = impact.secondaryScore ?? 0;
         impactText += ` (Poäng: ${primaryScore}.${secondaryScore}, `;
-        const assumedCompliance = impact.assumedCompliance ?? false;
+        const assumedCompliance = impact.assumedCompliance ?? false; 
         impactText += `Antagen efterlevnad: ${assumedCompliance ? 'Ja' : 'Nej'})`;
         impactP.innerHTML = impactText;
         metaSection.appendChild(impactP);
     }
     dynamicContentArea.appendChild(metaSection);
+
     const backButton = document.createElement('button');
     backButton.id = 'backButton';
     backButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.back}</span> Tillbaka till listan`;
     backButton.addEventListener('click', () => { displayRequirements(); });
     dynamicContentArea.appendChild(backButton);
+
     setTimeout(() => title.focus({ preventScroll: false }), 50);
 }
 
@@ -766,17 +787,22 @@ export function renderRequirementForm(reqKey) {
     const isEditing = reqKey !== null && state.jsonData?.requirements?.[reqKey];
     const requirement = isEditing ? state.jsonData.requirements[reqKey] : {};
     const formTitle = isEditing ? `Redigera krav` : 'Lägg till nytt krav';
+
     setupContentArea(true, false);
     if (!dynamicContentArea) return;
     dynamicContentArea.classList.add('form-view');
+
     const form = document.createElement('form');
     form.id = isEditing ? `requirementForm-${reqKey}` : 'requirementForm-new';
     form.noValidate = true;
     form.addEventListener('submit', (event) => saveRequirement(event, reqKey));
+
     const heading = document.createElement('h2');
     heading.textContent = isEditing ? `${formTitle}: ${escapeHtml(requirement.title || reqKey)}` : formTitle;
     form.appendChild(heading);
+
     form.appendChild(createFormField('Titel*', 'title', requirement.title || '', 'text', 'Kravets titel'));
+    
     const stdRefFieldset = document.createElement('fieldset');
     const stdRefLegend = document.createElement('legend');
     stdRefLegend.textContent = 'Standardreferens';
@@ -790,6 +816,7 @@ export function renderRequirementForm(reqKey) {
     stdRefFieldset.appendChild(createFormField('Text', 'standardReference.text', refText, 'text', 't.ex. WCAG 9.1.4.2'));
     stdRefFieldset.appendChild(createFormField('URL (valfri)', 'standardReference.url', refUrl, 'url', 'https://www.w3.org/TR/...'));
     form.appendChild(stdRefFieldset);
+
     const instrFieldset = document.createElement('fieldset');
     const instrLegend = document.createElement('legend');
     instrLegend.textContent = 'Instruktioner';
@@ -798,7 +825,7 @@ export function renderRequirementForm(reqKey) {
     instrList.id = 'instructionList';
     instrList.classList.add('dynamic-list');
     (requirement.instructions || []).forEach((instr, index) => {
-        const instructionText = getVal(instr, 'text', '');
+        const instructionText = getVal(instr, 'text', ''); 
         instrList.appendChild(createInstructionListItem(instructionText, index));
     });
     instrFieldset.appendChild(instrList);
@@ -808,14 +835,17 @@ export function renderRequirementForm(reqKey) {
     });
     instrFieldset.appendChild(addInstrButton);
     form.appendChild(instrFieldset);
+
     form.appendChild(createFormField('Exempel', 'examples', requirement.examples || '', 'textarea'));
     form.appendChild(createFormField('Undantag', 'exceptions', requirement.exceptions || '', 'textarea'));
     form.appendChild(createFormField('Vanliga Fel', 'commonErrors', requirement.commonErrors || '', 'textarea'));
     form.appendChild(createFormField('Tips', 'tips', requirement.tips || '', 'textarea'));
     const obsFieldContainer = createFormField('Förväntad observation', 'expectedObservation', requirement.expectedObservation || '', 'textarea', 'Beskriv den förväntade observationen här...', false, 'Text som beskriver vad som förväntas observeras vid granskning.');
     const obsTextarea = obsFieldContainer.querySelector('textarea');
-    if (obsTextarea) obsTextarea.rows = 5;
+    if(obsTextarea) obsTextarea.rows = 5;
     form.appendChild(obsFieldContainer);
+
+
     const checksFieldset = document.createElement('fieldset');
     const checksLegend = document.createElement('legend');
     checksLegend.textContent = 'Kontrollpunkter';
@@ -833,6 +863,7 @@ export function renderRequirementForm(reqKey) {
     });
     checksFieldset.appendChild(addCheckButton);
     form.appendChild(checksFieldset);
+
     const masterContentTypes = getVal(state.jsonData, 'metadata.contentTypes', []);
     if (masterContentTypes.length > 0) {
         const ctFieldset = document.createElement('fieldset');
@@ -853,6 +884,7 @@ export function renderRequirementForm(reqKey) {
         });
         form.appendChild(ctFieldset);
     }
+
     const metaFieldset = document.createElement('fieldset');
     const metaLegend = document.createElement('legend');
     metaLegend.textContent = 'Kategorisering & Påverkan';
@@ -870,6 +902,7 @@ export function renderRequirementForm(reqKey) {
     } else {
         metaFieldset.appendChild(createFormField('Underkategori (valfri)', 'metadata.subCategory.text', currentSubCatText, 'text', 'Ange underkategori (om relevant)'));
     }
+
     const impactFieldset = document.createElement('fieldset');
     const impactLegend = document.createElement('legend');
     impactLegend.textContent = 'Påverkan (Impact)';
@@ -878,16 +911,17 @@ export function renderRequirementForm(reqKey) {
     impactFieldset.appendChild(createFormField('Kritisk?', 'metadata.impact.isCritical', impactData.isCritical || false, 'checkbox'));
     impactFieldset.appendChild(createFormField('Primär poäng', 'metadata.impact.primaryScore', impactData.primaryScore ?? 0, 'number', '0'));
     impactFieldset.appendChild(createFormField('Sekundär poäng', 'metadata.impact.secondaryScore', impactData.secondaryScore ?? 0, 'number', '0'));
-    const defaultAssumedCompliance = impactData.assumedCompliance ?? false;
+    const defaultAssumedCompliance = impactData.assumedCompliance ?? false; 
     impactFieldset.appendChild(createFormField('Antagen efterlevnad?', 'metadata.impact.assumedCompliance', defaultAssumedCompliance, 'checkbox'));
     metaFieldset.appendChild(impactFieldset);
     form.appendChild(metaFieldset);
+
     const buttonDiv = document.createElement('div');
     buttonDiv.classList.add('form-buttons');
-    const saveButton = document.createElement('button');
-    saveButton.type = 'submit';
-    saveButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.save}</span> Spara ${isEditing ? 'ändringar' : 'nytt krav'}`;
-    buttonDiv.appendChild(saveButton);
+    const saveButtonElement = document.createElement('button'); // Bytte namn för att undvika konflikt med globala
+    saveButtonElement.type = 'submit';
+    saveButtonElement.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.save}</span> Spara ${isEditing ? 'ändringar' : 'nytt krav'}`;
+    buttonDiv.appendChild(saveButtonElement);
     const cancelButton = document.createElement('button');
     cancelButton.type = 'button';
     cancelButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.cancel}</span> Avbryt`;
@@ -901,13 +935,13 @@ export function renderRequirementForm(reqKey) {
     buttonDiv.appendChild(cancelButton);
     form.appendChild(buttonDiv);
     dynamicContentArea.appendChild(form);
+
     const titleInput = form.elements['title'];
     if (titleInput) {
         setTimeout(() => titleInput.focus(), 50);
     }
 }
 
-// Ersätt hela din befintliga saveRequirement med denna:
 function saveRequirement(event, reqKey) {
     event.preventDefault();
     const form = event.target;
@@ -939,11 +973,10 @@ function saveRequirement(event, reqKey) {
         const newId = isEditing ? (originalRequirement.id || crypto.randomUUID()) : crypto.randomUUID();
         const newReqKey = generateRequirementKey(titleValue, newId);
 
-        // Hämta alla värden från checkboxes med name="contentType" som är ikryssade
         const selectedContentTypes = [];
         const contentTypeCheckboxes = form.querySelectorAll('input[name="contentType"]:checked');
         contentTypeCheckboxes.forEach(checkbox => {
-            selectedContentTypes.push(checkbox.value); // 'value' för checkboxen är dess ID
+            selectedContentTypes.push(checkbox.value);
         });
         
         const updatedRequirement = {
@@ -971,11 +1004,11 @@ function saveRequirement(event, reqKey) {
             expectedObservation: form.elements['expectedObservation']?.value.trim() || '',
             instructions: [],
             checks: [],
-            contentType: selectedContentTypes // Använd den insamlade arrayen
+            contentType: selectedContentTypes
         };
 
         if (typeof updatedRequirement.metadata.subCategory === 'object' && !updatedRequirement.metadata.subCategory?.text) {
-            updatedRequirement.metadata.subCategory = "";
+            updatedRequirement.metadata.subCategory = ""; 
         }
         if (typeof updatedRequirement.standardReference === 'object' && !updatedRequirement.standardReference?.text && !updatedRequirement.standardReference?.url) {
              updatedRequirement.standardReference = "";
@@ -990,7 +1023,7 @@ function saveRequirement(event, reqKey) {
         const checkFieldsets = form.querySelectorAll('#checksContainer .check-fieldset');
         checkFieldsets.forEach((fieldset, checkIndex) => {
             const condition = fieldset.querySelector(`textarea[name="check-${checkIndex}-condition"]`)?.value.trim();
-            if (!condition) return;
+            if (!condition) return; 
             const check = {
                 id: (checkIndex + 1).toString(),
                 condition: condition,
@@ -1028,8 +1061,8 @@ function saveRequirement(event, reqKey) {
             state.jsonData.requirements[newReqKey] = updatedRequirement;
             state.setState('isDataModified', true);
             if(saveChangesButton) saveChangesButton.classList.remove('hidden');
-            state.setState('lastFocusedReqKey', newReqKey);
-            displayRequirementDetail(newReqKey);
+            state.setState('lastFocusedReqKey', newReqKey); 
+            displayRequirementDetail(newReqKey); 
             const targetArea = document.getElementById('dynamicContentArea');
             if (targetArea) {
                  const actionText = isEditing ? 'uppdaterat' : 'tillagt';
@@ -1038,9 +1071,9 @@ function saveRequirement(event, reqKey) {
         } else {
              if (isEditing) {
                 state.setState('lastFocusedReqKey', reqKey);
-                 displayRequirementDetail(reqKey);
+                 displayRequirementDetail(reqKey); 
             } else {
-                 displayRequirements();
+                 displayRequirements(); 
             }
             console.log("Inga ändringar upptäcktes i kravet.");
         }
@@ -1071,12 +1104,13 @@ function extractCategories(requirements) {
 }
 
 function createCategorySelect(labelText, name, categories, selectedValue, allowEmpty = false) {
-    const container = createFormField(labelText, name, '', 'select');
+    const container = createFormField(labelText, name, '', 'select'); 
     const select = document.createElement('select');
     const inputId = container.querySelector('label')?.htmlFor || `select-${name.replace('.', '-')}`;
     select.id = inputId;
     select.name = name;
-    select.required = !allowEmpty;
+    select.required = !allowEmpty; 
+
     if (allowEmpty) {
         const emptyOption = document.createElement('option');
         emptyOption.value = '';
@@ -1087,19 +1121,20 @@ function createCategorySelect(labelText, name, categories, selectedValue, allowE
          const promptOption = document.createElement('option');
          promptOption.value = '';
          promptOption.textContent = '-- Välj kategori --';
-         if (!selectedValue) {
+         if (!selectedValue) { 
             promptOption.selected = true;
-            promptOption.disabled = true;
+            promptOption.disabled = true; 
          }
          select.appendChild(promptOption);
     }
+
     categories.forEach(cat => {
         const option = document.createElement('option');
         option.value = cat;
         option.textContent = cat;
         if (cat === selectedValue) {
             option.selected = true;
-            if (!allowEmpty && select.options[0]?.disabled) {
+            if (!allowEmpty && select.options[0]?.disabled) { 
                  select.options[0].selected = false;
             }
         }
@@ -1115,7 +1150,7 @@ function getCategoryValue(form, name) {
     if (textValue) {
         return { text: textValue, key: generateKeyFromName(textValue) || "" };
     }
-    return "";
+    return ""; 
 }
 
 export function confirmDeleteRequirement(reqKey) {
@@ -1130,19 +1165,24 @@ export function confirmDeleteRequirement(reqKey) {
     setupContentArea(true, false);
     if (!dynamicContentArea) return;
     dynamicContentArea.classList.add('delete-confirmation-view');
+
     const heading = document.createElement('h2');
     heading.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.warning}</span> Radera krav?`;
     dynamicContentArea.appendChild(heading);
+
     const warningText = document.createElement('p');
     warningText.innerHTML = `Är du säker på att du vill radera kravet: <strong>${escapeHtml(requirement.title || reqKey)}</strong>?<br>Åtgärden kan inte ångras direkt här.`;
     dynamicContentArea.appendChild(warningText);
+
     const buttonDiv = document.createElement('div');
     buttonDiv.classList.add('form-buttons');
+
     const keepButton = document.createElement('button');
     keepButton.type = 'button';
     keepButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.keep}</span> Behåll kravet`;
     keepButton.addEventListener('click', () => displayRequirementDetail(reqKey));
     buttonDiv.appendChild(keepButton);
+
     const deleteConfirmButton = document.createElement('button');
     deleteConfirmButton.type = 'button';
     deleteConfirmButton.classList.add('button-danger');
@@ -1165,7 +1205,7 @@ function deleteRequirement(reqKeyToDelete) {
     state.setState('isDataModified', true);
     if(saveChangesButton) saveChangesButton.classList.remove('hidden');
     state.setState('currentRequirementKey', null);
-    state.setState('lastFocusedReqKey', null);
+    state.setState('lastFocusedReqKey', null); 
     console.log(`Krav "${deletedTitle}" (nyckel: ${reqKeyToDelete}) raderades.`);
     displayRequirements();
     const targetArea = document.getElementById('dynamicContentArea');
@@ -1174,4 +1214,284 @@ function deleteRequirement(reqKeyToDelete) {
     }
 }
 
-console.log("Module loaded: requirement_functions (with contentType fix in saveRequirement and display of contentTypes in detail view)");
+// --- Funktion för att hantera kopplingar för en specifik innehållstyp ---
+export function manageContentTypeAssociations(contentTypeId, contentTypeName) {
+    if (!state.jsonData || !state.jsonData.requirements) {
+        showError("Kravdata saknas.", dynamicContentArea);
+        return;
+    }
+
+    state.setState('currentView', 'manageContentTypeAssociations');
+    state.setState('lastFocusedReqKey', null);
+
+    setupContentArea(true, false); 
+    if (!dynamicContentArea) return;
+    dynamicContentArea.classList.add('manage-ct-associations-view');
+
+    const heading = document.createElement('h2');
+    heading.textContent = `Hantera kopplingar för: "${escapeHtml(contentTypeName)}" (ID: ${contentTypeId})`;
+    dynamicContentArea.appendChild(heading);
+
+    const instructionP = document.createElement('p');
+    instructionP.innerHTML = `Markera de krav som ska vara kopplade till innehållstypen <strong>${escapeHtml(contentTypeName)}</strong>. Dina ändringar här sparas först när du klickar på knappen "Spara ändringar för denna innehållstyp" längst ner. <strong>Att klicka på "Visa"-knappen bredvid ett krav sparar också det aktuella läget för alla kryssrutor på denna sida.</strong>`;
+    dynamicContentArea.appendChild(instructionP);
+
+    // Filter-kontroll
+    const filterContainer = document.createElement('div');
+    filterContainer.classList.add('ct-association-filter');
+    const filterLabel = document.createElement('label');
+    filterLabel.htmlFor = 'ctAssocFilterSelect';
+    filterLabel.textContent = 'Visa krav: ';
+    const filterSelect = document.createElement('select');
+    filterSelect.id = 'ctAssocFilterSelect';
+    filterSelect.innerHTML = `
+        <option value="all">Alla krav</option>
+        <option value="associated">Endast kopplade krav</option>
+    `;
+    filterContainer.appendChild(filterLabel);
+    filterContainer.appendChild(filterSelect);
+    dynamicContentArea.appendChild(filterContainer);
+
+    // Container för själva listan, så vi kan rendera om den vid filterbyte
+    const listContainer = document.createElement('div');
+    listContainer.id = 'ctAssocListContainer';
+    dynamicContentArea.appendChild(listContainer);
+    
+    let tempAssociations = {};
+    let isDataModifiedInView = false;
+
+    // Funktion för att spara det aktuella checkbox-läget till jsonData
+    const saveCurrentCheckboxState = () => {
+        let actualChangesMadeToGlobalState = false;
+        for (const reqKey in tempAssociations) {
+            const requirement = state.jsonData.requirements[reqKey];
+            if (!requirement) continue;
+
+            const shouldBeAssociated = tempAssociations[reqKey];
+            const isCurrentlyAssociated = requirement.contentType && requirement.contentType.includes(contentTypeId);
+
+            if (shouldBeAssociated && !isCurrentlyAssociated) {
+                if (!requirement.contentType) requirement.contentType = [];
+                requirement.contentType.push(contentTypeId);
+                actualChangesMadeToGlobalState = true;
+            } else if (!shouldBeAssociated && isCurrentlyAssociated) {
+                const index = requirement.contentType.indexOf(contentTypeId);
+                if (index > -1) {
+                    requirement.contentType.splice(index, 1);
+                    actualChangesMadeToGlobalState = true;
+                }
+            }
+        }
+        if (actualChangesMadeToGlobalState) {
+            state.setState('isDataModified', true);
+            if (saveChangesButton) saveChangesButton.classList.remove('hidden');
+            isDataModifiedInView = false; // Återställ flaggan för vyn
+            const saveBtn = dynamicContentArea.querySelector('.save-ct-view-changes-button');
+            if(saveBtn) saveBtn.disabled = true;
+            return true; // Indikerar att ändringar gjordes
+        }
+        return false; // Indikerar att inga ändringar gjordes
+    };
+
+
+    // Funktion för att rendera listan (flyttad för att kunna anropas vid filterbyte)
+    const renderFilteredList = () => {
+        listContainer.innerHTML = ''; // Rensa föregående lista
+
+        Object.values(state.jsonData.requirements).forEach(req => {
+            const reqKey = req.key || generateRequirementKey(req.title, req.id);
+            if (!req.key) req.key = reqKey;
+            // tempAssociations populeras bara en gång initialt, eller uppdateras av checkbox-klick
+            if (!(reqKey in tempAssociations)) { // Initial populering om nyckeln inte finns
+                 tempAssociations[reqKey] = req.contentType && req.contentType.includes(contentTypeId);
+            }
+        });
+
+        const requirementsArray = Object.values(state.jsonData.requirements).map(value => {
+            if (!value.key) value.key = generateRequirementKey(value.title, value.id);
+            return value;
+        });
+
+        const currentFilter = filterSelect.value;
+        let displayRequirementsArray = requirementsArray;
+
+        if (currentFilter === 'associated') {
+            displayRequirementsArray = requirementsArray.filter(req => tempAssociations[req.key] === true);
+        }
+
+        displayRequirementsArray.sort((a, b) => {
+            const mainCatA = getVal(a, 'metadata.mainCategory.text', getVal(a, 'metadata.mainCategory', 'ÖÖÖ')).trim();
+            const mainCatB = getVal(b, 'metadata.mainCategory.text', getVal(b, 'metadata.mainCategory', 'ÖÖÖ')).trim();
+            if (mainCatA.localeCompare(mainCatB, 'sv') !== 0) return mainCatA.localeCompare(mainCatB, 'sv');
+            const subCatA = getVal(a, 'metadata.subCategory.text', getVal(a, 'metadata.subCategory', 'ööö')).trim();
+            const subCatB = getVal(b, 'metadata.subCategory.text', getVal(b, 'metadata.subCategory', 'ööö')).trim();
+            if (subCatA.localeCompare(subCatB, 'sv') !== 0) return subCatA.localeCompare(subCatB, 'sv');
+            const titleA = getVal(a, 'title', a.key || '');
+            const titleB = getVal(b, 'title', b.key || '');
+            return titleA.localeCompare(titleB, 'sv');
+        });
+
+        const grouped = {};
+        displayRequirementsArray.forEach(req => {
+            const mainCatText = getVal(req, 'metadata.mainCategory.text', getVal(req, 'metadata.mainCategory', 'Okategoriserad')).trim();
+            const subCatText = getVal(req, 'metadata.subCategory.text', getVal(req, 'metadata.subCategory', '')).trim();
+            if (!grouped[mainCatText]) grouped[mainCatText] = {};
+            if (!grouped[mainCatText][subCatText]) grouped[mainCatText][subCatText] = [];
+            grouped[mainCatText][subCatText].push(req);
+        });
+
+        const sortedMainCategories = Object.keys(grouped).sort((a, b) => a.localeCompare(b, 'sv'));
+
+        if (displayRequirementsArray.length === 0) {
+            listContainer.appendChild(document.createElement('p')).textContent = 
+                currentFilter === 'associated' ? `Inga krav är för närvarande kopplade (och markerade) för "${escapeHtml(contentTypeName)}".` : 'Inga krav finns att visa med nuvarande filter.';
+        }
+
+        sortedMainCategories.forEach(mainCategory => {
+            const mainCatHeading = document.createElement('h3');
+            mainCatHeading.id = `maincat-assoc-${generateKeyFromName(mainCategory)}`;
+            mainCatHeading.textContent = mainCategory;
+            listContainer.appendChild(mainCatHeading);
+
+            const categoryContent = grouped[mainCategory];
+            const sortedSubCategories = Object.keys(categoryContent).sort((a, b) => a.localeCompare(b, 'sv'));
+
+            sortedSubCategories.forEach(subCategory => {
+                const reqListForSub = categoryContent[subCategory];
+                let subCatHeadingElement = null;
+                if (subCategory !== '') {
+                    subCatHeadingElement = document.createElement('h4');
+                    subCatHeadingElement.id = `subcat-assoc-${generateKeyFromName(subCategory)}`;
+                    subCatHeadingElement.textContent = subCategory;
+                    listContainer.appendChild(subCatHeadingElement);
+                }
+
+                const ul = document.createElement('ul');
+                ul.classList.add('requirement-list', 'manage-ct-assoc-list');
+                ul.setAttribute('aria-labelledby', subCatHeadingElement ? subCatHeadingElement.id : mainCatHeading.id);
+                listContainer.appendChild(ul);
+
+                reqListForSub.forEach(req => {
+                    renderAssociationListItem(ul, req, contentTypeId, tempAssociations, 
+                        () => { // onCheckboxChangeCallback
+                            isDataModifiedInView = true;
+                            const saveBtn = dynamicContentArea.querySelector('.save-ct-view-changes-button');
+                            if (saveBtn) saveBtn.disabled = false;
+                        },
+                        saveCurrentCheckboxState // Skicka med save-funktionen
+                    );
+                });
+            });
+        });
+    };
+    
+    filterSelect.addEventListener('change', renderFilteredList);
+    renderFilteredList(); // Initial rendering
+
+    const buttonDiv = dynamicContentArea.querySelector('.manage-ct-view-buttons') || document.createElement('div');
+    buttonDiv.innerHTML = ''; // Rensa eventuella gamla knappar
+    buttonDiv.classList.add('form-buttons', 'manage-ct-view-buttons');
+
+    const saveViewChangesButton = document.createElement('button');
+    saveViewChangesButton.type = 'button';
+    saveViewChangesButton.classList.add('save-ct-view-changes-button');
+    saveViewChangesButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.save}</span> Spara ändringar för denna innehållstyp`;
+    saveViewChangesButton.disabled = !isDataModifiedInView;
+
+    saveViewChangesButton.addEventListener('click', () => {
+        const changesMade = saveCurrentCheckboxState();
+        if (changesMade) {
+            displayConfirmation(`Ändringar för innehållstyp "${escapeHtml(contentTypeName)}" har sparats i datan. Glöm inte att ladda ner JSON-filen.`, 'save', dynamicContentArea);
+        } else {
+            displayConfirmation(`Inga ändringar att spara för innehållstyp "${escapeHtml(contentTypeName)}".`, 'info', dynamicContentArea);
+        }
+    });
+    buttonDiv.appendChild(saveViewChangesButton);
+    if (!dynamicContentArea.contains(buttonDiv)) { // Lägg bara till om den inte redan finns
+        dynamicContentArea.appendChild(buttonDiv);
+    }
+
+
+    if (postUploadControlsContainer) postUploadControlsContainer.classList.remove('hidden');
+    if (showMetadataButton) showMetadataButton.style.display = '';
+    if (showRequirementsButton) showRequirementsButton.style.display = '';
+    if (filterSortRow) filterSortRow.classList.add('hidden');
+}
+
+// Hjälpfunktion för att rendera ett listitem i manageContentTypeAssociations vyn
+// Lade till saveCheckboxStateCallback
+function renderAssociationListItem(ulElement, req, contentTypeId, tempAssociations, onCheckboxChangeCallback, saveCheckboxStateCallback) {
+    const reqKey = req.key;
+    if (!reqKey) {
+        console.error("Requirement missing key in renderAssociationListItem:", req);
+        return;
+    }
+    const li = document.createElement('li');
+    li.classList.add('requirement-item');
+    li.dataset.reqKey = reqKey;
+
+    const checkboxContainer = document.createElement('div');
+    checkboxContainer.classList.add('checkbox-container');
+
+    const checkboxId = `mng-ct-${reqKey.replace(/[\.\s]/g, '-')}-${contentTypeId.replace(/[\.\s]/g, '-')}`;
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = checkboxId;
+    checkbox.checked = tempAssociations[reqKey] === true;
+    checkbox.dataset.reqKey = reqKey;
+
+    checkbox.addEventListener('change', (e) => {
+        tempAssociations[e.target.dataset.reqKey] = e.target.checked;
+        if (onCheckboxChangeCallback) {
+            onCheckboxChangeCallback();
+        }
+    });
+    
+    const label = document.createElement('label');
+    label.htmlFor = checkboxId;
+    label.style.cursor = 'pointer';
+    label.style.display = 'inline-block';
+    label.style.marginLeft = '0.5em';
+
+    const reqTextDiv = document.createElement('span');
+    reqTextDiv.classList.add('requirement-text-brief');
+    const refStrong = document.createElement('strong');
+    refStrong.textContent = escapeHtml(getVal(req, 'standardReference.text', req.id || reqKey || 'REF?'));
+    reqTextDiv.appendChild(refStrong);
+    reqTextDiv.appendChild(document.createTextNode(`: ${escapeHtml(req.title || 'TITEL?')}`));
+    
+    label.appendChild(reqTextDiv);
+
+    checkboxContainer.appendChild(checkbox);
+    checkboxContainer.appendChild(label);
+    li.appendChild(checkboxContainer);
+
+    // Visa-knapp
+    const viewButton = document.createElement('button');
+    viewButton.classList.add('req-view-button', 'ct-assoc-view-button'); // Egen klass för ev. specifik styling
+    viewButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.view}</span> Visa`;
+    viewButton.setAttribute('aria-label', `Visa detaljer för ${escapeHtml(req.title || 'Okänt krav')}`);
+    viewButton.dataset.reqKey = reqKey;
+    viewButton.addEventListener('click', () => {
+        if (saveCheckboxStateCallback) {
+            const changesMadeOnSave = saveCheckboxStateCallback(); // Spara checkbox-läget FÖRST
+            if (changesMadeOnSave) {
+                // Visa en snabb bekräftelse om ändringar sparades innan navigering
+                // Detta kan bli lite rörigt om användaren klickar snabbt på många.
+                // Alternativt, skippa denna inline-bekräftelse och lita på den större när man klickar "Spara" manuellt.
+                // console.log("Checkbox state saved before viewing requirement detail.");
+            }
+        }
+        displayRequirementDetail(reqKey); // Navigera sedan till detaljvyn
+    });
+    
+    const actionsDiv = document.createElement('div');
+    actionsDiv.classList.add('requirement-actions', 'ct-assoc-actions'); // Egen klass
+    actionsDiv.appendChild(viewButton);
+    li.appendChild(actionsDiv);
+
+    ulElement.appendChild(li);
+}
+
+
+console.log("Module loaded: requirement_functions (with CT association management updates)");
