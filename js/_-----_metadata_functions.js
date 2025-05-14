@@ -3,27 +3,23 @@
 // Importer
 import { dynamicContentArea, saveChangesButton } from './_-----_dom_element_references.js';
 import { MONITORING_TYPES, ICONS, commonLanguages } from './_-----_constants.js';
-import * as state from './_-----_global_state.js'; // Importera state
+import * as state from './_-----_global_state.js';
 import { escapeHtml, getVal, isValidEmail, generateKeyFromName } from './_-----_utils__helpers.js';
 import { setupContentArea, showError, displayConfirmation } from './_-----_ui_functions.js';
-// Importera den uppdaterade createFormField från krav-modulen
 import { createFormField } from './_---_requirement_functions.js'; 
-// Importera den nya funktionen för att hantera kopplingar
-import { manageContentTypeAssociations } from './_---_requirement_functions.js'; 
+import { manageContentTypeAssociations, displayRequirementsWithoutContentTypes } from './_---_requirement_functions.js'; 
 
-// HJÄLPFUNKTION för att räkna krav per innehållstyp-ID (används fortfarande för visning)
+// HJÄLPFUNKTION för att räkna krav per innehållstyp-ID
 function getRequirementCountsByContentTypeId() {
     const counts = {};
     if (!state.jsonData || !state.jsonData.requirements || !state.jsonData.metadata?.contentTypes) {
         return counts; 
     }
-
     state.jsonData.metadata.contentTypes.forEach(ct => {
         if (ct && ct.id) {
             counts[ct.id] = 0;
         }
     });
-
     Object.values(state.jsonData.requirements).forEach(req => {
         if (req && Array.isArray(req.contentType)) {
             req.contentType.forEach(ctId => {
@@ -35,7 +31,6 @@ function getRequirementCountsByContentTypeId() {
     });
     return counts;
 }
-
 
 export function displayMetadata() {
     console.log("Visar metadata (modul)...");
@@ -184,52 +179,92 @@ export function displayMetadata() {
         dynamicContentArea.appendChild(ptDiv);
     }
 
-    // 4. Hantera 'contentTypes' MED LÄNKAR OCH RÄKNING
-    if (Array.isArray(metadata.contentTypes)) {
-        itemCount++;
+    // 4. Hantera 'contentTypes'
+    // Skapa alltid detta block för att "Krav utan..."-länken ska kunna visas här.
+    itemCount++; 
+    const ctDiv = document.createElement('div');
+    ctDiv.classList.add('metadata-item'); 
+    const ctHeading = document.createElement('strong');
+    ctHeading.textContent = 'Innehållstyper:';
+    ctHeading.style.display = 'block'; 
+    ctDiv.appendChild(ctHeading);
+
+    const ctList = document.createElement('ul'); 
+    ctList.style.listStyle = 'disc';
+    ctList.style.marginLeft = '20px'; 
+
+    if (Array.isArray(metadata.contentTypes) && metadata.contentTypes.length > 0) {
         const requirementCounts = getRequirementCountsByContentTypeId(); 
-
-        const ctDiv = document.createElement('div');
-        ctDiv.classList.add('metadata-item');
-        const ctHeading = document.createElement('strong');
-        ctHeading.textContent = 'Innehållstyper:';
-        ctHeading.style.display = 'block';
-        ctDiv.appendChild(ctHeading);
-
-        if (metadata.contentTypes.length > 0) {
-            const ctList = document.createElement('ul');
-            ctList.style.listStyle = 'disc';
-            ctList.style.marginLeft = '20px';
-            metadata.contentTypes.forEach(ct => {
-                const li = document.createElement('li');
-                const count = requirementCounts[ct.id] || 0;
-                const siffraText = count === 1 ? "krav" : "krav";
-                
-                const link = document.createElement('a');
-                link.href = '#'; 
-                const contentTypeName = getVal(ct, 'text', getVal(ct, 'id', 'Okänd typ'));
-                link.textContent = `${escapeHtml(contentTypeName)} (${count} ${siffraText})`;
-                link.dataset.contentTypeId = ct.id;
-                link.dataset.contentTypeName = contentTypeName; 
-                link.style.cursor = 'pointer';
-                link.style.textDecoration = 'underline';
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const idToManage = e.target.dataset.contentTypeId;
-                    const nameToManage = e.target.dataset.contentTypeName;
-                    if (idToManage && nameToManage) {
-                        manageContentTypeAssociations(idToManage, nameToManage);
-                    }
-                });
-                li.appendChild(link);
-                ctList.appendChild(li);
+        metadata.contentTypes.forEach(ct => {
+            const li = document.createElement('li');
+            const count = requirementCounts[ct.id] || 0;
+            const siffraText = count === 1 ? "krav" : "krav";
+            
+            const link = document.createElement('a');
+            link.href = '#'; 
+            const contentTypeName = getVal(ct, 'text', getVal(ct, 'id', 'Okänd typ'));
+            link.textContent = `${escapeHtml(contentTypeName)} (${count} ${siffraText})`;
+            link.dataset.contentTypeId = ct.id;
+            link.dataset.contentTypeName = contentTypeName; 
+            link.style.cursor = 'pointer';
+            link.style.textDecoration = 'underline';
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const idToManage = e.target.dataset.contentTypeId;
+                const nameToManage = e.target.dataset.contentTypeName;
+                if (idToManage && nameToManage) {
+                    manageContentTypeAssociations(idToManage, nameToManage);
+                }
             });
-            ctDiv.appendChild(ctList);
-        } else {
-             const valueSpan = document.createElement('span'); valueSpan.textContent = ' (inga angivna)'; valueSpan.style.fontStyle = 'italic'; ctDiv.appendChild(valueSpan);
-        }
-        dynamicContentArea.appendChild(ctDiv);
+            li.appendChild(link);
+            ctList.appendChild(li);
+        });
+    } else {
+        const noCtDefinedLi = document.createElement('li');
+        noCtDefinedLi.textContent = '(Inga innehållstyper definierade i metadatan)';
+        noCtDefinedLi.style.fontStyle = 'italic';
+        noCtDefinedLi.style.color = 'var(--neutral-color)'; // Gör den lite diskretare
+        ctList.appendChild(noCtDefinedLi);
     }
+
+    // Lägg till "Krav utan kopplade innehållstyper" som sista element i DENNA UL-lista
+    if (state.jsonData && state.jsonData.requirements) {
+        const reqsWithoutContentTypes = Object.values(state.jsonData.requirements).filter(req => {
+            return !req.contentType || (Array.isArray(req.contentType) && req.contentType.length === 0);
+        });
+        const countNoCt = reqsWithoutContentTypes.length;
+
+        const noCtLi = document.createElement('li');
+        // noCtLi.classList.add('no-ct-link-item'); // Om du vill ha specifik CSS för denna li
+
+        // Lägg till en separator om det finns andra listelement (förutom "inga definierade")
+        if (ctList.children.length > 0 && 
+            !(ctList.children.length === 1 && ctList.firstChild.textContent.startsWith('(Inga innehållstyper'))) {
+            const separator = document.createElement('hr');
+            separator.style.border = 'none';
+            separator.style.borderTop = '1px dotted var(--border-color)';
+            separator.style.margin = '0.5em 0'; // Justera vid behov
+            noCtLi.appendChild(separator); // Lägg separatorn inuti li för att hålla strukturen
+        }
+        
+        const linkNoCt = document.createElement('a');
+        linkNoCt.href = '#';
+        linkNoCt.textContent = `Krav utan kopplade innehållstyper (${countNoCt} st)`;
+        linkNoCt.style.cursor = 'pointer';
+        linkNoCt.style.textDecoration = 'underline';
+        
+        linkNoCt.addEventListener('click', (e) => {
+            e.preventDefault();
+            displayRequirementsWithoutContentTypes();
+        });
+        
+        noCtLi.appendChild(linkNoCt);
+        ctList.appendChild(noCtLi); 
+    }
+    
+    ctDiv.appendChild(ctList); 
+    dynamicContentArea.appendChild(ctDiv); 
+
 
     // 5. Hantera 'keywords'
     if (Array.isArray(metadata.keywords)) {
@@ -577,4 +612,4 @@ export function saveMetadata(event) {
     }
 }
 
-console.log("Module loaded: metadata_functions (with CT links and count display)");
+console.log("Module loaded: metadata_functions (with integrated no-CT link)");

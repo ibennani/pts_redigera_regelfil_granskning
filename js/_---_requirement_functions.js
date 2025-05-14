@@ -1,6 +1,6 @@
 // js/_---_requirement_functions.js
 
-// ... (befintliga importer, inklusive de från _dom_element_references.js) ...
+// Importer
 import {
     dynamicContentArea, filterSortRow, sortOrderSelect, searchInput, saveChangesButton,
     postUploadControlsContainer, showMetadataButton, showRequirementsButton
@@ -9,10 +9,10 @@ import { ICONS } from './_-----_constants.js';
 import * as state from './_-----_global_state.js';
 import { escapeHtml, parseSimpleMarkdown, getVal, generateKeyFromName, generateRequirementKey } from './_-----_utils__helpers.js';
 import { setupContentArea, showError, displayConfirmation } from './_-----_ui_functions.js';
+import { displayMetadata } from './_-----_metadata_functions.js'; // Importera för Tillbaka-knapp
 
 
-// ... (createFormField och andra hjälpfunktioner förblir desamma som tidigare) ...
-// Kopiera in dem här om du vill ha hela filen på en gång. Jag utelämnar dem för korthetens skull i detta svar.
+// ----- Form Field Creation Helpers -----
 export function createFormField(labelText, name, value, type = 'text', placeholder = '', readonly = false, instructionText = null) {
     const container = document.createElement('div');
     container.classList.add('form-field');
@@ -213,13 +213,6 @@ function createDynamicListButton(text, onClick, classNames = 'add-item-button') 
     button.addEventListener('click', onClick);
     return button;
 }
-
-// ... (displayRequirements och dess hjälpfunktioner förblir desamma) ...
-// (renderGroupedRequirements, renderFlatRequirements, renderRequirementListItem, getSortFunction)
-// ... (displayRequirementDetail förblir detsamma) ...
-// ... (renderRequirementForm och dess hjälpfunktioner createCategorySelect, getCategoryValue förblir desamma) ...
-// ... (saveRequirement, extractCategories, confirmDeleteRequirement, deleteRequirement förblir desamma) ...
-// Dessa funktioner kan kopieras in från föregående svar för en komplett fil. Jag utelämnar dem här för att fokusera på ändringarna.
 
 export function displayRequirements() {
     console.log(`Visar krav. Sortering: ${state.currentSortOrder}, Sökterm: "${state.currentSearchTerm}"`);
@@ -918,7 +911,7 @@ export function renderRequirementForm(reqKey) {
 
     const buttonDiv = document.createElement('div');
     buttonDiv.classList.add('form-buttons');
-    const saveButtonElement = document.createElement('button'); // Bytte namn för att undvika konflikt med globala
+    const saveButtonElement = document.createElement('button'); 
     saveButtonElement.type = 'submit';
     saveButtonElement.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.save}</span> Spara ${isEditing ? 'ändringar' : 'nytt krav'}`;
     buttonDiv.appendChild(saveButtonElement);
@@ -1252,7 +1245,6 @@ export function manageContentTypeAssociations(contentTypeId, contentTypeName) {
     filterContainer.appendChild(filterSelect);
     dynamicContentArea.appendChild(filterContainer);
 
-    // Container för själva listan, så vi kan rendera om den vid filterbyte
     const listContainer = document.createElement('div');
     listContainer.id = 'ctAssocListContainer';
     dynamicContentArea.appendChild(listContainer);
@@ -1260,7 +1252,6 @@ export function manageContentTypeAssociations(contentTypeId, contentTypeName) {
     let tempAssociations = {};
     let isDataModifiedInView = false;
 
-    // Funktion för att spara det aktuella checkbox-läget till jsonData
     const saveCurrentCheckboxState = () => {
         let actualChangesMadeToGlobalState = false;
         for (const reqKey in tempAssociations) {
@@ -1285,24 +1276,21 @@ export function manageContentTypeAssociations(contentTypeId, contentTypeName) {
         if (actualChangesMadeToGlobalState) {
             state.setState('isDataModified', true);
             if (saveChangesButton) saveChangesButton.classList.remove('hidden');
-            isDataModifiedInView = false; // Återställ flaggan för vyn
+            isDataModifiedInView = false; 
             const saveBtn = dynamicContentArea.querySelector('.save-ct-view-changes-button');
             if(saveBtn) saveBtn.disabled = true;
-            return true; // Indikerar att ändringar gjordes
+            return true; 
         }
-        return false; // Indikerar att inga ändringar gjordes
+        return false; 
     };
 
-
-    // Funktion för att rendera listan (flyttad för att kunna anropas vid filterbyte)
     const renderFilteredList = () => {
-        listContainer.innerHTML = ''; // Rensa föregående lista
+        listContainer.innerHTML = ''; 
 
         Object.values(state.jsonData.requirements).forEach(req => {
             const reqKey = req.key || generateRequirementKey(req.title, req.id);
             if (!req.key) req.key = reqKey;
-            // tempAssociations populeras bara en gång initialt, eller uppdateras av checkbox-klick
-            if (!(reqKey in tempAssociations)) { // Initial populering om nyckeln inte finns
+            if (!(reqKey in tempAssociations)) {
                  tempAssociations[reqKey] = req.contentType && req.contentType.includes(contentTypeId);
             }
         });
@@ -1373,12 +1361,12 @@ export function manageContentTypeAssociations(contentTypeId, contentTypeName) {
 
                 reqListForSub.forEach(req => {
                     renderAssociationListItem(ul, req, contentTypeId, tempAssociations, 
-                        () => { // onCheckboxChangeCallback
+                        () => { 
                             isDataModifiedInView = true;
                             const saveBtn = dynamicContentArea.querySelector('.save-ct-view-changes-button');
                             if (saveBtn) saveBtn.disabled = false;
                         },
-                        saveCurrentCheckboxState // Skicka med save-funktionen
+                        saveCurrentCheckboxState 
                     );
                 });
             });
@@ -1386,10 +1374,10 @@ export function manageContentTypeAssociations(contentTypeId, contentTypeName) {
     };
     
     filterSelect.addEventListener('change', renderFilteredList);
-    renderFilteredList(); // Initial rendering
+    renderFilteredList(); 
 
     const buttonDiv = dynamicContentArea.querySelector('.manage-ct-view-buttons') || document.createElement('div');
-    buttonDiv.innerHTML = ''; // Rensa eventuella gamla knappar
+    buttonDiv.innerHTML = ''; 
     buttonDiv.classList.add('form-buttons', 'manage-ct-view-buttons');
 
     const saveViewChangesButton = document.createElement('button');
@@ -1407,7 +1395,7 @@ export function manageContentTypeAssociations(contentTypeId, contentTypeName) {
         }
     });
     buttonDiv.appendChild(saveViewChangesButton);
-    if (!dynamicContentArea.contains(buttonDiv)) { // Lägg bara till om den inte redan finns
+    if (!dynamicContentArea.contains(buttonDiv)) { 
         dynamicContentArea.appendChild(buttonDiv);
     }
 
@@ -1418,8 +1406,6 @@ export function manageContentTypeAssociations(contentTypeId, contentTypeName) {
     if (filterSortRow) filterSortRow.classList.add('hidden');
 }
 
-// Hjälpfunktion för att rendera ett listitem i manageContentTypeAssociations vyn
-// Lade till saveCheckboxStateCallback
 function renderAssociationListItem(ulElement, req, contentTypeId, tempAssociations, onCheckboxChangeCallback, saveCheckboxStateCallback) {
     const reqKey = req.key;
     if (!reqKey) {
@@ -1466,32 +1452,134 @@ function renderAssociationListItem(ulElement, req, contentTypeId, tempAssociatio
     checkboxContainer.appendChild(label);
     li.appendChild(checkboxContainer);
 
-    // Visa-knapp
+    const actionsDiv = document.createElement('div');
+    actionsDiv.classList.add('requirement-actions', 'ct-assoc-actions'); 
+    
     const viewButton = document.createElement('button');
-    viewButton.classList.add('req-view-button', 'ct-assoc-view-button'); // Egen klass för ev. specifik styling
+    viewButton.classList.add('req-view-button', 'ct-assoc-view-button'); 
     viewButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.view}</span> Visa`;
     viewButton.setAttribute('aria-label', `Visa detaljer för ${escapeHtml(req.title || 'Okänt krav')}`);
     viewButton.dataset.reqKey = reqKey;
     viewButton.addEventListener('click', () => {
         if (saveCheckboxStateCallback) {
-            const changesMadeOnSave = saveCheckboxStateCallback(); // Spara checkbox-läget FÖRST
+            const changesMadeOnSave = saveCheckboxStateCallback();
             if (changesMadeOnSave) {
-                // Visa en snabb bekräftelse om ändringar sparades innan navigering
-                // Detta kan bli lite rörigt om användaren klickar snabbt på många.
-                // Alternativt, skippa denna inline-bekräftelse och lita på den större när man klickar "Spara" manuellt.
-                // console.log("Checkbox state saved before viewing requirement detail.");
+                 // Visa en diskret bekräftelse, eller ingen alls för att undvika för mycket brus
+                 // console.log("Checkbox state saved before viewing requirement detail.");
+                 // displayConfirmation("Checkbox-ändringar sparade.", "info", dynamicContentArea); // Kan bli rörigt
             }
         }
-        displayRequirementDetail(reqKey); // Navigera sedan till detaljvyn
+        displayRequirementDetail(reqKey);
     });
-    
-    const actionsDiv = document.createElement('div');
-    actionsDiv.classList.add('requirement-actions', 'ct-assoc-actions'); // Egen klass
     actionsDiv.appendChild(viewButton);
     li.appendChild(actionsDiv);
 
     ulElement.appendChild(li);
 }
 
+// --- Ny Funktion för att visa krav utan kopplade innehållstyper ---
+export function displayRequirementsWithoutContentTypes() {
+    if (!state.jsonData || !state.jsonData.requirements) {
+        showError("Kravdata saknas.", dynamicContentArea);
+        return;
+    }
 
-console.log("Module loaded: requirement_functions (with CT association management updates)");
+    state.setState('currentView', 'requirementsWithoutContentTypes');
+    state.setState('lastFocusedReqKey', null);
+
+    setupContentArea(true, false); 
+    if (!dynamicContentArea) return;
+    dynamicContentArea.classList.add('reqs-no-ct-view'); 
+
+    const heading = document.createElement('h2');
+    heading.textContent = 'Krav utan kopplade innehållstyper';
+    dynamicContentArea.appendChild(heading);
+
+    const filteredRequirements = Object.values(state.jsonData.requirements).filter(req => {
+        return !req.contentType || (Array.isArray(req.contentType) && req.contentType.length === 0);
+    }).map(req => { 
+        if (!req.key) req.key = generateRequirementKey(req.title, req.id);
+        return req;
+    });
+
+    if (filteredRequirements.length === 0) {
+        const noReqsP = document.createElement('p');
+        noReqsP.textContent = 'Alla krav har minst en kopplad innehållstyp.';
+        dynamicContentArea.appendChild(noReqsP);
+    } else {
+        filteredRequirements.sort((a, b) => {
+            const mainCatA = getVal(a, 'metadata.mainCategory.text', getVal(a, 'metadata.mainCategory', 'ÖÖÖ')).trim();
+            const mainCatB = getVal(b, 'metadata.mainCategory.text', getVal(b, 'metadata.mainCategory', 'ÖÖÖ')).trim();
+            if (mainCatA.localeCompare(mainCatB, 'sv') !== 0) return mainCatA.localeCompare(mainCatB, 'sv');
+
+            const subCatA = getVal(a, 'metadata.subCategory.text', getVal(a, 'metadata.subCategory', 'ööö')).trim();
+            const subCatB = getVal(b, 'metadata.subCategory.text', getVal(b, 'metadata.subCategory', 'ööö')).trim();
+            if (subCatA.localeCompare(subCatB, 'sv') !== 0) return subCatA.localeCompare(subCatB, 'sv');
+            
+            const titleA = getVal(a, 'title', a.key || '');
+            const titleB = getVal(b, 'title', b.key || '');
+            return titleA.localeCompare(titleB, 'sv');
+        });
+
+        const ul = document.createElement('ul');
+        ul.classList.add('requirement-list', 'flat-list'); 
+        dynamicContentArea.appendChild(ul);
+
+        filteredRequirements.forEach(req => {
+            const li = document.createElement('li');
+            li.classList.add('requirement-item');
+            li.id = `req-no-ct-item-${req.key}`;
+
+            const textDiv = document.createElement('div');
+            textDiv.classList.add('requirement-text');
+            const refStrong = document.createElement('strong');
+            refStrong.textContent = escapeHtml(getVal(req, 'standardReference.text', req.id || req.key || 'REF?'));
+            textDiv.appendChild(refStrong);
+            textDiv.appendChild(document.createTextNode(`: ${escapeHtml(req.title || 'TITEL?')}`));
+            li.appendChild(textDiv);
+
+            const actionsDiv = document.createElement('div');
+            actionsDiv.classList.add('requirement-actions');
+
+            const viewButton = document.createElement('button');
+            viewButton.classList.add('req-view-button');
+            viewButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.view}</span> Visa`;
+            viewButton.setAttribute('aria-label', `Visa ${escapeHtml(req.title || 'Okänt krav')}`);
+            viewButton.dataset.reqKey = req.key;
+            viewButton.addEventListener('click', () => displayRequirementDetail(req.key));
+            actionsDiv.appendChild(viewButton);
+
+            const editButton = document.createElement('button');
+            editButton.classList.add('req-edit-button');
+            editButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.edit}</span> Redigera`;
+            editButton.setAttribute('aria-label', `Redigera ${escapeHtml(req.title || 'Okänt krav')}`);
+            editButton.dataset.reqKey = req.key;
+            editButton.addEventListener('click', () => renderRequirementForm(req.key));
+            actionsDiv.appendChild(editButton);
+            
+            li.appendChild(actionsDiv);
+            ul.appendChild(li);
+        });
+    }
+
+    const backButtonContainer = document.createElement('div');
+    backButtonContainer.style.textAlign = 'center'; 
+    backButtonContainer.style.marginTop = '2rem';
+
+    const backToMetaButton = document.createElement('button');
+    backToMetaButton.type = 'button';
+    backToMetaButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.back}</span> Tillbaka till Metadata`;
+    backToMetaButton.addEventListener('click', () => {
+        displayMetadata(); 
+    });
+    backButtonContainer.appendChild(backToMetaButton);
+    dynamicContentArea.appendChild(backButtonContainer);
+
+    if (postUploadControlsContainer) postUploadControlsContainer.classList.remove('hidden');
+    if (showMetadataButton) showMetadataButton.style.display = '';
+    if (showRequirementsButton) showRequirementsButton.style.display = '';
+    if (filterSortRow) filterSortRow.classList.add('hidden');
+}
+
+
+console.log("Module loaded: requirement_functions (with CT association management and no-CT display updates)");

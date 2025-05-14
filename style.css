@@ -1374,3 +1374,181 @@ body.dark-theme .confirmation-message.info-confirmation {
     .manage-ct-view-buttons { flex-direction: column; }
     .manage-ct-view-buttons button { width: 100%; }
 }
+
+/* --- Styling för Hantera Innehållstyp-kopplingar vyn --- */
+
+#dynamicContentArea.manage-ct-associations-view h2 {
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem; 
+}
+#dynamicContentArea.manage-ct-associations-view > p { /* Beskrivningen */
+    margin-bottom: 1.5rem;
+    font-size: 0.95em;
+    background-color: var(--secondary-color); 
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    border-left: 3px solid var(--accent-color);
+}
+
+/* Filterkontroll i manageContentTypeAssociations vyn */
+.ct-association-filter {
+    margin-bottom: 1.5rem;
+    padding: 0.5rem;
+    background-color: var(--secondary-color);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    font-size: 0.9em;
+}
+.ct-association-filter label {
+    font-weight: 500;
+    color: var(--text-color);
+}
+.ct-association-filter select {
+    padding: 0.4rem 0.6rem;
+    border-radius: 3px;
+    border: 1px solid var(--neutral-color);
+    background-color: var(--section-bg);
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+
+/* Rubriker för kategorier i denna vy */
+#dynamicContentArea.manage-ct-associations-view h3 {
+    font-size: 1.3rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+#dynamicContentArea.manage-ct-associations-view h4 {
+    font-size: 1.1rem;
+    margin-top: 1rem;
+    margin-bottom: 0.3rem;
+    color: var(--heading-color);
+    opacity: 0.8;
+    font-weight: 500;
+}
+
+/* Listan med krav och checkboxes */
+.manage-ct-assoc-list { 
+    list-style: none;
+    padding-left: 0;
+    margin-top: 0.5rem;
+}
+.manage-ct-assoc-list .requirement-item { /* LI-elementet */
+    display: flex;
+    align-items: center; 
+    justify-content: space-between; /* För att få Visa-knappen till höger */
+    padding: 0.6rem 0.5rem; 
+    margin-bottom: 0.3rem;
+    border-bottom: 1px dotted var(--border-color); 
+}
+.manage-ct-assoc-list .requirement-item:last-child {
+    border-bottom: none;
+}
+
+.manage-ct-assoc-list .checkbox-container {
+    display: flex;
+    align-items: center;
+    min-width: 0; 
+    flex-grow: 1; /* Låt denna ta upp mest plats */
+}
+
+.manage-ct-assoc-list input[type="checkbox"] {
+    width: 1.2em; 
+    height: 1.2em;
+    margin-right: 0.3em; 
+    accent-color: var(--primary-color);
+    cursor: pointer;
+    flex-shrink: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--section-bg); 
+    border: 1px solid var(--neutral-color);
+    border-radius: 3px;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+}
+.manage-ct-assoc-list input[type="checkbox"]:checked::before {
+    content: '✔';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--primary-color);
+    font-size: 1em; 
+    line-height: 1;
+}
+
+
+.manage-ct-assoc-list label { /* Labeln som omsluter kravtexten */
+    /* flex-grow: 1; */ /* Tas bort, checkbox-container har nu flex-grow */
+    min-width: 0; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; 
+    padding-left: 0.3em; 
+}
+
+.manage-ct-assoc-list .requirement-text-brief strong {
+    color: var(--primary-color);
+    margin-right: 0.3em;
+}
+
+/* Anpassning för Visa-knappen i denna listan */
+.manage-ct-assoc-list .ct-assoc-actions {
+    flex-shrink: 0; /* Se till att den inte krymper */
+    margin-left: 1em; /* Lite space från texten */
+}
+.manage-ct-assoc-list .ct-assoc-view-button {
+    padding: 0.25rem 0.5rem; /* Mindre knapp */
+    font-size: 0.8rem;
+}
+
+
+/* Knappar längst ner i denna vy */
+.manage-ct-view-buttons {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end; 
+    gap: 1rem;
+}
+
+.manage-ct-view-buttons .save-ct-view-changes-button {
+    background-color: var(--success-color);
+    color: var(--success-text);
+}
+.manage-ct-view-buttons .save-ct-view-changes-button:hover {
+    background-color: var(--success-hover);
+}
+.manage-ct-view-buttons .save-ct-view-changes-button:disabled {
+    background-color: var(--disabled-bg);
+    color: var(--disabled-text);
+    cursor: not-allowed;
+}
+
+
+/* --- Styling för vyn "Krav utan innehållstyper" --- */
+#dynamicContentArea.reqs-no-ct-view h2 {
+    margin-bottom: 1rem;
+}
+/* Återanvänder .requirement-list och .requirement-item från den vanliga kravlistan för denna vy */
+
+
+/* Länk för krav utan innehållstyper i metadatavyn */
+#dynamicContentArea .special-link-item {
+    margin-top: 1.5rem; 
+    padding: 0.75rem 1rem;
+    background-color: var(--secondary-color); 
+    border-left: 4px solid var(--warning-color); 
+    border-radius: 4px;
+}
+#dynamicContentArea .special-link-item a {
+    font-weight: 600; 
+}
