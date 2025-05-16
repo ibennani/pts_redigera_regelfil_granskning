@@ -118,7 +118,7 @@ function createCheckFieldset(checkData, index) {
         `check-${index}-condition`, 
         checkData.condition || '', 
         'textarea', 
-        'Beskriv när kontrollen ska utföras...'
+        '' // Placeholder borttagen
     );
     const conditionTextarea = conditionContainer.querySelector('textarea');
     if (conditionTextarea) {
@@ -207,7 +207,7 @@ function createDynamicListButton(text, onClick, classNames = 'add-item-button') 
     button.type = 'button';
     let icon = ICONS.add;
     if (text.toLowerCase().includes('ta bort')) icon = ICONS.delete;
-    button.innerHTML = `<span class="icon" aria-hidden="true">${icon}</span> ${escapeHtml(text)}`;
+    button.innerHTML = `${escapeHtml(text)} <span class="icon" aria-hidden="true">${icon}</span>`; // Ikon till höger
     if (Array.isArray(classNames)) button.classList.add(...classNames);
     else if (typeof classNames === 'string') button.classList.add(classNames);
     button.addEventListener('click', onClick);
@@ -440,21 +440,21 @@ function renderRequirementListItem(req, keyToFocus) {
     actionsDiv.classList.add('requirement-actions');
     const viewButton = document.createElement('button');
     viewButton.classList.add('req-view-button');
-    viewButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.view}</span> Visa`;
+    viewButton.innerHTML = `Visa <span class="icon" aria-hidden="true">${ICONS.view}</span>`; // Ikon till höger
     viewButton.setAttribute('aria-label', `Visa ${escapeHtml(req.title || 'Okänt krav')}`);
     viewButton.dataset.reqKey = req.key;
     viewButton.addEventListener('click', () => displayRequirementDetail(req.key));
     actionsDiv.appendChild(viewButton);
     const editButton = document.createElement('button');
     editButton.classList.add('req-edit-button');
-    editButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.edit}</span> Redigera`;
+    editButton.innerHTML = `Redigera <span class="icon" aria-hidden="true">${ICONS.edit}</span>`; // Ikon till höger
     editButton.setAttribute('aria-label', `Redigera ${escapeHtml(req.title || 'Okänt krav')}`);
     editButton.dataset.reqKey = req.key;
     editButton.addEventListener('click', () => renderRequirementForm(req.key));
     actionsDiv.appendChild(editButton);
     const deleteButton = document.createElement('button');
     deleteButton.classList.add('button-danger', 'req-delete-button');
-    deleteButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.delete}</span> Radera`;
+    deleteButton.innerHTML = `Radera <span class="icon" aria-hidden="true">${ICONS.delete}</span>`; // Ikon till höger
     deleteButton.setAttribute('aria-label', `Radera ${escapeHtml(req.title || 'Okänt krav')}`);
     deleteButton.dataset.reqKey = req.key;
     deleteButton.addEventListener('click', () => confirmDeleteRequirement(req.key));
@@ -548,14 +548,14 @@ export function displayRequirementDetail(reqKey) {
 
     const editButton = document.createElement('button');
     editButton.className = 'req-edit-button';
-    editButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.edit}</span> Redigera`;
+    editButton.innerHTML = `Redigera <span class="icon" aria-hidden="true">${ICONS.edit}</span>`; // Ikon till höger
     editButton.setAttribute('aria-label', `Redigera ${escapeHtml(requirement.title)}`);
     editButton.addEventListener('click', () => renderRequirementForm(reqKey));
     actionButtonContainer.appendChild(editButton);
 
     const deleteButton = document.createElement('button');
     deleteButton.className = 'button-danger req-delete-button';
-    deleteButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.delete}</span> Radera`;
+    deleteButton.innerHTML = `Radera <span class="icon" aria-hidden="true">${ICONS.delete}</span>`; // Ikon till höger
     deleteButton.setAttribute('aria-label', `Radera ${escapeHtml(requirement.title)}`);
     deleteButton.addEventListener('click', () => confirmDeleteRequirement(reqKey));
     actionButtonContainer.appendChild(deleteButton);
@@ -768,7 +768,7 @@ export function displayRequirementDetail(reqKey) {
 
     const backButton = document.createElement('button');
     backButton.id = 'backButton';
-    backButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.back}</span> Tillbaka till listan`;
+    backButton.innerHTML = `Tillbaka till listan <span class="icon" aria-hidden="true">${ICONS.back}</span>`; // Ikon till höger
     backButton.addEventListener('click', () => { displayRequirements(); });
     dynamicContentArea.appendChild(backButton);
 
@@ -794,7 +794,7 @@ export function renderRequirementForm(reqKey) {
     heading.textContent = isEditing ? `${formTitle}: ${escapeHtml(requirement.title || reqKey)}` : formTitle;
     form.appendChild(heading);
 
-    form.appendChild(createFormField('Titel*', 'title', requirement.title || '', 'text', 'Kravets titel'));
+    form.appendChild(createFormField('Titel*', 'title', requirement.title || '', 'text', '')); // Placeholder borttagen
     
     const stdRefFieldset = document.createElement('fieldset');
     const stdRefLegend = document.createElement('legend');
@@ -806,8 +806,8 @@ export function renderRequirementForm(reqKey) {
     } else if (typeof requirement.standardReference === 'string') {
         refText = requirement.standardReference;
     }
-    stdRefFieldset.appendChild(createFormField('Text', 'standardReference.text', refText, 'text', 't.ex. WCAG 9.1.4.2'));
-    stdRefFieldset.appendChild(createFormField('URL (valfri)', 'standardReference.url', refUrl, 'url', 'https://www.w3.org/TR/...'));
+    stdRefFieldset.appendChild(createFormField('Text', 'standardReference.text', refText, 'text', '')); // Placeholder borttagen
+    stdRefFieldset.appendChild(createFormField('URL (valfri)', 'standardReference.url', refUrl, 'url', '')); // Placeholder borttagen
     form.appendChild(stdRefFieldset);
 
     const instrFieldset = document.createElement('fieldset');
@@ -829,14 +829,16 @@ export function renderRequirementForm(reqKey) {
     instrFieldset.appendChild(addInstrButton);
     form.appendChild(instrFieldset);
 
-    form.appendChild(createFormField('Exempel', 'examples', requirement.examples || '', 'textarea'));
-    form.appendChild(createFormField('Undantag', 'exceptions', requirement.exceptions || '', 'textarea'));
-    form.appendChild(createFormField('Vanliga Fel', 'commonErrors', requirement.commonErrors || '', 'textarea'));
-    form.appendChild(createFormField('Tips', 'tips', requirement.tips || '', 'textarea'));
-    const obsFieldContainer = createFormField('Förväntad observation', 'expectedObservation', requirement.expectedObservation || '', 'textarea', 'Beskriv den förväntade observationen här...', false, 'Text som beskriver vad som förväntas observeras vid granskning.');
+    // Ändrad ordning och borttagna placeholders
+    const obsFieldContainer = createFormField('Förväntad observation', 'expectedObservation', requirement.expectedObservation || '', 'textarea', '', false, 'Text som beskriver vad som förväntas observeras vid granskning.'); // Placeholder borttagen
     const obsTextarea = obsFieldContainer.querySelector('textarea');
     if(obsTextarea) obsTextarea.rows = 5;
     form.appendChild(obsFieldContainer);
+
+    form.appendChild(createFormField('Exempel', 'examples', requirement.examples || '', 'textarea', '')); // Placeholder borttagen
+    form.appendChild(createFormField('Undantag', 'exceptions', requirement.exceptions || '', 'textarea', '')); // Placeholder borttagen
+    form.appendChild(createFormField('Vanliga Fel', 'commonErrors', requirement.commonErrors || '', 'textarea', '')); // Placeholder borttagen
+    form.appendChild(createFormField('Tips', 'tips', requirement.tips || '', 'textarea', '')); // Placeholder borttagen
 
 
     const checksFieldset = document.createElement('fieldset');
@@ -888,12 +890,12 @@ export function renderRequirementForm(reqKey) {
     if (mainCategories.length > 0) {
         metaFieldset.appendChild(createCategorySelect('Huvudkategori*', 'metadata.mainCategory.text', mainCategories, currentMainCatText, false));
     } else {
-        metaFieldset.appendChild(createFormField('Huvudkategori*', 'metadata.mainCategory.text', currentMainCatText, 'text', 'Ange huvudkategori'));
+        metaFieldset.appendChild(createFormField('Huvudkategori*', 'metadata.mainCategory.text', currentMainCatText, 'text', '')); // Placeholder borttagen
     }
     if (subCategories.length > 0) {
         metaFieldset.appendChild(createCategorySelect('Underkategori (valfri)', 'metadata.subCategory.text', subCategories, currentSubCatText, true));
     } else {
-        metaFieldset.appendChild(createFormField('Underkategori (valfri)', 'metadata.subCategory.text', currentSubCatText, 'text', 'Ange underkategori (om relevant)'));
+        metaFieldset.appendChild(createFormField('Underkategori (valfri)', 'metadata.subCategory.text', currentSubCatText, 'text', '')); // Placeholder borttagen
     }
 
     const impactFieldset = document.createElement('fieldset');
@@ -902,8 +904,8 @@ export function renderRequirementForm(reqKey) {
     impactFieldset.appendChild(impactLegend);
     const impactData = getVal(requirement, 'metadata.impact', {});
     impactFieldset.appendChild(createFormField('Kritisk?', 'metadata.impact.isCritical', impactData.isCritical || false, 'checkbox'));
-    impactFieldset.appendChild(createFormField('Primär poäng', 'metadata.impact.primaryScore', impactData.primaryScore ?? 0, 'number', '0'));
-    impactFieldset.appendChild(createFormField('Sekundär poäng', 'metadata.impact.secondaryScore', impactData.secondaryScore ?? 0, 'number', '0'));
+    impactFieldset.appendChild(createFormField('Primär poäng', 'metadata.impact.primaryScore', impactData.primaryScore ?? 0, 'number', '')); // Placeholder borttagen
+    impactFieldset.appendChild(createFormField('Sekundär poäng', 'metadata.impact.secondaryScore', impactData.secondaryScore ?? 0, 'number', '')); // Placeholder borttagen
     const defaultAssumedCompliance = impactData.assumedCompliance ?? false; 
     impactFieldset.appendChild(createFormField('Antagen efterlevnad?', 'metadata.impact.assumedCompliance', defaultAssumedCompliance, 'checkbox'));
     metaFieldset.appendChild(impactFieldset);
@@ -913,11 +915,11 @@ export function renderRequirementForm(reqKey) {
     buttonDiv.classList.add('form-buttons');
     const saveButtonElement = document.createElement('button'); 
     saveButtonElement.type = 'submit';
-    saveButtonElement.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.save}</span> Spara ${isEditing ? 'ändringar' : 'nytt krav'}`;
+    saveButtonElement.innerHTML = `Spara ${isEditing ? 'ändringar' : 'nytt krav'} <span class="icon" aria-hidden="true">${ICONS.save}</span>`; // Ikon till höger
     buttonDiv.appendChild(saveButtonElement);
     const cancelButton = document.createElement('button');
     cancelButton.type = 'button';
-    cancelButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.cancel}</span> Avbryt`;
+    cancelButton.innerHTML = `Avbryt <span class="icon" aria-hidden="true">${ICONS.cancel}</span>`; // Ikon till höger
     cancelButton.addEventListener('click', () => {
         if (isEditing) {
             displayRequirementDetail(reqKey);
@@ -1160,7 +1162,7 @@ export function confirmDeleteRequirement(reqKey) {
     dynamicContentArea.classList.add('delete-confirmation-view');
 
     const heading = document.createElement('h2');
-    heading.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.warning}</span> Radera krav?`;
+    heading.innerHTML = `Radera krav? <span class="icon" aria-hidden="true">${ICONS.warning}</span>`; // Ikon till höger
     dynamicContentArea.appendChild(heading);
 
     const warningText = document.createElement('p');
@@ -1172,14 +1174,14 @@ export function confirmDeleteRequirement(reqKey) {
 
     const keepButton = document.createElement('button');
     keepButton.type = 'button';
-    keepButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.keep}</span> Behåll kravet`;
+    keepButton.innerHTML = `Behåll kravet <span class="icon" aria-hidden="true">${ICONS.keep}</span>`; // Ikon till höger
     keepButton.addEventListener('click', () => displayRequirementDetail(reqKey));
     buttonDiv.appendChild(keepButton);
 
     const deleteConfirmButton = document.createElement('button');
     deleteConfirmButton.type = 'button';
     deleteConfirmButton.classList.add('button-danger');
-    deleteConfirmButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.delete}</span> Ja, radera kravet`;
+    deleteConfirmButton.innerHTML = `Ja, radera kravet <span class="icon" aria-hidden="true">${ICONS.delete}</span>`; // Ikon till höger
     deleteConfirmButton.addEventListener('click', () => deleteRequirement(reqKey));
     buttonDiv.appendChild(deleteConfirmButton);
     dynamicContentArea.appendChild(buttonDiv);
@@ -1383,7 +1385,7 @@ export function manageContentTypeAssociations(contentTypeId, contentTypeName) {
     const saveViewChangesButton = document.createElement('button');
     saveViewChangesButton.type = 'button';
     saveViewChangesButton.classList.add('save-ct-view-changes-button');
-    saveViewChangesButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.save}</span> Spara ändringar för denna innehållstyp`;
+    saveViewChangesButton.innerHTML = `Spara ändringar för denna innehållstyp <span class="icon" aria-hidden="true">${ICONS.save}</span>`; // Ikon till höger
     saveViewChangesButton.disabled = !isDataModifiedInView;
 
     saveViewChangesButton.addEventListener('click', () => {
@@ -1457,7 +1459,7 @@ function renderAssociationListItem(ulElement, req, contentTypeId, tempAssociatio
     
     const viewButton = document.createElement('button');
     viewButton.classList.add('req-view-button', 'ct-assoc-view-button'); 
-    viewButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.view}</span> Visa`;
+    viewButton.innerHTML = `Visa <span class="icon" aria-hidden="true">${ICONS.view}</span>`; // Ikon till höger
     viewButton.setAttribute('aria-label', `Visa detaljer för ${escapeHtml(req.title || 'Okänt krav')}`);
     viewButton.dataset.reqKey = reqKey;
     viewButton.addEventListener('click', () => {
@@ -1543,7 +1545,7 @@ export function displayRequirementsWithoutContentTypes() {
 
             const viewButton = document.createElement('button');
             viewButton.classList.add('req-view-button');
-            viewButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.view}</span> Visa`;
+            viewButton.innerHTML = `Visa <span class="icon" aria-hidden="true">${ICONS.view}</span>`; // Ikon till höger
             viewButton.setAttribute('aria-label', `Visa ${escapeHtml(req.title || 'Okänt krav')}`);
             viewButton.dataset.reqKey = req.key;
             viewButton.addEventListener('click', () => displayRequirementDetail(req.key));
@@ -1551,7 +1553,7 @@ export function displayRequirementsWithoutContentTypes() {
 
             const editButton = document.createElement('button');
             editButton.classList.add('req-edit-button');
-            editButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.edit}</span> Redigera`;
+            editButton.innerHTML = `Redigera <span class="icon" aria-hidden="true">${ICONS.edit}</span>`; // Ikon till höger
             editButton.setAttribute('aria-label', `Redigera ${escapeHtml(req.title || 'Okänt krav')}`);
             editButton.dataset.reqKey = req.key;
             editButton.addEventListener('click', () => renderRequirementForm(req.key));
@@ -1568,7 +1570,7 @@ export function displayRequirementsWithoutContentTypes() {
 
     const backToMetaButton = document.createElement('button');
     backToMetaButton.type = 'button';
-    backToMetaButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.back}</span> Tillbaka till Metadata`;
+    backToMetaButton.innerHTML = `Tillbaka till Metadata <span class="icon" aria-hidden="true">${ICONS.back}</span>`; // Ikon till höger
     backToMetaButton.addEventListener('click', () => {
         displayMetadata(); 
     });

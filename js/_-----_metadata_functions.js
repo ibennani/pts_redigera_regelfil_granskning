@@ -51,7 +51,7 @@ export function displayMetadata() {
     actionContainer.className = 'action-button-container';
     const editButton = document.createElement('button');
     editButton.id = 'editMetadataButton';
-    editButton.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.edit}</span> Redigera metadata`;
+    editButton.innerHTML = `Redigera metadata <span class="icon" aria-hidden="true">${ICONS.edit}</span>`; // Ikon till höger
     editButton.addEventListener('click', renderMetadataForm);
     actionContainer.appendChild(editButton);
     dynamicContentArea.insertBefore(actionContainer, heading);
@@ -203,15 +203,15 @@ export function displayMetadata() {
             const link = document.createElement('a');
             link.href = '#'; 
             const contentTypeName = getVal(ct, 'text', getVal(ct, 'id', 'Okänd typ'));
-            link.textContent = `${escapeHtml(contentTypeName)} (${count} ${siffraText})`;
+            link.innerHTML = `${escapeHtml(contentTypeName)} (${count} ${siffraText}) <span class="icon" aria-hidden="true">${ICONS.edit}</span>`; // Ikon till höger
             link.dataset.contentTypeId = ct.id;
             link.dataset.contentTypeName = contentTypeName; 
             link.style.cursor = 'pointer';
             link.style.textDecoration = 'underline';
             link.addEventListener('click', (e) => {
                 e.preventDefault();
-                const idToManage = e.target.dataset.contentTypeId;
-                const nameToManage = e.target.dataset.contentTypeName;
+                const idToManage = e.target.closest('a').dataset.contentTypeId; // Närmaste a-element
+                const nameToManage = e.target.closest('a').dataset.contentTypeName;
                 if (idToManage && nameToManage) {
                     manageContentTypeAssociations(idToManage, nameToManage);
                 }
@@ -249,7 +249,7 @@ export function displayMetadata() {
         
         const linkNoCt = document.createElement('a');
         linkNoCt.href = '#';
-        linkNoCt.textContent = `Krav utan kopplade innehållstyper (${countNoCt} st)`;
+        linkNoCt.innerHTML = `Krav utan kopplade innehållstyper (${countNoCt} st) <span class="icon" aria-hidden="true">${ICONS.list}</span>`; // Ikon till höger
         linkNoCt.style.cursor = 'pointer';
         linkNoCt.style.textDecoration = 'underline';
         
@@ -385,13 +385,13 @@ export function renderMetadataForm() {
                                          : (subKey === 'url') ? 'url'
                                          : (['retrievedDate'].includes(subKey)) ? 'date'
                                          : 'text';
-                        const placeholder = (inputType === 'url') ? 'https://exempel.com' : '';
+                        const placeholder = (inputType === 'url') ? '' : ''; // Placeholder borttagen
                         fieldset.appendChild(createFormField(readableSubKey, `${key}.${subKey}`, subValue, inputType, placeholder, false, null));
                     }
                 }
                 fieldContainer.appendChild(fieldset);
             } else if (key === 'language') {
-                 fieldContainer = createFormField('Språk*', 'language', value, 'text', 't.ex. sv', false, 'Ange språkkod (ISO 639-1, t.ex. sv, en) eller välj från listan.');
+                 fieldContainer = createFormField('Språk*', 'language', value, 'text', '', false, 'Ange språkkod (ISO 639-1, t.ex. sv, en) eller välj från listan.'); // Placeholder borttagen
                  const input = fieldContainer.querySelector('input');
                  if (input) {
                     input.setAttribute('list', 'language-list');
@@ -454,11 +454,11 @@ export function renderMetadataForm() {
     buttonDiv.classList.add('form-buttons');
     const saveBtn = document.createElement('button');
     saveBtn.type = 'submit';
-    saveBtn.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.save}</span> Spara ändringar`;
+    saveBtn.innerHTML = `Spara ändringar <span class="icon" aria-hidden="true">${ICONS.save}</span>`; // Ikon till höger
     buttonDiv.appendChild(saveBtn);
     const cancelBtn = document.createElement('button');
     cancelBtn.type = 'button';
-    cancelBtn.innerHTML = `<span class="icon" aria-hidden="true">${ICONS.cancel}</span> Avbryt`;
+    cancelBtn.innerHTML = `Avbryt <span class="icon" aria-hidden="true">${ICONS.cancel}</span>`; // Ikon till höger
     cancelBtn.addEventListener('click', () => displayMetadata());
     buttonDiv.appendChild(cancelBtn);
     form.appendChild(buttonDiv);

@@ -16,7 +16,7 @@
             <p>Ladda upp din JSON-fil med kravdata för att börja.</p>
             <!-- ÄNDRING HÄR: Från label till button -->
             <button type="button" id="uploadFileButton" class="button-like-styling"> <!-- Nytt ID och ev. ny klass -->
-                 <span class="icon" aria-hidden="true">⬆️</span> Ladda upp JSON-fil...
+                 Ladda upp JSON-fil... <span class="icon" aria-hidden="true">⬆️</span>
             </button>
             <input type="file" id="fileInput" accept=".json" style="display: none;">
             <p class="field-instruction">Använd en JSON-fil som följer Diggs tillsynsmanuals struktur.</p>
@@ -27,10 +27,10 @@
     <div id="postUploadControlsContainer" class="hidden">
          <div class="main-controls">
             <button id="showMetadataButton">
-                <span class="icon" aria-hidden="true">ℹ️</span> Visa metadata
+                Visa metadata <span class="icon" aria-hidden="true">ℹ️</span>
             </button>
             <button id="showRequirementsButton">
-                 <span class="icon" aria-hidden="true">📋</span> Visa kontroller
+                 Visa kontroller <span class="icon" aria-hidden="true">📋</span>
             </button>
         </div>
          <div class="secondary-controls">
@@ -41,25 +41,25 @@
                      <select id="sortOrderSelect">
                          <option value="category-asc" selected>Kategorier (A-Ö)</option>
                          <option value="category-desc">Kategorier (Ö-A)</option>
-                         <option value="ref-asc">Referens (Stigande)</option>
-                         <option value="ref-desc">Referens (Fallande)</option>
+                         <option value="ref-asc">Krav (Stigande)</option> <!-- Ändrad text -->
+                         <option value="ref-desc">Krav (Fallande)</option> <!-- Ändrad text -->
                          <option value="impact-critical-first">Påverkan (Kritisk först)</option>
                          <option value="impact-critical-last">Påverkan (Kritisk sist)</option>
                      </select>
                  </div>
                  <div class="search-control">
                     <label for="searchInput" class="visually-hidden">Sök krav</label>
-                    <input type="search" id="searchInput" placeholder="Sök på titel, ref, text...">
+                    <input type="search" id="searchInput" placeholder="Sök på titel, kravnr, text...">
                     <span class="search-icon" aria-hidden="true">🔍</span>
                  </div>
                  <button id="addRequirementButton">
-                      <span class="icon" aria-hidden="true">➕</span> Lägg till krav
+                      Lägg till krav <span class="icon" aria-hidden="true">➕</span>
                   </button>
             </div>
 
              <!-- Globala spara-knappen -->
              <button id="saveChangesButton" class="hidden">
-                 <span class="icon" aria-hidden="true">💾</span> Spara ändringar (JSON)
+                 Spara ändringar (JSON) <span class="icon" aria-hidden="true">💾</span>
             </button>
             <!-- Plats för inline save confirmation (läggs till av JS) -->
          </div>
