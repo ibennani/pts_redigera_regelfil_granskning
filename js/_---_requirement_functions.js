@@ -632,7 +632,6 @@ export function displayRequirementDetail(reqKey) {
         if (Object.prototype.hasOwnProperty.call(requirement, key) && requirement[key]) {
             const section = document.createElement('div');
             section.classList.add('detail-section');
-            if (key === 'exceptions') section.classList.add('exceptions');
             const heading = document.createElement('h3');
             heading.textContent = optionalSections[key];
             section.appendChild(heading);
