@@ -984,10 +984,12 @@ body.dark-theme #dynamicContentArea.form-view .check-fieldset > legend {
 
 
 #dynamicContentArea.form-view .remove-check-button { /* För hela kontrollpunkten */
-    position: absolute; 
-    top: 1rem; 
-    right: 1rem; 
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1; /* NY RAD: Säkerställer att knappen är ovanpå legend */
 }
+
 #dynamicContentArea.form-view .check-fieldset .form-field { 
     margin-bottom: 1.5rem; 
 }
