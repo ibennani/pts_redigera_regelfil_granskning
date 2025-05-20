@@ -76,7 +76,7 @@ export function createFormField(labelText, name, value, type = 'text', placehold
     } else {
         if (type === 'textarea') {
             inputElement = document.createElement('textarea');
-            inputElement.rows = 1; // ÄNDRING: Sätt till 1 initialt för bättre auto-resize
+            inputElement.rows = 1; // Sätt till 1 initialt för bättre auto-resize
         } else {
             inputElement = document.createElement('input');
             inputElement.type = type;
@@ -103,7 +103,7 @@ function createInstructionListItem(text, index) {
     li.dataset.index = index;
     const textarea = document.createElement('textarea');
     textarea.name = `instruction-${index}`;
-    textarea.rows = 1; // ÄNDRING: Sätt till 1 initialt
+    textarea.rows = 1; // Sätt till 1 initialt
     textarea.value = text;
     textarea.placeholder = "Instruktionstext...";
     textarea.setAttribute('aria-label', `Instruktion ${index + 1}`);
@@ -172,7 +172,6 @@ function createCheckFieldset(checkData, index) {
 
     fieldset.appendChild(headerDiv);
 
-    // `createFormField` kommer nu sätta rows=1 för denna textarea
     const conditionContainer = createFormField(
         `Påståendetext*`,
         `check-${index}-condition`,
@@ -445,6 +444,7 @@ export function displayRequirements() {
     const heading = document.createElement('h2');
     dynamicContentArea.appendChild(heading);
     const keyToFocus = state.lastFocusedReqKey;
+    // console.log("[displayRequirements] keyToFocus is:", keyToFocus); // Felsökningslogg
     let requirementsArray;
     try {
         requirementsArray = Object.entries(requirements).map(([key, value]) => {
@@ -507,6 +507,7 @@ export function displayRequirements() {
     }
 
     const elementToFocus = dynamicContentArea.querySelector('[data-focus-target="true"] .requirement-text');
+    // console.log("[displayRequirements] Element to actually focus:", elementToFocus); // Felsökningslogg
     if (elementToFocus) {
         setTimeout(() => {
              if (elementToFocus && document.body.contains(elementToFocus)) {
@@ -516,6 +517,7 @@ export function displayRequirements() {
              state.setState('lastFocusedReqKey', null);
         }, 50);
     } else if (keyToFocus) {
+        // Om keyToFocus var satt men elementet inte hittades (t.ex. pga filtrering), nollställ ändå.
         state.setState('lastFocusedReqKey', null);
     }
 }
@@ -644,6 +646,7 @@ function renderRequirementListItem(req, keyToFocus) {
     li.appendChild(actionsDiv);
     if (req.key === keyToFocus) {
         li.dataset.focusTarget = 'true';
+        // console.log(`[renderRequirementListItem] Set focusTarget for ${req.key}`); // Felsökningslogg
     }
     return li;
 }
@@ -699,7 +702,7 @@ function getSortFunction(sortOrder) {
                     valB = getVal(subCatBObj, 'text', typeof subCatBObj === 'string' ? subCatBObj : 'ööö').trim() || 'ööö';
                     compareResult = valA.localeCompare(valB, 'sv');
                      if (compareResult !== 0) {
-                        return compareResult; // Subkategorier sorteras alltid A-Ö inom huvudkategori
+                        return compareResult; 
                     }
                     valA = getVal(a, 'standardReference.text', a.key || '');
                     valB = getVal(b, 'standardReference.text', b.key || '');
@@ -719,7 +722,7 @@ export function displayRequirementDetail(reqKey) {
         if (state.jsonData?.requirements) displayRequirements();
         return;
     }
-    state.setState('currentRequirementKey', reqKey);
+    state.setState('currentRequirementKey', reqKey); // VIKTIGT: Sätt currentRequirementKey här
     state.setState('lastFocusedReqKey', reqKey);
     setupContentArea(true, false);
     if (!dynamicContentArea) return;
@@ -763,7 +766,7 @@ export function displayRequirementDetail(reqKey) {
         }
         if (refUrl && refUrl.trim() !== '') {
             try {
-                const urlObj = new URL(refUrl); // Validate URL
+                const urlObj = new URL(refUrl); 
                 const refLink = document.createElement('a');
                 refLink.href = urlObj.href;
                 refLink.textContent = escapeHtml(refText || refUrl);
@@ -806,7 +809,7 @@ export function displayRequirementDetail(reqKey) {
         obsSection.appendChild(obsHeading);
         const obsP = document.createElement('p');
         let obsHTML = parseSimpleMarkdown(requirement.expectedObservation);
-        obsP.innerHTML = linkifyText(obsHTML); // Linkify after markdown
+        obsP.innerHTML = linkifyText(obsHTML); 
         obsSection.appendChild(obsP);
         dynamicContentArea.appendChild(obsSection);
     }
@@ -821,7 +824,7 @@ export function displayRequirementDetail(reqKey) {
             section.appendChild(heading);
             const p = document.createElement('p');
             let sectionHTML = parseSimpleMarkdown(requirement[key]);
-            p.innerHTML = linkifyText(sectionHTML); // Linkify after markdown
+            p.innerHTML = linkifyText(sectionHTML); 
             section.appendChild(p);
             dynamicContentArea.appendChild(section);
         }
@@ -831,14 +834,14 @@ export function displayRequirementDetail(reqKey) {
         const checkSection = document.createElement('div');
         checkSection.classList.add('detail-section');
         const checkHeading = document.createElement('h3');
-        checkHeading.textContent = 'Påståenden'; // Ändrad från "Kontroller"
+        checkHeading.textContent = 'Påståenden'; 
         checkSection.appendChild(checkHeading);
         requirement.checks.forEach((check, index) => {
             const checkItemDiv = document.createElement('div');
             checkItemDiv.classList.add('check-item');
-            checkItemDiv.id = `check-${reqKey}-${index + 1}`; // Användbart för länkning?
+            checkItemDiv.id = `check-${reqKey}-${index + 1}`; 
 
-            const checkSubHeading = document.createElement('h4'); // Lägg till sub-rubrik för varje påstående
+            const checkSubHeading = document.createElement('h4'); 
             checkSubHeading.textContent = `Påstående ${index + 1}`;
             checkItemDiv.appendChild(checkSubHeading);
 
@@ -877,7 +880,7 @@ export function displayRequirementDetail(reqKey) {
                 checkItemDiv.appendChild(noHeading);
 
                 const noUl = document.createElement('ul');
-                noUl.classList.add('pass-criteria-list'); // Återanvänd stil
+                noUl.classList.add('pass-criteria-list'); 
                 ifNoCriteria.forEach(criterion => {
                     const li = document.createElement('li');
                     li.innerHTML = parseSimpleMarkdown(getVal(criterion, 'requirement', ''));
@@ -926,7 +929,7 @@ export function displayRequirementDetail(reqKey) {
             ctSection.appendChild(ctUL);
             dynamicContentArea.appendChild(ctSection);
         } else {
-             ctHeading.remove(); // Ta bort rubrik om inga giltiga typer visas
+             ctHeading.remove(); 
              ctSection.remove();
         }
     }
@@ -947,7 +950,7 @@ export function displayRequirementDetail(reqKey) {
         const primaryScore = impact.primaryScore ?? 0;
         const secondaryScore = impact.secondaryScore ?? 0;
         impactText += ` (Poäng: ${primaryScore}.${secondaryScore}, `;
-        const assumedCompliance = impact.assumedCompliance ?? false; // Default false om saknas
+        const assumedCompliance = impact.assumedCompliance ?? false; 
         impactText += `Antagen efterlevnad: ${assumedCompliance ? 'Ja' : 'Nej'})`;
         impactP.innerHTML = impactText;
         metaSection.appendChild(impactP);
@@ -968,6 +971,19 @@ export function renderRequirementForm(reqKey) {
     const isEditing = reqKey !== null && state.jsonData?.requirements?.[reqKey];
     const requirement = isEditing ? state.jsonData.requirements[reqKey] : {};
     const formTitle = isEditing ? `Redigera krav` : 'Lägg till nytt krav';
+
+    // === ÄNDRING HÄR: Sätt currentRequirementKey när formuläret laddas för redigering ===
+    if (isEditing) {
+        state.setState('currentRequirementKey', reqKey);
+        console.log(`[renderRequirementForm] Set currentRequirementKey to: ${reqKey} for editing mode.`);
+    } else {
+        // För nya krav är det logiskt att currentRequirementKey är null tills det sparas.
+        // Om användaren avbryter skapandet och klickar "Visa alla krav",
+        // vill vi inte att det finns ett "lastFocusedReqKey" från ett icke-existerande krav.
+        state.setState('currentRequirementKey', null);
+        console.log(`[renderRequirementForm] Set currentRequirementKey to null for new requirement form.`);
+    }
+    // === SLUT PÅ ÄNDRING ===
 
     function autoResizeTextarea(textarea) {
         const originalOverflow = textarea.style.overflowY;
@@ -995,8 +1011,18 @@ export function renderRequirementForm(reqKey) {
         
         const contentAndPaddingHeight = textarea.scrollHeight;
         const minHeightBasedOnRows = (textarea.rows * lineHeight) + paddingTop + paddingBottom;
+        
         let targetHeight = Math.max(contentAndPaddingHeight, minHeightBasedOnRows);
         
+        if (textarea.value.trim() !== '' || textarea.placeholder) {
+            targetHeight += lineHeight; 
+        } else if (contentAndPaddingHeight > lineHeight) { 
+            targetHeight += lineHeight;
+        }
+
+        const absoluteMinHeight = (2 * lineHeight) + paddingTop + paddingBottom; 
+        targetHeight = Math.max(targetHeight, absoluteMinHeight);
+
         textarea.style.height = targetHeight + 'px';
         textarea.style.overflowY = originalOverflow || 'auto';
     }
@@ -1189,7 +1215,7 @@ export function renderRequirementForm(reqKey) {
     cancelButton.innerHTML = `Avbryt <span class="icon" aria-hidden="true">${ICONS.cancel}</span>`;
     cancelButton.addEventListener('click', () => {
         if (isEditing) {
-            state.setState('lastFocusedReqKey', reqKey);
+            state.setState('lastFocusedReqKey', reqKey); // Sätts här, används av displayRequirementDetail
             displayRequirementDetail(reqKey); 
         } else {
             state.setState('lastFocusedReqKey', null);
@@ -1916,4 +1942,4 @@ export function displayRequirementsWithoutContentTypes() {
 }
 
 
-console.log("Module loaded: requirement_functions (v11 - textarea initial rows, UUID fallback)");
+console.log("Module loaded: requirement_functions (v12 - currentReqKey set in renderForm)");

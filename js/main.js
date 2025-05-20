@@ -5,8 +5,7 @@
 import {
     fileInput, showMetadataButton, showRequirementsButton,
     addRequirementButton, saveChangesButton, sortOrderSelect, searchInput,
-    filterSortRow, uploadFileButton
-    // themeToggleButton behöver INTE importeras härifrån längre, hanteras i _theme_switcher.js
+    filterSortRow, uploadFileButton, dynamicContentArea // Lade till dynamicContentArea här
 } from './_-----_dom_element_references.js';
 import { handleFileUpload, downloadJsonFile } from './_-----_file_handling.js';
 import { displayMetadata } from './_-----_metadata_functions.js';
@@ -15,7 +14,7 @@ import { initializeUI } from './_-----_ui_functions.js';
 import * as state from './_-----_global_state.js';
 
 // Importera den nya modulen för temaväxlaren
-import { initializeThemeSwitcher } from './_theme_switcher.js'; // Anpassa sökvägen om din filstruktur är annorlunda
+import { initializeThemeSwitcher } from './_theme_switcher.js'; 
 
 // ----- Event Listeners -----
 
@@ -27,18 +26,16 @@ function initializeApp() {
     initializeUI(); // Sätt initialt UI-läge
 
     // Anropa initieringsfunktionen för temaväxlaren
-    // Denna funktion kommer att sätta initialt tema och lägga till event listener för knappen.
     initializeThemeSwitcher();
 
 
     // Händelselyssnare för filuppladdning
     if (uploadFileButton && fileInput) {
         uploadFileButton.addEventListener('click', () => {
-            fileInput.click(); // Trigga klick på den dolda filinputen
+            fileInput.click(); 
         });
         console.log("Upload file button listener added.");
 
-        // Change-lyssnaren på fileInput är fortfarande den som hanterar den faktiska filen
         fileInput.addEventListener('change', handleFileUpload);
         console.log("File input 'change' listener added.");
 
@@ -49,22 +46,38 @@ function initializeApp() {
 
     // Händelselyssnare för huvudkontrollknappar
     if (showMetadataButton) {
-        showMetadataButton.addEventListener('click', displayMetadata);
+        showMetadataButton.addEventListener('click', () => {
+            // Om vi kommer från en kravvy, kanske vi vill nollställa currentRequirementKey
+            // men lastFocusedReqKey kan vara kvar om vi vill återgå till ett specifikt krav senare.
+            // För nu, låt oss bara nollställa currentRequirementKey för metadata-vyn.
+            state.setState('currentRequirementKey', null);
+            displayMetadata();
+        });
         console.log("Metadata button listener added.");
     } else {
         console.error("Metadata button not found!");
     }
 
     if (showRequirementsButton) {
-        showRequirementsButton.addEventListener('click', displayRequirements);
-        console.log("Requirements button listener added.");
+        showRequirementsButton.addEventListener('click', () => {
+            // Om vi kommer från en detalj- eller redigeringsvy för ett krav,
+            // sätt lastFocusedReqKey så att displayRequirements kan scrolla dit.
+            if (state.currentRequirementKey) {
+                state.setState('lastFocusedReqKey', state.currentRequirementKey);
+                console.log(`[Show All] Set lastFocusedReqKey to: ${state.currentRequirementKey}`);
+            }
+            // Nollställ currentRequirementKey eftersom vi nu går till en listvy.
+            state.setState('currentRequirementKey', null);
+
+            displayRequirements();
+        });
+        console.log("Requirements button listener added (with focus logic).");
     } else {
         console.error("Requirements button not found!");
     }
 
     // Händelselyssnare för kravlistans kontroller
     if (addRequirementButton) {
-        // Visa formulär för nytt krav (null indikerar nytt)
         addRequirementButton.addEventListener('click', () => renderRequirementForm(null));
         console.log("Add requirement button listener added.");
     } else {
@@ -76,12 +89,13 @@ function initializeApp() {
             state.setState('currentSortOrder', event.target.value);
             console.log("Sort order changed:", state.currentSortOrder);
             // Re-render the requirements list if it's currently displayed
-            if (state.jsonData?.requirements && dynamicContentArea && // dynamicContentArea från import
+            // Använder den importerade dynamicContentArea
+            if (state.jsonData?.requirements && dynamicContentArea && 
                 !dynamicContentArea.classList.contains('form-view') &&
                 !dynamicContentArea.classList.contains('requirement-detail') &&
                 !dynamicContentArea.classList.contains('delete-confirmation-view'))
             {
-                displayRequirements(); // Uppdatera listan med ny sortering
+                displayRequirements(); 
             }
         });
          console.log("Sort order select listener added.");
@@ -90,7 +104,7 @@ function initializeApp() {
     }
 
     if (searchInput) {
-        let searchTimeout; // debounce
+        let searchTimeout; 
         function handleSearchInput(event) {
             const searchTerm = event.target.value || '';
             clearTimeout(searchTimeout);
@@ -98,6 +112,7 @@ function initializeApp() {
             searchTimeout = setTimeout(() => {
                 state.setState('currentSearchTerm', searchTerm);
                 console.log(`Search term updated: "${state.currentSearchTerm}"`);
+                // Använder den importerade dynamicContentArea
                 if (state.jsonData?.requirements && dynamicContentArea &&
                     !dynamicContentArea.classList.contains('form-view') &&
                     !dynamicContentArea.classList.contains('requirement-detail') &&
@@ -105,10 +120,10 @@ function initializeApp() {
                 {
                     displayRequirements();
                 }
-            }, 300); // 300ms debounce
+            }, 300); 
         }
         searchInput.addEventListener('input', handleSearchInput);
-        searchInput.addEventListener('search', handleSearchInput); // För rensningsknappen (x)
+        searchInput.addEventListener('search', handleSearchInput); 
         console.log("Search input listener added.");
     } else {
         // console.warn("Search input not found initially.");
@@ -127,9 +142,9 @@ function initializeApp() {
     window.addEventListener('beforeunload', (event) => {
         if (state.isDataModified) {
             console.log("Data är modifierad, visar beforeunload-prompt.");
-            event.preventDefault(); // Standard för de flesta webbläsare
-            event.returnValue = ''; // Krävs för vissa äldre webbläsare
-            return ''; // För att visa standardmeddelandet
+            event.preventDefault(); 
+            event.returnValue = ''; 
+            return ''; 
         }
          console.log("Inga modifierade data, lämnar sidan utan prompt.");
     });
