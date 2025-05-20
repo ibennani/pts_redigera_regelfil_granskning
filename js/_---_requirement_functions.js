@@ -12,6 +12,20 @@ import { setupContentArea, showError, displayConfirmation } from './_-----_ui_fu
 import { displayMetadata } from './_-----_metadata_functions.js'; // Importera för Tillbaka-knapp
 
 
+// ----- Helper function for UUID generation -----
+/**
+ * Generates a simple pseudo-random UUID (Version 4).
+ * This is a fallback if crypto.randomUUID() is not available.
+ * @returns {string} A UUID-like string.
+ */
+function generateSimpleUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+
 // ----- Form Field Creation Helpers -----
 export function createFormField(labelText, name, value, type = 'text', placeholder = '', readonly = false, instructionText = null) {
     const container = document.createElement('div');
@@ -1222,7 +1236,7 @@ function saveRequirement(event, reqKey) {
     if (!state.jsonData.requirements) state.jsonData.requirements = {};
 
     const isEditing = reqKey !== null && state.jsonData.requirements?.[reqKey];
-    const originalRequirement = isEditing ? { ...state.jsonData.requirements[reqKey] } : {}; // Djupare kopia vid behov
+    const originalRequirement = isEditing ? { ...state.jsonData.requirements[reqKey] } : {};
     const originalRequirementString = isEditing ? JSON.stringify(state.jsonData.requirements[reqKey]) : null;
 
 
@@ -1235,7 +1249,7 @@ function saveRequirement(event, reqKey) {
         let errors = [];
         if (!titleValue) errors.push("Kravets rubrik är obligatorisk.");
         if (!mainCategoryValue) errors.push("Huvudkategori är obligatorisk.");
-        // Ytterligare validering för obligatoriska fält i påståenden:
+        
         const checkFieldsetsForValidation = form.querySelectorAll('#checksContainer .check-fieldset');
         checkFieldsetsForValidation.forEach((fieldset, checkIndex) => {
             const conditionTextarea = fieldset.querySelector(`textarea[name="check-${checkIndex}-condition"]`);
@@ -1247,10 +1261,9 @@ function saveRequirement(event, reqKey) {
 
         if (errors.length > 0) {
             alert("Formuläret innehåller fel:\n- " + errors.join("\n- "));
-            // Fokusera på första felaktiga fältet (förenklad logik)
             if (!titleValue) titleElement?.focus();
             else if (!mainCategoryValue) mainCategoryElement?.focus();
-            else { // Försök fokusera på första felaktiga påstående
+            else { 
                 const firstErrorCheck = Array.from(checkFieldsetsForValidation).find((fs, idx) => {
                     const ta = fs.querySelector(`textarea[name="check-${idx}-condition"]`);
                     return ta && !ta.value.trim();
@@ -1260,7 +1273,15 @@ function saveRequirement(event, reqKey) {
             return;
         }
 
-        const newId = isEditing ? (originalRequirement.id || crypto.randomUUID()) : crypto.randomUUID();
+        let generatedUuid;
+        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+            generatedUuid = crypto.randomUUID();
+        } else {
+            console.warn("crypto.randomUUID() not available. Using fallback UUID generator.");
+            generatedUuid = generateSimpleUUID();
+        }
+
+        const newId = isEditing ? (originalRequirement.id || generatedUuid) : generatedUuid;
         const currentReqKey = isEditing ? reqKey : generateRequirementKey(titleValue, newId);
 
 
@@ -1272,7 +1293,7 @@ function saveRequirement(event, reqKey) {
 
         const updatedRequirement = {
             id: newId,
-            key: currentReqKey, // Använd currentReqKey
+            key: currentReqKey, 
             title: titleValue,
             metadata: {
                 mainCategory: getCategoryValue(form, 'metadata.mainCategory.text'),
@@ -1299,10 +1320,10 @@ function saveRequirement(event, reqKey) {
         };
 
         if (typeof updatedRequirement.metadata.subCategory === 'object' && !updatedRequirement.metadata.subCategory?.text) {
-            updatedRequirement.metadata.subCategory = ""; // Spara som tom sträng
+            updatedRequirement.metadata.subCategory = ""; 
         }
         if (typeof updatedRequirement.standardReference === 'object' && !updatedRequirement.standardReference?.text && !updatedRequirement.standardReference?.url) {
-             updatedRequirement.standardReference = ""; // Spara som tom sträng
+             updatedRequirement.standardReference = ""; 
         }
 
         const instructionTextareas = form.querySelectorAll('#instructionList .instruction-item textarea');
@@ -1312,7 +1333,7 @@ function saveRequirement(event, reqKey) {
         });
 
         const checkFieldsets = form.querySelectorAll('#checksContainer .check-fieldset');
-        checkFieldsets.forEach((fieldset, checkIndex) => { // checkIndex här är DOM-ordningen
+        checkFieldsets.forEach((fieldset, checkIndex) => { 
             const condition = fieldset.querySelector(`textarea[name="check-${checkIndex}-condition"]`)?.value.trim();
 
             if (!condition) return; 
@@ -1902,4 +1923,4 @@ export function displayRequirementsWithoutContentTypes() {
 }
 
 
-console.log("Module loaded: requirement_functions (v9 - checkpoint move UI/animation further refined)");
+console.log("Module loaded: requirement_functions (v10 - UUID fallback added)");
