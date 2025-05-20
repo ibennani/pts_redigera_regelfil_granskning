@@ -76,7 +76,7 @@ export function createFormField(labelText, name, value, type = 'text', placehold
     } else {
         if (type === 'textarea') {
             inputElement = document.createElement('textarea');
-            inputElement.rows = 5; // Standardhöjd 5 rader
+            inputElement.rows = 1; // ÄNDRING: Sätt till 1 initialt för bättre auto-resize
         } else {
             inputElement = document.createElement('input');
             inputElement.type = type;
@@ -103,7 +103,7 @@ function createInstructionListItem(text, index) {
     li.dataset.index = index;
     const textarea = document.createElement('textarea');
     textarea.name = `instruction-${index}`;
-    textarea.rows = 5;
+    textarea.rows = 1; // ÄNDRING: Sätt till 1 initialt
     textarea.value = text;
     textarea.placeholder = "Instruktionstext...";
     textarea.setAttribute('aria-label', `Instruktion ${index + 1}`);
@@ -112,7 +112,6 @@ function createInstructionListItem(text, index) {
         const itemToRemove = e.target.closest('li.dynamic-list-item');
         if (itemToRemove) {
             itemToRemove.remove();
-            // Inget behov av att uppdatera index här eftersom instruktioner sparas baserat på DOM-ordning
         }
     }, 'remove-item-button');
     removeButton.setAttribute('aria-label', `Ta bort instruktion ${index + 1}`);
@@ -130,7 +129,7 @@ function createCheckFieldset(checkData, index) {
 
     const legend = document.createElement('legend');
     legend.textContent = `Påstående ${index + 1}`;
-    headerDiv.appendChild(legend); // Legend först
+    headerDiv.appendChild(legend);
 
     const moveButtonsDiv = document.createElement('div');
     moveButtonsDiv.classList.add('check-fieldset-move-buttons');
@@ -151,7 +150,7 @@ function createCheckFieldset(checkData, index) {
     moveDownButton.addEventListener('click', () => handleMoveCheckpoint(fieldset, 'down'));
     moveButtonsDiv.appendChild(moveDownButton);
 
-    headerDiv.appendChild(moveButtonsDiv); // Flyttknappar näst efter legend
+    headerDiv.appendChild(moveButtonsDiv);
 
     const removeCheckButton = createDynamicListButton(
         'Ta bort Påstående',
@@ -169,11 +168,11 @@ function createCheckFieldset(checkData, index) {
         ['remove-item-button', 'remove-check-button', 'button-danger']
     );
     removeCheckButton.setAttribute('aria-label', `Ta bort påstående ${index + 1}`);
-    headerDiv.appendChild(removeCheckButton); // Ta bort-knapp sist i headerDiv
+    headerDiv.appendChild(removeCheckButton);
 
     fieldset.appendChild(headerDiv);
 
-
+    // `createFormField` kommer nu sätta rows=1 för denna textarea
     const conditionContainer = createFormField(
         `Påståendetext*`,
         `check-${index}-condition`,
@@ -258,7 +257,7 @@ function createCriterionListItem(text, checkIndex, type, critIndex) {
     const labelText = `${typeText} ${critIndex + 1} för påstående ${checkIndex + 1}`;
 
     const textarea = document.createElement('textarea');
-    textarea.rows = 5;
+    textarea.rows = 1; // ÄNDRING: Sätt till 1 initialt
     textarea.name = `check-${checkIndex}-${type}Crit-${critIndex}`;
     textarea.value = text;
     textarea.placeholder = 'Beskriv kravet/kriteriet här...';
@@ -978,9 +977,8 @@ export function renderRequirementForm(reqKey) {
         const computedStyle = getComputedStyle(textarea);
         let lineHeight = parseFloat(computedStyle.lineHeight);
         if (isNaN(lineHeight) || lineHeight === 0) {
-            // Fallback if lineHeight is not available
             const tempSpan = document.createElement('span');
-            tempSpan.innerHTML = 'A'; // Add some content
+            tempSpan.innerHTML = 'A';
             tempSpan.style.font = computedStyle.font;
             tempSpan.style.padding = '0';
             tempSpan.style.border = '0';
@@ -989,18 +987,18 @@ export function renderRequirementForm(reqKey) {
             document.body.appendChild(tempSpan);
             lineHeight = tempSpan.offsetHeight;
             document.body.removeChild(tempSpan);
-            if (lineHeight === 0) lineHeight = 20; // Absolute fallback
+            if (lineHeight === 0) lineHeight = 20; 
         }
 
         const paddingTop = parseFloat(computedStyle.paddingTop) || 0;
         const paddingBottom = parseFloat(computedStyle.paddingBottom) || 0;
         
-        const contentAndPaddingHeight = textarea.scrollHeight; // Includes padding
+        const contentAndPaddingHeight = textarea.scrollHeight;
         const minHeightBasedOnRows = (textarea.rows * lineHeight) + paddingTop + paddingBottom;
         let targetHeight = Math.max(contentAndPaddingHeight, minHeightBasedOnRows);
         
         textarea.style.height = targetHeight + 'px';
-        textarea.style.overflowY = originalOverflow || 'auto'; // Restore original overflowY
+        textarea.style.overflowY = originalOverflow || 'auto';
     }
 
     setupContentArea(true, false);
@@ -1046,7 +1044,6 @@ export function renderRequirementForm(reqKey) {
         if (textareaInItem && !textareaInItem.dataset.autoResizeAttached) {
             textareaInItem.addEventListener('input', () => autoResizeTextarea(textareaInItem));
             textareaInItem.dataset.autoResizeAttached = 'true';
-            // autoResizeTextarea(textareaInItem); // Initial resize
         }
         instrList.appendChild(listItem);
     });
@@ -1059,7 +1056,7 @@ export function renderRequirementForm(reqKey) {
             if (newTextarea && !newTextarea.dataset.autoResizeAttached) {
                 newTextarea.addEventListener('input', () => autoResizeTextarea(newTextarea));
                 newTextarea.dataset.autoResizeAttached = 'true';
-                autoResizeTextarea(newTextarea); // Resize after adding
+                autoResizeTextarea(newTextarea); 
             }
             list.appendChild(newListItem);
         }
@@ -1089,7 +1086,7 @@ export function renderRequirementForm(reqKey) {
 
     const checksFieldset = document.createElement('fieldset');
     const checksLegend = document.createElement('legend');
-    checksLegend.textContent = 'Påståenden'; // Ändrad från Kontrollpunkter
+    checksLegend.textContent = 'Påståenden'; 
     checksFieldset.appendChild(checksLegend);
     const checksContainer = document.createElement('div');
     checksContainer.id = 'checksContainer';
@@ -1105,7 +1102,7 @@ export function renderRequirementForm(reqKey) {
         checksContainer.appendChild(checkFieldsetElement);
     });
     checksFieldset.appendChild(checksContainer);
-    const addCheckButton = createDynamicListButton('Lägg till påstående', () => { // Ändrad knapptext
+    const addCheckButton = createDynamicListButton('Lägg till påstående', () => { 
         const container = document.getElementById('checksContainer');
         if (container) {
             const newCheckFieldset = createCheckFieldset({}, container.children.length);
@@ -1114,19 +1111,18 @@ export function renderRequirementForm(reqKey) {
                     ta.addEventListener('input', () => autoResizeTextarea(ta));
                     ta.dataset.autoResizeAttached = 'true';
                 }
-                autoResizeTextarea(ta); // Resize after adding
+                autoResizeTextarea(ta); 
             });
             container.appendChild(newCheckFieldset);
-            updateAllCheckpointDOMIndices(container); // Uppdatera index och knappar
+            updateAllCheckpointDOMIndices(container); 
             updateMoveButtonsState(container);
         }
     });
     checksFieldset.appendChild(addCheckButton);
     form.appendChild(checksFieldset);
 
-    // Initial state for move buttons
     if (checksContainer.children.length > 0) {
-        updateAllCheckpointDOMIndices(checksContainer); // Säkerställ korrekta index från start
+        updateAllCheckpointDOMIndices(checksContainer); 
         updateMoveButtonsState(checksContainer);
     }
 
@@ -1194,32 +1190,29 @@ export function renderRequirementForm(reqKey) {
     cancelButton.addEventListener('click', () => {
         if (isEditing) {
             state.setState('lastFocusedReqKey', reqKey);
-            displayRequirementDetail(reqKey); // Tillbaka till detaljvyn
+            displayRequirementDetail(reqKey); 
         } else {
             state.setState('lastFocusedReqKey', null);
-            displayRequirements(); // Tillbaka till listvyn
+            displayRequirements(); 
         }
     });
     buttonDiv.appendChild(cancelButton);
     form.appendChild(buttonDiv);
     dynamicContentArea.appendChild(form);
 
-    // Initial auto-resize for all textareas in the form
-    // Needs to run after form is in DOM and visible
     setTimeout(() => {
-        requestAnimationFrame(() => { // Ensure layout is calculated
+        requestAnimationFrame(() => { 
             const allTextareasInForm = form.querySelectorAll('textarea');
             allTextareasInForm.forEach(ta => {
                 if (!ta.dataset.autoResizeAttached) {
                     ta.addEventListener('input', () => autoResizeTextarea(ta));
                     ta.dataset.autoResizeAttached = 'true';
                 }
-                autoResizeTextarea(ta); // Initial call
-                // Another call after a short delay sometimes helps with complex layouts
+                autoResizeTextarea(ta); 
                 setTimeout(() => autoResizeTextarea(ta), 50);
             });
         });
-    }, 50); // Delay to ensure elements are rendered
+    }, 50); 
 
 
     const titleInput = form.elements['title'];
@@ -1923,4 +1916,4 @@ export function displayRequirementsWithoutContentTypes() {
 }
 
 
-console.log("Module loaded: requirement_functions (v10 - UUID fallback added)");
+console.log("Module loaded: requirement_functions (v11 - textarea initial rows, UUID fallback)");
