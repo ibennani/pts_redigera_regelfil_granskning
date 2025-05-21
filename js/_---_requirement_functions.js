@@ -1052,7 +1052,8 @@ export function renderRequirementForm(reqKey) {
     heading.textContent = isEditing ? `${formTitle}: ${escapeHtml(requirement.title || reqKey)}` : formTitle;
     form.appendChild(heading);
 
-    form.appendChild(createFormField('Kravets rubrik*', 'Titel', requirement.title || '', 'text'));
+    // I renderRequirementForm (js/_---_requirement_functions.js)
+    form.appendChild(createFormField('Kravets rubrik*', 'title', requirement.title || '', 'text'));
 
     const stdRefFieldset = document.createElement('fieldset');
     const stdRefLegend = document.createElement('legend');
@@ -1284,7 +1285,7 @@ function saveRequirement(event, reqKey) {
         const mainCategoryValue = mainCategoryElement?.value.trim();
 
         let errors = [];
-        // if (!titleValue) errors.push("Kravets rubrik är obligatorisk.");
+        if (!titleValue) errors.push("Kravets rubrik är obligatorisk.");
         if (!mainCategoryValue) errors.push("Huvudkategori är obligatorisk.");
         
         const checkFieldsetsForValidation = form.querySelectorAll('#checksContainer .check-fieldset');
