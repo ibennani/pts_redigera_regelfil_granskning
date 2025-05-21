@@ -1284,7 +1284,7 @@ function saveRequirement(event, reqKey) {
         const mainCategoryValue = mainCategoryElement?.value.trim();
 
         let errors = [];
-        if (!titleValue) errors.push("Kravets rubrik är obligatorisk.");
+        // if (!titleValue) errors.push("Kravets rubrik är obligatorisk.");
         if (!mainCategoryValue) errors.push("Huvudkategori är obligatorisk.");
         
         const checkFieldsetsForValidation = form.querySelectorAll('#checksContainer .check-fieldset');
