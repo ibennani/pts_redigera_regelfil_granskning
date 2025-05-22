@@ -811,7 +811,8 @@ export function displayRequirementDetail(reqKey) {
         requirement.instructions.forEach(instr => {
             const originalInstructionText = getVal(instr, 'text', '');
             const li = document.createElement('li');
-            li.innerHTML = parseSimpleMarkdown(originalInstructionText);
+            let htmlContent = parseSimpleMarkdown(originalInstructionText);
+            li.innerHTML = linkifyText(htmlContent); // UPDATED
             ol.appendChild(li);
         });
         instrSection.appendChild(ol);
@@ -865,7 +866,8 @@ export function displayRequirementDetail(reqKey) {
 
             const conditionP = document.createElement('p');
             conditionP.classList.add('check-condition');
-            conditionP.innerHTML = parseSimpleMarkdown(getVal(check, 'condition', '<em>Påstående saknas</em>'));
+            let conditionHTML = parseSimpleMarkdown(getVal(check, 'condition', '<em>Påstående saknas</em>'));
+            conditionP.innerHTML = linkifyText(conditionHTML); // UPDATED
             checkItemDiv.appendChild(conditionP);
 
             const passCriteriaCount = getVal(check, 'passCriteria.length', 0);
@@ -882,7 +884,8 @@ export function displayRequirementDetail(reqKey) {
                 ul.classList.add('pass-criteria-list');
                 check.passCriteria.forEach(criterion => {
                     const li = document.createElement('li');
-                    li.innerHTML = parseSimpleMarkdown(getVal(criterion, 'requirement', ''));
+                    let critHTML = parseSimpleMarkdown(getVal(criterion, 'requirement', ''));
+                    li.innerHTML = linkifyText(critHTML); // UPDATED
                     ul.appendChild(li);
                 });
                 checkItemDiv.appendChild(ul);
@@ -900,7 +903,8 @@ export function displayRequirementDetail(reqKey) {
                 noUl.classList.add('pass-criteria-list'); 
                 ifNoCriteria.forEach(criterion => {
                     const li = document.createElement('li');
-                    li.innerHTML = parseSimpleMarkdown(getVal(criterion, 'requirement', ''));
+                    let ifNoCritHTML = parseSimpleMarkdown(getVal(criterion, 'requirement', ''));
+                    li.innerHTML = linkifyText(ifNoCritHTML); // UPDATED
                     noUl.appendChild(li);
                 });
                 checkItemDiv.appendChild(noUl);
