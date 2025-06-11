@@ -1019,24 +1019,24 @@ export function renderRequirementForm(reqKey) {
             document.body.appendChild(tempSpan);
             lineHeight = tempSpan.offsetHeight;
             document.body.removeChild(tempSpan);
-            if (lineHeight === 0) lineHeight = 20; 
+            if (lineHeight === 0) lineHeight = 20;
         }
 
         const paddingTop = parseFloat(computedStyle.paddingTop) || 0;
         const paddingBottom = parseFloat(computedStyle.paddingBottom) || 0;
-        
+
         const contentAndPaddingHeight = textarea.scrollHeight;
         const minHeightBasedOnRows = (textarea.rows * lineHeight) + paddingTop + paddingBottom;
-        
+
         let targetHeight = Math.max(contentAndPaddingHeight, minHeightBasedOnRows);
-        
-        if (textarea.value.trim() !== '' || textarea.placeholder) { 
-            targetHeight += lineHeight; 
-        } else if (contentAndPaddingHeight > lineHeight) { 
+
+        if (textarea.value.trim() !== '' || textarea.placeholder) {
+            targetHeight += lineHeight;
+        } else if (contentAndPaddingHeight > lineHeight) {
             targetHeight += lineHeight;
         }
 
-        const absoluteMinHeight = (2 * lineHeight) + paddingTop + paddingBottom; 
+        const absoluteMinHeight = (2 * lineHeight) + paddingTop + paddingBottom;
         targetHeight = Math.max(targetHeight, absoluteMinHeight);
 
         textarea.style.height = targetHeight + 'px';
@@ -1056,7 +1056,6 @@ export function renderRequirementForm(reqKey) {
     heading.textContent = isEditing ? `${formTitle}: ${escapeHtml(requirement.title || reqKey)}` : formTitle;
     form.appendChild(heading);
 
-    // I renderRequirementForm (js/_---_requirement_functions.js)
     form.appendChild(createFormField('Kravets rubrik*', 'title', requirement.title || '', 'text'));
 
     const stdRefFieldset = document.createElement('fieldset');
@@ -1099,7 +1098,7 @@ export function renderRequirementForm(reqKey) {
             if (newTextarea && !newTextarea.dataset.autoResizeAttached) {
                 newTextarea.addEventListener('input', () => autoResizeTextarea(newTextarea));
                 newTextarea.dataset.autoResizeAttached = 'true';
-                autoResizeTextarea(newTextarea); 
+                autoResizeTextarea(newTextarea);
             }
             list.appendChild(newListItem);
         }
@@ -1115,29 +1114,38 @@ export function renderRequirementForm(reqKey) {
     }
     form.appendChild(obsFieldContainer);
 
-    ['Exempel', 'Undantag', 'Vanliga fel', 'Tips och goda råd'].forEach(fieldName => {
-        const readableFieldName = fieldName.charAt(0).toUpperCase() + fieldName.slice(1).replace(/([A-Z])/g, ' $1');
-        const instruction = `Beskriv ${readableFieldName.toLowerCase()} här om det finns några.`;
-        const fieldContainer = createFormField(readableFieldName, fieldName, requirement[fieldName] || '', 'textarea', instruction);
+    // KORRIGERAD DEL STARTAR HÄR
+    const optionalTextFields = {
+        examples: 'Exempel',
+        exceptions: 'Undantag',
+        commonErrors: 'Vanliga fel', // JSON-nyckel: readableLabel
+        tips: 'Tips och goda råd'  // JSON-nyckel: readableLabel
+    };
+
+    for (const [jsonKey, readableLabel] of Object.entries(optionalTextFields)) {
+        const instruction = `Beskriv ${readableLabel.toLowerCase()} här om det finns några.`;
+        // Använd jsonKey för både name-attributet (andra argumentet till createFormField)
+        // och för att hämta initialt värde från requirement-objektet (requirement[jsonKey]).
+        const fieldContainer = createFormField(readableLabel, jsonKey, requirement[jsonKey] || '', 'textarea', instruction);
         const textarea = fieldContainer.querySelector('textarea');
         if (textarea && !textarea.dataset.autoResizeAttached) {
             textarea.addEventListener('input', () => autoResizeTextarea(textarea));
             textarea.dataset.autoResizeAttached = 'true';
         }
         form.appendChild(fieldContainer);
-    });
-
+    }
+    // KORRIGERAD DEL SLUTAR HÄR
 
     const checksFieldset = document.createElement('fieldset');
     const checksLegend = document.createElement('legend');
-    checksLegend.textContent = 'Påståenden'; 
+    checksLegend.textContent = 'Påståenden';
     checksFieldset.appendChild(checksLegend);
     const checksContainer = document.createElement('div');
     checksContainer.id = 'checksContainer';
     checksContainer.classList.add('checks-container');
     (requirement.checks || []).forEach((check, index) => {
         const checkFieldsetElement = createCheckFieldset(check, index);
-        checkFieldsetElement.querySelectorAll('textarea').forEach(ta => { 
+        checkFieldsetElement.querySelectorAll('textarea').forEach(ta => {
             if(!ta.dataset.autoResizeAttached) {
                 ta.addEventListener('input', () => autoResizeTextarea(ta));
                 ta.dataset.autoResizeAttached = 'true';
@@ -1146,7 +1154,7 @@ export function renderRequirementForm(reqKey) {
         checksContainer.appendChild(checkFieldsetElement);
     });
     checksFieldset.appendChild(checksContainer);
-    const addCheckButton = createDynamicListButton('Lägg till påstående', () => { 
+    const addCheckButton = createDynamicListButton('Lägg till påstående', () => {
         const container = document.getElementById('checksContainer');
         if (container) {
             const newCheckFieldset = createCheckFieldset({}, container.children.length);
@@ -1155,10 +1163,10 @@ export function renderRequirementForm(reqKey) {
                     ta.addEventListener('input', () => autoResizeTextarea(ta));
                     ta.dataset.autoResizeAttached = 'true';
                 }
-                autoResizeTextarea(ta); 
+                autoResizeTextarea(ta);
             });
             container.appendChild(newCheckFieldset);
-            updateAllCheckpointDOMIndices(container); 
+            updateAllCheckpointDOMIndices(container);
             updateMoveButtonsState(container);
         }
     });
@@ -1166,7 +1174,7 @@ export function renderRequirementForm(reqKey) {
     form.appendChild(checksFieldset);
 
     if (checksContainer.children.length > 0) {
-        updateAllCheckpointDOMIndices(checksContainer); 
+        updateAllCheckpointDOMIndices(checksContainer);
         updateMoveButtonsState(checksContainer);
     }
 
@@ -1238,11 +1246,11 @@ export function renderRequirementForm(reqKey) {
     cancelButton.innerHTML = `Avbryt <span class="icon" aria-hidden="true">${ICONS.cancel}</span>`;
     cancelButton.addEventListener('click', () => {
         if (isEditing) {
-            state.setState('lastFocusedReqKey', reqKey); 
-            displayRequirementDetail(reqKey); 
+            state.setState('lastFocusedReqKey', reqKey);
+            displayRequirementDetail(reqKey);
         } else {
             state.setState('lastFocusedReqKey', null);
-            displayRequirements(); 
+            displayRequirements();
         }
     });
     buttonDiv.appendChild(cancelButton);
@@ -1250,25 +1258,25 @@ export function renderRequirementForm(reqKey) {
     dynamicContentArea.appendChild(form);
 
     setTimeout(() => {
-        requestAnimationFrame(() => { 
+        requestAnimationFrame(() => {
             const allTextareasInForm = form.querySelectorAll('textarea');
             allTextareasInForm.forEach(ta => {
                 if (!ta.dataset.autoResizeAttached) {
                     ta.addEventListener('input', () => autoResizeTextarea(ta));
                     ta.dataset.autoResizeAttached = 'true';
                 }
-                autoResizeTextarea(ta); 
+                autoResizeTextarea(ta);
                 setTimeout(() => autoResizeTextarea(ta), 50);
             });
         });
-    }, 50); 
-
+    }, 50);
 
     const titleInput = form.elements['title'];
     if (titleInput) {
         setTimeout(() => titleInput.focus(), 100);
     }
 }
+
 
 function saveRequirement(event, reqKey) {
     event.preventDefault();
