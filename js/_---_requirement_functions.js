@@ -811,17 +811,20 @@ export function displayRequirementDetail(reqKey) {
         const instrHeading = document.createElement('h3');
         instrHeading.textContent = 'Instruktioner';
         instrSection.appendChild(instrHeading);
-        const ol = document.createElement('ol');
+    
+        // Skapa vanliga textblock istället för punktlista
+        const container = document.createElement('div');
         requirement.instructions.forEach(instr => {
-            const originalInstructionText = getVal(instr, 'text', '');
-            const li = document.createElement('li');
-            let htmlContent = parseSimpleMarkdown(originalInstructionText);
-            li.innerHTML = linkifyText(htmlContent); // UPDATED
-            ol.appendChild(li);
+            const p = document.createElement('p');
+            let htmlContent = parseSimpleMarkdown(instr.text);
+            p.innerHTML = linkifyText(htmlContent);
+            container.appendChild(p);
         });
-        instrSection.appendChild(ol);
+    
+        instrSection.appendChild(container);
         dynamicContentArea.appendChild(instrSection);
     }
+    
 
     const optionalSections = { examples: 'Exempel', exceptions: 'Undantag', commonErrors: 'Vanliga Fel', tips: 'Tips' };
     for (const key in optionalSections) {
