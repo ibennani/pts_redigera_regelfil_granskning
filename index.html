@@ -4,7 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JSON-editor för kravlistan</title>
+    
+    <!-- Din befintliga CSS -->
     <link rel="stylesheet" href="style.css">
+
+    <!-- START: Tillägg för Markdown Toolbar -->
+    <!-- 1. Font Awesome för ikonerna i verktygsraden -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- 2. CSS för själva verktygsraden -->
+    <link rel="stylesheet" href="css/features/markdown_toolbar.css">
+    <!-- SLUT: Tillägg för Markdown Toolbar -->
+
 </head>
 <body>
     <button id="themeToggleButton" aria-live="polite">Byt till mörkt tema</button>
@@ -14,8 +25,7 @@
     <div id="contentDisplay" class="content-container">
         <div id="uploadSection">
             <p>Ladda upp din JSON-fil med kravdata för att börja.</p>
-            <!-- ÄNDRING HÄR: Från label till button -->
-            <button type="button" id="uploadFileButton" class="button-like-styling"> <!-- Nytt ID och ev. ny klass -->
+            <button type="button" id="uploadFileButton" class="button-like-styling">
                  Ladda upp JSON-fil... <span class="icon" aria-hidden="true">⬆️</span>
             </button>
             <input type="file" id="fileInput" accept=".json" style="display: none;">
@@ -34,15 +44,14 @@
             </button>
         </div>
          <div class="secondary-controls">
-            <!-- Sök- och filterrad (visas bara i kravlistan) -->
             <div id="filterSortRow" class="hidden filter-sort-row">
                  <div id="sortControls">
                      <label for="sortOrderSelect">Sortera:</label>
                      <select id="sortOrderSelect">
                          <option value="category-asc" selected>Kategorier (A-Ö)</option>
                          <option value="category-desc">Kategorier (Ö-A)</option>
-                         <option value="ref-asc">Krav (Stigande)</option> <!-- Ändrad text -->
-                         <option value="ref-desc">Krav (Fallande)</option> <!-- Ändrad text -->
+                         <option value="ref-asc">Krav (Stigande)</option>
+                         <option value="ref-desc">Krav (Fallande)</option>
                          <option value="impact-critical-first">Påverkan (Kritisk först)</option>
                          <option value="impact-critical-last">Påverkan (Kritisk sist)</option>
                      </select>
@@ -56,24 +65,22 @@
                       Lägg till krav <span class="icon" aria-hidden="true">➕</span>
                   </button>
             </div>
-
-             <!-- Globala spara-knappen -->
              <button id="saveChangesButton" class="hidden">
                  Spara ändringar (JSON) <span class="icon" aria-hidden="true">💾</span>
             </button>
-            <!-- Plats för inline save confirmation (läggs till av JS) -->
          </div>
     </div>
     <hr id="controlsDivider" class="hidden">
 
     <!-- Dynamiskt innehåll -->
     <div id="dynamicContentArea" class="hidden">
-        <!-- Innehåll renderas här av JavaScript -->
+        <!-- Innehåll renderas här av JavaScript.
+             När textrutor skapas här kommer verktygsraden automatiskt att läggas till. -->
     </div>
 
     <!-- Scripts -->
 
-    <!-- 1. FileSaver.js från CDN med korrekt integrity-hash (hämtad 2024-05-07) -->
+    <!-- Befintligt skript för FileSaver.js -->
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"
         integrity="sha512-Qlv6VSKh1gDKGoJbnyA5RMXYcvnpIqhO++MhIM2fStMcGT9i2T//tSwYFlcyoRRDcDZ+TYHpH8azBBCyhpSeqw=="
@@ -81,8 +88,31 @@
         referrerpolicy="no-referrer">
     </script>
 
-    <!-- 2. Ladda huvudapplikationen som en ES-modul -->
+    <!-- START: Tillägg för Markdown Toolbar -->
+    <!-- 1. Beroende: Marked.js (för att rendera förhandsgranskning) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- 2. Dina nya skript-filer -->
+    <script src="js/helpers.js"></script>
+    <script src="js/features/markdown_toolbar.js"></script>
+    <!-- SLUT: Tillägg för Markdown Toolbar -->
+
+    <!-- Ditt befintliga huvudskript för applikationen -->
     <script type="module" src="js/main.js"></script>
+    
+    <!-- START: Tillägg för Markdown Toolbar -->
+    <!-- 3. Initiera (starta) Markdown-verktygsraden när sidan har laddats -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Kontrollerar att funktionen finns innan den anropas
+            if (window.MarkdownToolbar && typeof window.MarkdownToolbar.init === 'function') {
+                window.MarkdownToolbar.init();
+            } else {
+                console.error('MarkdownToolbar kunde inte initieras. Kontrollera att markdown_toolbar.js är korrekt inladdad.');
+            }
+        });
+    </script>
+    <!-- SLUT: Tillägg för Markdown Toolbar -->
 
 </body>
 </html>
