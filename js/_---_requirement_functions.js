@@ -1,4 +1,3 @@
-
 // js/_---_requirement_functions.js
 
 // Importer
@@ -28,7 +27,6 @@ function generateSimpleUUID() {
 
 
 // ----- Form Field Creation Helpers -----
-// ÄNDRING: placeholder-parametern tas bort/ignoreras, instructionText används för text under label.
 export function createFormField(labelText, name, value, type = 'text', instructionText = null, readonly = false) {
     const container = document.createElement('div');
     container.classList.add('form-field');
@@ -68,17 +66,15 @@ export function createFormField(labelText, name, value, type = 'text', instructi
         checkboxLabel.htmlFor = inputId;
         checkboxLabel.textContent = labelText.replace('*','').trim(); // Labeltext för checkboxen
 
-        // Om checkboxen har en instruktion (ovanligt men möjligt)
         if (instructionText && !container.querySelector('.field-instruction')) {
             const instr = document.createElement('p');
             instr.className = 'field-instruction';
             instr.textContent = instructionText;
-            // Lägg till instruktionen efter checkbox+label
-            const wrapper = document.createElement('div'); // En div för att hålla checkbox och dess label tillsammans
+            const wrapper = document.createElement('div');
             wrapper.appendChild(inputElement);
             wrapper.appendChild(checkboxLabel);
             container.appendChild(wrapper);
-            container.appendChild(instr); // Instruktion efter wrapper
+            container.appendChild(instr);
         } else {
             container.appendChild(inputElement);
             container.appendChild(checkboxLabel);
@@ -99,7 +95,6 @@ export function createFormField(labelText, name, value, type = 'text', instructi
         inputElement.id = inputId;
         inputElement.name = name;
         inputElement.value = value ?? '';
-        // inputElement.placeholder = ''; // Placeholder tas bort
         if (readonly) {
             inputElement.readOnly = true;
             inputElement.classList.add('readonly-field');
@@ -118,7 +113,6 @@ function createInstructionListItem(text, index) {
     textarea.name = `instruction-${index}`;
     textarea.rows = 1;
     textarea.value = text;
-    // textarea.placeholder = "Instruktionstext..."; // Borttagen placeholder
     textarea.setAttribute('aria-label', `Instruktion ${index + 1}`);
     li.appendChild(textarea);
 
@@ -183,7 +177,7 @@ function createCheckFieldset(checkData, index) {
         `check-${index}-condition`,
         checkData.condition || '',
         'textarea',
-        'Skriv det påstående som stämmer eller som inte stämma.' // Detta blir field-instruction
+        'Skriv det påstående som stämmer eller som inte stämma.'
     );
     const conditionTextarea = conditionContainer.querySelector('textarea');
     if (conditionTextarea) {
@@ -194,7 +188,7 @@ function createCheckFieldset(checkData, index) {
     const logicContainer = createFormField(
         `Logik för Godkänd-kriterier`,
         `check-${index}-logic`,
-        '', // Value för select hanteras direkt
+        '',
         'select',
         'Välj om ALLA eller ETT kriterium måste vara uppfyllt för att påståendet ska anses godkänt.'
     );
@@ -226,12 +220,12 @@ function createCheckFieldset(checkData, index) {
     const passList = document.createElement('ul');
     passList.classList.add('pass-criteria-list', 'dynamic-list');
     (checkData.passCriteria || []).forEach((crit, critIndex) => {
-        passList.appendChild(createCriterionListItem(crit.requirement || '', index, 'pass', critIndex));
+        passList.appendChild(createCriterionListItem(crit, index, 'pass', critIndex));
     });
     passFieldset.appendChild(passList);
     const addPassButton = createDynamicListButton('+ Lägg till Godkänd-kriterium', () => {
         const currentCheckIndex = parseInt(fieldset.dataset.index, 10);
-        passList.appendChild(createCriterionListItem('', currentCheckIndex, 'pass', passList.children.length));
+        passList.appendChild(createCriterionListItem({}, currentCheckIndex, 'pass', passList.children.length));
     });
     passFieldset.appendChild(addPassButton);
     fieldset.appendChild(passFieldset);
@@ -248,12 +242,12 @@ function createCheckFieldset(checkData, index) {
     const ifNoList = document.createElement('ul');
     ifNoList.classList.add('if-no-criteria-list', 'dynamic-list');
     (checkData.ifNo || []).forEach((crit, critIndex) => {
-        ifNoList.appendChild(createCriterionListItem(crit.requirement || '', index, 'ifNo', critIndex));
+        ifNoList.appendChild(createCriterionListItem(crit, index, 'ifNo', critIndex));
     });
     ifNoFieldset.appendChild(ifNoList);
     const addIfNoButton = createDynamicListButton('+ Lägg till "Om Nej"-kriterium', () => {
         const currentCheckIndex = parseInt(fieldset.dataset.index, 10);
-        ifNoList.appendChild(createCriterionListItem('', currentCheckIndex, 'ifNo', ifNoList.children.length));
+        ifNoList.appendChild(createCriterionListItem({}, currentCheckIndex, 'ifNo', ifNoList.children.length));
     });
     ifNoFieldset.appendChild(addIfNoButton);
     fieldset.appendChild(ifNoFieldset);
@@ -261,38 +255,76 @@ function createCheckFieldset(checkData, index) {
     return fieldset;
 }
 
-function createCriterionListItem(text, checkIndex, type, critIndex) {
+// ** START OF CORRECTION **
+// This function was creating an empty textarea for failureStatementTemplate.
+// It is now corrected to read the existing value from the criterion object.
+function createCriterionListItem(criterion, checkIndex, type, critIndex) {
     const li = document.createElement('li');
     li.classList.add(`${type}-criterion-item`, 'dynamic-list-item');
     li.dataset.checkIndex = checkIndex;
     li.dataset.critIndex = critIndex;
 
     const typeText = type === 'pass' ? 'Godkänd-kriterium' : '"Om Nej"-kriterium';
-    const labelText = `${typeText} ${critIndex + 1} för påstående ${checkIndex + 1}`;
+    const baseName = `check-${checkIndex}-${type}Crit-${critIndex}`;
 
-    const textarea = document.createElement('textarea');
-    textarea.rows = 1;
-    textarea.name = `check-${checkIndex}-${type}Crit-${critIndex}`;
-    textarea.value = text;
-    // textarea.placeholder = 'Beskriv kravet/kriteriet här...'; // Borttagen placeholder
-    textarea.setAttribute('aria-label', labelText);
-    li.appendChild(textarea);
+    const fieldsWrapper = document.createElement('div');
+    fieldsWrapper.className = 'criterion-fields-wrapper';
 
+    // 1. Requirement Textarea (No change here)
+    const requirementContainer = createFormField(
+        `Kriterietext*`,
+        `${baseName}-requirement`,
+        criterion.requirement || '',
+        'textarea',
+        `Texten för ${typeText.toLowerCase()} ${critIndex + 1}.`
+    );
+    const requirementTextarea = requirementContainer.querySelector('textarea');
+    if (requirementTextarea) {
+        requirementTextarea.required = true;
+        requirementTextarea.setAttribute('aria-label', `Kriterietext för ${typeText.toLowerCase()} ${critIndex + 1}, påstående ${checkIndex + 1}`);
+    }
+    fieldsWrapper.appendChild(requirementContainer);
+
+    // 2. Failure Statement Template Textarea (CORRECTED)
+    const failureContainer = createFormField(
+        `Mall för avvikelsetext`,
+        `${baseName}-failureStatementTemplate`,
+        // **FIX:** Changed from `''` to correctly read the value from the object.
+        criterion.failureStatementTemplate || '', 
+        'textarea',
+        `Fyll i en mall för hur en avvikelse mot detta specifika kriterium ska formuleras. Använd [ange var och hur det brister] som platshållare.`
+    );
+    const failureTextarea = failureContainer.querySelector('textarea');
+    if (failureTextarea) {
+        failureTextarea.setAttribute('aria-label', `Mall för avvikelsetext för ${typeText.toLowerCase()} ${critIndex + 1}, påstående ${checkIndex + 1}`);
+    }
+    fieldsWrapper.appendChild(failureContainer);
+
+    li.appendChild(fieldsWrapper);
+
+    // Remove Button (No change here)
     const removeButton = createDynamicListButton('Ta bort', (e) => {
         const itemToRemove = e.target.closest('li.dynamic-list-item');
         if (itemToRemove) {
             const list = itemToRemove.parentElement;
             itemToRemove.remove();
+            // Re-index siblings to maintain correct form names
             Array.from(list.children).forEach((siblingLi, newCritIndex) => {
                 siblingLi.dataset.critIndex = newCritIndex;
-                const siblingTextarea = siblingLi.querySelector('textarea');
-                const siblingRemoveButton = siblingLi.querySelector('.remove-item-button');
                 const currentCheckIdx = parseInt(siblingLi.dataset.checkIndex, 10);
+                const newBaseName = `check-${currentCheckIdx}-${type}Crit-${newCritIndex}`;
 
-                if (siblingTextarea) {
-                    siblingTextarea.name = `check-${currentCheckIdx}-${type}Crit-${newCritIndex}`;
-                    const newLabelText = `${typeText} ${newCritIndex + 1} för påstående ${currentCheckIdx + 1}`;
-                    siblingTextarea.setAttribute('aria-label', newLabelText);
+                const reqTextarea = siblingLi.querySelector(`textarea[name$="-requirement"]`);
+                const failTextarea = siblingLi.querySelector(`textarea[name$="-failureStatementTemplate"]`);
+                const siblingRemoveButton = siblingLi.querySelector('.remove-item-button');
+                
+                if (reqTextarea) {
+                    reqTextarea.name = `${newBaseName}-requirement`;
+                    reqTextarea.setAttribute('aria-label', `Kriterietext för ${typeText.toLowerCase()} ${newCritIndex + 1}, påstående ${currentCheckIdx + 1}`);
+                }
+                if (failTextarea) {
+                    failTextarea.name = `${newBaseName}-failureStatementTemplate`;
+                    failTextarea.setAttribute('aria-label', `Mall för avvikelsetext för ${typeText.toLowerCase()} ${newCritIndex + 1}, påstående ${currentCheckIdx + 1}`);
                 }
                 if (siblingRemoveButton) {
                     siblingRemoveButton.setAttribute('aria-label', `Ta bort ${typeText.toLowerCase()} ${newCritIndex + 1}`);
@@ -300,8 +332,16 @@ function createCriterionListItem(text, checkIndex, type, critIndex) {
             });
         }
     }, 'remove-item-button');
+    removeButton.setAttribute('aria-label', `Ta bort ${typeText.toLowerCase()} ${critIndex + 1}`);
+    
+    const removeButtonWrapper = document.createElement('div');
+    removeButtonWrapper.className = 'criterion-remove-wrapper';
+    removeButtonWrapper.appendChild(removeButton);
+    li.appendChild(removeButtonWrapper);
+    
     return li;
 }
+// ** END OF CORRECTION **
 
 function createDynamicListButton(text, onClick, classNames = 'add-item-button') {
     const button = document.createElement('button');
@@ -316,6 +356,7 @@ function createDynamicListButton(text, onClick, classNames = 'add-item-button') 
 }
 
 // --- Funktioner för att flytta kontrollpunkter ---
+// ... (resten av filen är oförändrad från din version) ...
 
 function handleMoveCheckpoint(fieldsetElement, direction) {
     const checksContainer = fieldsetElement.parentElement;
@@ -401,15 +442,21 @@ function updateAllCheckpointDOMIndices(checksContainer) {
             criteriaListItems.forEach((li, critIndex) => {
                 li.dataset.checkIndex = newIndex;
                 li.dataset.critIndex = critIndex;
-
-                const textarea = li.querySelector('textarea');
-                const removeCritButton = li.querySelector('.remove-item-button');
+                
                 const typeText = type === 'pass' ? 'Godkänd-kriterium' : '"Om Nej"-kriterium';
-                const critLabelText = `${typeText} ${critIndex + 1} för påstående ${newIndex + 1}`;
+                const newBaseName = `check-${newIndex}-${type}Crit-${critIndex}`;
 
-                if (textarea) {
-                    textarea.name = `check-${newIndex}-${type}Crit-${critIndex}`;
-                    textarea.setAttribute('aria-label', critLabelText);
+                const reqTextarea = li.querySelector(`textarea[name$="-requirement"]`);
+                const failTextarea = li.querySelector(`textarea[name$="-failureStatementTemplate"]`);
+                const removeCritButton = li.querySelector('.remove-item-button');
+
+                if (reqTextarea) {
+                    reqTextarea.name = `${newBaseName}-requirement`;
+                    reqTextarea.setAttribute('aria-label', `Kriterietext för ${typeText.toLowerCase()} ${critIndex + 1}, påstående ${newIndex + 1}`);
+                }
+                if (failTextarea) {
+                    failTextarea.name = `${newBaseName}-failureStatementTemplate`;
+                    failTextarea.setAttribute('aria-label', `Mall för avvikelsetext för ${typeText.toLowerCase()} ${critIndex + 1}, påstående ${newIndex + 1}`);
                 }
                 if (removeCritButton) {
                     removeCritButton.setAttribute('aria-label', `Ta bort ${typeText.toLowerCase()} ${critIndex + 1}`);
@@ -736,6 +783,21 @@ export function displayRequirementDetail(reqKey) {
     if (!dynamicContentArea) return;
     dynamicContentArea.classList.add('requirement-detail');
 
+    // Hjälpfunktion för att säkert rendera Markdown utan oönskade radbrytningar
+    const renderMarkdownToElement = (targetElement, markdownString) => {
+        if (!markdownString) return;
+        // ** FIX: Ta bort alla typer av radbrytningar och ersätt med ett mellanslag **
+        const singleLineMarkdown = markdownString.replace(/(\r\n|\n|\r)/gm, " ");
+        
+        const processedHTML = linkifyText(parseSimpleMarkdown(singleLineMarkdown));
+        const template = document.createElement('template');
+        template.innerHTML = processedHTML.trim();
+        
+        const fragment = document.createDocumentFragment();
+        fragment.append(template.content);
+        targetElement.appendChild(fragment);
+    };
+
     const actionButtonContainer = document.createElement('div');
     actionButtonContainer.className = 'action-button-container';
 
@@ -799,8 +861,7 @@ export function displayRequirementDetail(reqKey) {
         obsHeading.textContent = 'Förväntad observation';
         obsSection.appendChild(obsHeading);
         const obsP = document.createElement('p');
-        let obsHTML = parseSimpleMarkdown(requirement.expectedObservation);
-        obsP.innerHTML = linkifyText(obsHTML); 
+        renderMarkdownToElement(obsP, requirement.expectedObservation);
         obsSection.appendChild(obsP);
         dynamicContentArea.appendChild(obsSection);
     }
@@ -812,18 +873,15 @@ export function displayRequirementDetail(reqKey) {
         instrHeading.textContent = 'Instruktioner';
         instrSection.appendChild(instrHeading);
 
-        // Lägg <p>-elementen direkt i instrSection, ingen extra div
         requirement.instructions.forEach(instr => {
             const p = document.createElement('p');
-            let htmlContent = parseSimpleMarkdown(instr.text);
-            p.innerHTML = linkifyText(htmlContent);
+            renderMarkdownToElement(p, instr.text);
             instrSection.appendChild(p);
         });
 
         dynamicContentArea.appendChild(instrSection);
     }
     
-
     const optionalSections = { examples: 'Exempel', exceptions: 'Undantag', commonErrors: 'Vanliga Fel', tips: 'Tips' };
     for (const key in optionalSections) {
         if (Object.prototype.hasOwnProperty.call(requirement, key) && requirement[key]) {
@@ -833,8 +891,7 @@ export function displayRequirementDetail(reqKey) {
             heading.textContent = optionalSections[key];
             section.appendChild(heading);
             const p = document.createElement('p');
-            let sectionHTML = parseSimpleMarkdown(requirement[key]);
-            p.innerHTML = linkifyText(sectionHTML); 
+            renderMarkdownToElement(p, requirement[key]);
             section.appendChild(p);
             dynamicContentArea.appendChild(section);
         }
@@ -855,11 +912,9 @@ export function displayRequirementDetail(reqKey) {
             checkSubHeading.textContent = `Påstående ${index + 1}`;
             checkItemDiv.appendChild(checkSubHeading);
 
-
             const conditionP = document.createElement('p');
             conditionP.classList.add('check-condition');
-            let conditionHTML = parseSimpleMarkdown(getVal(check, 'condition', '<em>Påstående saknas</em>'));
-            conditionP.innerHTML = linkifyText(conditionHTML); // UPDATED
+            renderMarkdownToElement(conditionP, getVal(check, 'condition', '<em>Påstående saknas</em>'));
             checkItemDiv.appendChild(conditionP);
 
             const passCriteriaCount = getVal(check, 'passCriteria.length', 0);
@@ -876,9 +931,20 @@ export function displayRequirementDetail(reqKey) {
                 ul.classList.add('pass-criteria-list');
                 check.passCriteria.forEach(criterion => {
                     const li = document.createElement('li');
-                    let critHTML = parseSimpleMarkdown(getVal(criterion, 'requirement', ''));
-                    li.innerHTML = linkifyText(critHTML); // UPDATED
+                    renderMarkdownToElement(li, getVal(criterion, 'requirement', ''));
                     ul.appendChild(li);
+
+                    const failureTemplate = getVal(criterion, 'failureStatementTemplate');
+                    if (failureTemplate) {
+                        const templateBlock = document.createElement('blockquote');
+                        templateBlock.className = 'failure-template-display';
+                        const templateLabel = document.createElement('strong');
+                        templateLabel.textContent = 'Mall för avvikelsetext:';
+                        templateBlock.appendChild(templateLabel);
+                        templateBlock.appendChild(document.createTextNode(' '));
+                        renderMarkdownToElement(templateBlock, failureTemplate);
+                        li.appendChild(templateBlock);
+                    }
                 });
                 checkItemDiv.appendChild(ul);
             }
@@ -895,9 +961,20 @@ export function displayRequirementDetail(reqKey) {
                 noUl.classList.add('pass-criteria-list'); 
                 ifNoCriteria.forEach(criterion => {
                     const li = document.createElement('li');
-                    let ifNoCritHTML = parseSimpleMarkdown(getVal(criterion, 'requirement', ''));
-                    li.innerHTML = linkifyText(ifNoCritHTML); // UPDATED
+                    renderMarkdownToElement(li, getVal(criterion, 'requirement', ''));
                     noUl.appendChild(li);
+
+                    const failureTemplate = getVal(criterion, 'failureStatementTemplate');
+                    if (failureTemplate) {
+                        const templateBlock = document.createElement('blockquote');
+                        templateBlock.className = 'failure-template-display';
+                        const templateLabel = document.createElement('strong');
+                        templateLabel.textContent = 'Mall för avvikelsetext:';
+                        templateBlock.appendChild(templateLabel);
+                        templateBlock.appendChild(document.createTextNode(' '));
+                        renderMarkdownToElement(templateBlock, failureTemplate);
+                        li.appendChild(templateBlock);
+                    }
                 });
                 checkItemDiv.appendChild(noUl);
             }
@@ -978,6 +1055,7 @@ export function displayRequirementDetail(reqKey) {
 
     setTimeout(() => title.focus({ preventScroll: false }), 50);
 }
+
 
 
 export function renderRequirementForm(reqKey) {
@@ -1098,18 +1176,15 @@ export function renderRequirementForm(reqKey) {
     form.appendChild(instrFieldset);
 
 
-    // KORRIGERAD DEL STARTAR HÄR
     const optionalTextFields = {
         examples: 'Exempel',
         exceptions: 'Undantag',
-        commonErrors: 'Vanliga fel', // JSON-nyckel: readableLabel
-        tips: 'Tips och goda råd'  // JSON-nyckel: readableLabel
+        commonErrors: 'Vanliga fel', 
+        tips: 'Tips och goda råd'
     };
 
     for (const [jsonKey, readableLabel] of Object.entries(optionalTextFields)) {
         const instruction = `Beskriv ${readableLabel.toLowerCase()} här om det finns några.`;
-        // Använd jsonKey för både name-attributet (andra argumentet till createFormField)
-        // och för att hämta initialt värde från requirement-objektet (requirement[jsonKey]).
         const fieldContainer = createFormField(readableLabel, jsonKey, requirement[jsonKey] || '', 'textarea', instruction);
         const textarea = fieldContainer.querySelector('textarea');
         if (textarea && !textarea.dataset.autoResizeAttached) {
@@ -1118,7 +1193,6 @@ export function renderRequirementForm(reqKey) {
         }
         form.appendChild(fieldContainer);
     }
-    // KORRIGERAD DEL SLUTAR HÄR
 
     const checksFieldset = document.createElement('fieldset');
     const checksLegend = document.createElement('legend');
@@ -1261,7 +1335,6 @@ export function renderRequirementForm(reqKey) {
     }
 }
 
-
 function saveRequirement(event, reqKey) {
     event.preventDefault();
     const form = event.target;
@@ -1379,17 +1452,38 @@ function saveRequirement(event, reqKey) {
                 passCriteria: [],
                 ifNo: []
             };
-            const passCritTextareas = fieldset.querySelectorAll(`.pass-criteria-list textarea[name^="check-${checkIndex}-passCrit"]`);
-            passCritTextareas.forEach((textarea, critIndex) => {
-                const reqText = textarea.value.trim();
-                if (reqText) check.passCriteria.push({ id: `${check.id}.${critIndex + 1}`, requirement: reqText });
+
+            // ** START: KORRIGERAD KOD HÄR **
+            // Process passCriteria
+            const passCritListItems = fieldset.querySelectorAll(`.pass-criteria-list li.dynamic-list-item`);
+            passCritListItems.forEach((li, critIndex) => {
+                const reqText = li.querySelector(`textarea[name$="-requirement"]`)?.value.trim();
+                if (reqText) {
+                    const failText = li.querySelector(`textarea[name$="-failureStatementTemplate"]`)?.value.trim() || '';
+                    check.passCriteria.push({
+                        id: `${check.id}.${critIndex + 1}`,
+                        requirement: reqText,
+                        failureStatementTemplate: failText
+                    });
+                }
             });
-            const ifNoCritTextareas = fieldset.querySelectorAll(`.if-no-criteria-list textarea[name^="check-${checkIndex}-ifNoCrit"]`);
-             ifNoCritTextareas.forEach((textarea, critIndex) => {
-                const reqText = textarea.value.trim();
-                if (reqText) check.ifNo.push({ id: `${check.id}.no.${critIndex + 1}`, requirement: reqText });
+
+            // Process ifNo criteria
+            const ifNoCritListItems = fieldset.querySelectorAll(`.if-no-criteria-list li.dynamic-list-item`);
+            ifNoCritListItems.forEach((li, critIndex) => {
+                const reqText = li.querySelector(`textarea[name$="-requirement"]`)?.value.trim();
+                if (reqText) {
+                    const failText = li.querySelector(`textarea[name$="-failureStatementTemplate"]`)?.value.trim() || '';
+                    check.ifNo.push({
+                        id: `${check.id}.no.${critIndex + 1}`,
+                        requirement: reqText,
+                        failureStatementTemplate: failText
+                    });
+                }
             });
-             updatedRequirement.checks.push(check);
+            // ** SLUT: KORRIGERAD KOD HÄR **
+            
+            updatedRequirement.checks.push(check);
         });
 
         const updatedRequirementString = JSON.stringify(updatedRequirement);
@@ -1941,4 +2035,4 @@ export function displayRequirementsWithoutContentTypes() {
 }
 
 
-console.log("Module loaded: requirement_functions (v13 - Form field instructions & Swedish UI)");
+console.log("Module loaded: requirement_functions (v14 - Failure Statement Templates)");

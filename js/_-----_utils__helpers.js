@@ -32,6 +32,8 @@ export function escapeHtml(unsafe) {
 * @param {string} text Texten att tolka.
 * @returns {string} HTML-sträng.
 */
+
+// NY, KORRIGERAD KOD
 export function parseSimpleMarkdown(text) {
     if (typeof text !== 'string' || !text) {
         return text;
@@ -39,22 +41,24 @@ export function parseSimpleMarkdown(text) {
 
     let processedText = text;
 
+    // 1. Skydda medveten HTML som vi vill bevara (t.ex. länkar, br, hr)
     const placeholders = {};
     let placeholderId = 0;
-    // Skydda redan existerande <a> och <pre> taggar från escapeHtml och markdown
-    processedText = processedText.replace(/<(a|pre)\b[^>]*>.*?<\/\1>/gis, (match) => {
+    // Denna regex fångar både par-taggar som <a>...</a> och enskilda taggar som <br>
+    processedText = processedText.replace(/<(a|pre)\b[^>]*>.*?<\/\1>|<(br|hr)\b[^>]*\/?>/gis, (match) => {
         const id = `__MARKDOWN_PLACEHOLDER_${placeholderId++}__`;
         placeholders[id] = match;
         return id;
     });
 
+    // 2. Escapa ALLT annat för att neutralisera oönskad HTML
     processedText = escapeHtml(processedText);
 
-    // Markdown-regler
+    // 3. Applicera Markdown-regler på den nu säkra texten
     processedText = processedText.replace(/\*\*(?=\S)(.+?[_*]*)(?<=\S)\*\*|__(?=\S)(.+?[_*]*)(?<=\S)__/gs, (match, p1, p2) => `<strong>${p1 || p2}</strong>`);
     processedText = processedText.replace(/(?<!\w|\*|_)(\*|_)(?=\S)(.+?[_*]*)(?<=\S)\1(?!\w|\*|_)/gs, (match, marker, content) => `<em>${content}</em>`);
 
-    // Återställ skyddade taggar
+    // 4. Återställ de skyddade HTML-taggarna
     for (let i = placeholderId - 1; i >= 0; i--) {
         const id = `__MARKDOWN_PLACEHOLDER_${i}__`;
         processedText = processedText.replace(id, () => placeholders[id]);
