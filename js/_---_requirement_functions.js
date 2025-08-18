@@ -121,15 +121,7 @@ function createInstructionListItem(text, index) {
     // textarea.placeholder = "Instruktionstext..."; // Borttagen placeholder
     textarea.setAttribute('aria-label', `Instruktion ${index + 1}`);
     li.appendChild(textarea);
-    // Ingen separat field-instruction här, placeholder var den primära vägledningen
-    const removeButton = createDynamicListButton('Ta bort', (e) => {
-        const itemToRemove = e.target.closest('li.dynamic-list-item');
-        if (itemToRemove) {
-            itemToRemove.remove();
-        }
-    }, 'remove-item-button');
-    removeButton.setAttribute('aria-label', `Ta bort instruktion ${index + 1}`);
-    li.appendChild(removeButton);
+
     return li;
 }
 
@@ -308,8 +300,6 @@ function createCriterionListItem(text, checkIndex, type, critIndex) {
             });
         }
     }, 'remove-item-button');
-    removeButton.setAttribute('aria-label', `Ta bort ${typeText.toLowerCase()} ${critIndex + 1}`);
-    li.appendChild(removeButton);
     return li;
 }
 
@@ -833,19 +823,6 @@ export function displayRequirementDetail(reqKey) {
         dynamicContentArea.appendChild(instrSection);
     }
 
-    if (requirement.expectedObservation) {
-        const obsSection = document.createElement('div');
-        obsSection.classList.add('detail-section');
-        const obsHeading = document.createElement('h3');
-        obsHeading.textContent = 'Förväntad observation';
-        obsSection.appendChild(obsHeading);
-        const obsP = document.createElement('p');
-        let obsHTML = parseSimpleMarkdown(requirement.expectedObservation);
-        obsP.innerHTML = linkifyText(obsHTML); 
-        obsSection.appendChild(obsP);
-        dynamicContentArea.appendChild(obsSection);
-    }
-
     const optionalSections = { examples: 'Exempel', exceptions: 'Undantag', commonErrors: 'Vanliga Fel', tips: 'Tips' };
     for (const key in optionalSections) {
         if (Object.prototype.hasOwnProperty.call(requirement, key) && requirement[key]) {
@@ -1105,21 +1082,8 @@ export function renderRequirementForm(reqKey) {
         instrList.appendChild(listItem);
     });
     instrFieldset.appendChild(instrList);
-    const addInstrButton = createDynamicListButton('Lägg till instruktion', () => {
-        const list = document.getElementById('instructionList');
-        if (list) {
-            const newListItem = createInstructionListItem('', list.children.length);
-            const newTextarea = newListItem.querySelector('textarea');
-            if (newTextarea && !newTextarea.dataset.autoResizeAttached) {
-                newTextarea.addEventListener('input', () => autoResizeTextarea(newTextarea));
-                newTextarea.dataset.autoResizeAttached = 'true';
-                autoResizeTextarea(newTextarea);
-            }
-            list.appendChild(newListItem);
-        }
-    });
-    instrFieldset.appendChild(addInstrButton);
-    form.appendChild(instrFieldset);
+
+
 
     const obsFieldContainer = createFormField('Förväntad observation', 'expectedObservation', requirement.expectedObservation || '', 'textarea', 'Text som beskriver vad som förväntas observeras vid granskning.');
     const obsTextarea = obsFieldContainer.querySelector('textarea');
@@ -1128,6 +1092,10 @@ export function renderRequirementForm(reqKey) {
         obsTextarea.dataset.autoResizeAttached = 'true';
     }
     form.appendChild(obsFieldContainer);
+
+
+    form.appendChild(instrFieldset);
+
 
     // KORRIGERAD DEL STARTAR HÄR
     const optionalTextFields = {
