@@ -1586,4 +1586,24 @@ body.dark-theme .confirmation-message.info-confirmation {
     .manage-ct-view-buttons button { width: 100%; }
 }
 
+
+/* Justera enbart fieldset för Instruktioner */
+fieldset.instr-fieldset {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+  
+  fieldset.instr-fieldset legend {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Ta bort list-indraget för instruktionerna */
+  .instr-fieldset ol.dynamic-list {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+  }
+  
+  
 /* END OF FILE style.css */
