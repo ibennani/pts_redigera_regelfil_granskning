@@ -255,9 +255,6 @@ function createCheckFieldset(checkData, index) {
     return fieldset;
 }
 
-// ** START OF CORRECTION **
-// This function was creating an empty textarea for failureStatementTemplate.
-// It is now corrected to read the existing value from the criterion object.
 function createCriterionListItem(criterion, checkIndex, type, critIndex) {
     const li = document.createElement('li');
     li.classList.add(`${type}-criterion-item`, 'dynamic-list-item');
@@ -270,7 +267,6 @@ function createCriterionListItem(criterion, checkIndex, type, critIndex) {
     const fieldsWrapper = document.createElement('div');
     fieldsWrapper.className = 'criterion-fields-wrapper';
 
-    // 1. Requirement Textarea (No change here)
     const requirementContainer = createFormField(
         `Kriterietext*`,
         `${baseName}-requirement`,
@@ -285,12 +281,11 @@ function createCriterionListItem(criterion, checkIndex, type, critIndex) {
     }
     fieldsWrapper.appendChild(requirementContainer);
 
-    // 2. Failure Statement Template Textarea (CORRECTED)
+    // **KORRIGERING:** Namnet är nu konsekvent
     const failureContainer = createFormField(
         `Mall för avvikelsetext`,
         `${baseName}-failureStatementTemplate`,
-        // **FIX:** Changed from `''` to correctly read the value from the object.
-        criterion.failureStatementTemplate || '', 
+        criterion.failureStatementTemplate || '',
         'textarea',
         `Fyll i en mall för hur en avvikelse mot detta specifika kriterium ska formuleras. Använd [ange var och hur det brister] som platshållare.`
     );
@@ -302,13 +297,11 @@ function createCriterionListItem(criterion, checkIndex, type, critIndex) {
 
     li.appendChild(fieldsWrapper);
 
-    // Remove Button (No change here)
     const removeButton = createDynamicListButton('Ta bort', (e) => {
         const itemToRemove = e.target.closest('li.dynamic-list-item');
         if (itemToRemove) {
             const list = itemToRemove.parentElement;
             itemToRemove.remove();
-            // Re-index siblings to maintain correct form names
             Array.from(list.children).forEach((siblingLi, newCritIndex) => {
                 siblingLi.dataset.critIndex = newCritIndex;
                 const currentCheckIdx = parseInt(siblingLi.dataset.checkIndex, 10);
@@ -341,7 +334,6 @@ function createCriterionListItem(criterion, checkIndex, type, critIndex) {
     
     return li;
 }
-// ** END OF CORRECTION **
 
 function createDynamicListButton(text, onClick, classNames = 'add-item-button') {
     const button = document.createElement('button');
@@ -413,6 +405,7 @@ function handleMoveCheckpoint(fieldsetElement, direction) {
     }
 }
 
+
 function updateAllCheckpointDOMIndices(checksContainer) {
     if (!checksContainer) return;
     const fieldsets = Array.from(checksContainer.children);
@@ -447,7 +440,8 @@ function updateAllCheckpointDOMIndices(checksContainer) {
                 const newBaseName = `check-${newIndex}-${type}Crit-${critIndex}`;
 
                 const reqTextarea = li.querySelector(`textarea[name$="-requirement"]`);
-                const failTextarea = li.querySelector(`textarea[name$="-failureStatementTemplate"]`);
+                // **KORRIGERING:** Letar efter det korrekta, konsekventa namnet
+                const failTextarea = li.querySelector(`textarea[name$="-failureStatementTemplate"]`); 
                 const removeCritButton = li.querySelector('.remove-item-button');
 
                 if (reqTextarea) {
@@ -455,6 +449,7 @@ function updateAllCheckpointDOMIndices(checksContainer) {
                     reqTextarea.setAttribute('aria-label', `Kriterietext för ${typeText.toLowerCase()} ${critIndex + 1}, påstående ${newIndex + 1}`);
                 }
                 if (failTextarea) {
+                    // **KORRIGERING:** Sätter det korrekta, konsekventa namnet
                     failTextarea.name = `${newBaseName}-failureStatementTemplate`;
                     failTextarea.setAttribute('aria-label', `Mall för avvikelsetext för ${typeText.toLowerCase()} ${critIndex + 1}, påstående ${newIndex + 1}`);
                 }
@@ -783,16 +778,19 @@ export function displayRequirementDetail(reqKey) {
     if (!dynamicContentArea) return;
     dynamicContentArea.classList.add('requirement-detail');
 
-    // Hjälpfunktion för att säkert rendera Markdown utan oönskade radbrytningar
+    // Hjälpfunktion för att säkert rendera Markdown utan radbrytningsproblem
     const renderMarkdownToElement = (targetElement, markdownString) => {
-        if (!markdownString) return;
-        // ** FIX: Ta bort alla typer av radbrytningar och ersätt med ett mellanslag **
-        const singleLineMarkdown = markdownString.replace(/(\r\n|\n|\r)/gm, " ");
+        if (markdownString === null || markdownString === undefined) return;
         
-        const processedHTML = linkifyText(parseSimpleMarkdown(singleLineMarkdown));
+        // Ersätt medvetna radbrytningar (\n) i textsträngar med <br> INNAN markdown-parsern körs.
+        // Detta respekterar avsiktliga radbrytningar i fält som "examples".
+        const withBreaks = markdownString.replace(/\n/g, '<br>');
+        
+        const processedHTML = linkifyText(parseSimpleMarkdown(withBreaks));
         const template = document.createElement('template');
         template.innerHTML = processedHTML.trim();
         
+        // Använd en DocumentFragment för att undvika onödiga wrapper-element
         const fragment = document.createDocumentFragment();
         fragment.append(template.content);
         targetElement.appendChild(fragment);
@@ -1335,6 +1333,8 @@ export function renderRequirementForm(reqKey) {
     }
 }
 
+
+// **KORRIGERAD saveRequirement-funktion**
 function saveRequirement(event, reqKey) {
     event.preventDefault();
     const form = event.target;
@@ -1453,12 +1453,12 @@ function saveRequirement(event, reqKey) {
                 ifNo: []
             };
 
-            // ** START: KORRIGERAD KOD HÄR **
             // Process passCriteria
             const passCritListItems = fieldset.querySelectorAll(`.pass-criteria-list li.dynamic-list-item`);
             passCritListItems.forEach((li, critIndex) => {
                 const reqText = li.querySelector(`textarea[name$="-requirement"]`)?.value.trim();
                 if (reqText) {
+                    // *** HÄR ÄR DEN KORRIGERADE RADEN ***
                     const failText = li.querySelector(`textarea[name$="-failureStatementTemplate"]`)?.value.trim() || '';
                     check.passCriteria.push({
                         id: `${check.id}.${critIndex + 1}`,
@@ -1473,6 +1473,7 @@ function saveRequirement(event, reqKey) {
             ifNoCritListItems.forEach((li, critIndex) => {
                 const reqText = li.querySelector(`textarea[name$="-requirement"]`)?.value.trim();
                 if (reqText) {
+                    // *** OCH HÄR ÄR DEN KORRIGERADE RADEN ***
                     const failText = li.querySelector(`textarea[name$="-failureStatementTemplate"]`)?.value.trim() || '';
                     check.ifNo.push({
                         id: `${check.id}.no.${critIndex + 1}`,
@@ -1481,7 +1482,6 @@ function saveRequirement(event, reqKey) {
                     });
                 }
             });
-            // ** SLUT: KORRIGERAD KOD HÄR **
             
             updatedRequirement.checks.push(check);
         });
@@ -1523,6 +1523,7 @@ function saveRequirement(event, reqKey) {
         showError(`Kunde inte spara kravet. Se konsolen för detaljer. Fel: ${escapeHtml(error.message)}`, dynamicContentArea);
     }
 }
+
 
 function extractCategories(requirements) {
     const mainCategoriesSet = new Set();

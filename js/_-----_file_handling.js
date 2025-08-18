@@ -158,22 +158,16 @@ export function downloadJsonFile() {
         const filename = `${safeTitle}_${safeVersion}.json`;
         console.log(`Förbereder nedladdning. Filnamn: ${filename}`);
 
-        // Skapa en djup kopia av jsonData för att modifiera inför sparande
         const dataToSave = JSON.parse(JSON.stringify(state.jsonData));
 
-        // 1. Säkerställ att metadata.pageTypes är en array av strängar
         if (dataToSave.metadata.pageTypes && typeof dataToSave.metadata.pageTypes === 'string') {
-            // Om det fortfarande är en sträng, konvertera (detta bör hanteras av saveMetadata nu)
-            dataToSave.metadata.pageTypes = dataToSave.metadata.pageTypes.split(/\r?\n|,/) // Hantera både newline och komma
+            dataToSave.metadata.pageTypes = dataToSave.metadata.pageTypes.split(/\r?\n|,/)
                 .map(pt => pt.trim()).filter(Boolean);
         } else if (!Array.isArray(dataToSave.metadata.pageTypes)) {
-            dataToSave.metadata.pageTypes = []; // Default till tom array om fel typ eller saknas
+            dataToSave.metadata.pageTypes = [];
         }
-        // Säkerställ att varje element är en sträng
         dataToSave.metadata.pageTypes = dataToSave.metadata.pageTypes.map(pt => String(pt).trim()).filter(Boolean);
 
-
-        // 2. Säkerställ att metadata.contentTypes har korrekt struktur
         if (Array.isArray(dataToSave.metadata.contentTypes)) {
             dataToSave.metadata.contentTypes = dataToSave.metadata.contentTypes.map(ct => {
                 let text = '';
@@ -181,27 +175,24 @@ export function downloadJsonFile() {
                 if (typeof ct === 'object' && ct !== null) {
                     text = String(ct.text || '').trim();
                     id = String(ct.id || '').trim();
-                } else if (typeof ct === 'string') { // Om det av misstag är en sträng
+                } else if (typeof ct === 'string') {
                     text = ct.trim();
                 }
 
-                if (!text) return null; // Hoppa över om text saknas
+                if (!text) return null;
 
-                // Korrigera text till stor begynnelsebokstav (förenklad)
                 text = text.charAt(0).toUpperCase() + text.slice(1);
                 
-                // Generera id om den saknas eller är felaktig
                 if (!id || id !== generateKeyFromName(text)) {
                     id = generateKeyFromName(text);
                 }
                 
                 return { id: id, text: text };
-            }).filter(Boolean); // Ta bort null-värden
+            }).filter(Boolean);
         } else {
-            dataToSave.metadata.contentTypes = []; // Default till tom array
+            dataToSave.metadata.contentTypes = [];
         }
 
-        // 3. Kontrollera metadata.monitoringType
         if (!dataToSave.metadata.monitoringType ||
             typeof dataToSave.metadata.monitoringType.type !== 'string' ||
             typeof dataToSave.metadata.monitoringType.text !== 'string') {
@@ -210,7 +201,6 @@ export function downloadJsonFile() {
             dataToSave.metadata.monitoringType = { ...defaultMonType };
         }
 
-        // 4. Bearbeta requirements för att säkerställa obligatoriska fält och standardstruktur
         const processedRequirements = {};
         if (dataToSave.requirements && typeof dataToSave.requirements === 'object') {
             for (const key in dataToSave.requirements) {
@@ -221,63 +211,57 @@ export function downloadJsonFile() {
                         continue;
                     }
 
-                    const processedReq = { ...originalReq }; // Börja med en kopia
+                    const processedReq = { ...originalReq };
 
-                    // Säkerställ metadata och dess underfält
                     processedReq.metadata = processedReq.metadata || {};
                     processedReq.metadata.mainCategory = processedReq.metadata.mainCategory || REQUIREMENT_KEY_DEFAULTS.metadata.mainCategory;
-                    // (subCategory och impact hanteras av STANDARD_REQUIREMENT_KEYS nedan om de saknas helt)
-
-                    // Säkerställ titel
                     processedReq.title = processedReq.title || REQUIREMENT_KEY_DEFAULTS.title;
-                    if (!processedReq.title) console.warn(`Krav ${key} saknar titel.`);
 
-                    // Säkerställ standardReference struktur
                     if (typeof processedReq.standardReference !== 'object' || processedReq.standardReference === null) {
                         processedReq.standardReference = { text: "", url: "" };
                     }
                     processedReq.standardReference.text = processedReq.standardReference.text || "";
                     processedReq.standardReference.url = processedReq.standardReference.url || "";
-                    if (!processedReq.standardReference.text) console.warn(`Krav ${key} saknar standardReference.text.`);
 
-
-                    // Säkerställ instructions (array av objekt med id och text)
                     processedReq.instructions = Array.isArray(processedReq.instructions) ? processedReq.instructions : [];
                     processedReq.instructions = processedReq.instructions.map((instr, idx) => {
                         if (typeof instr === 'object' && instr !== null) {
                             return { id: String(instr.id || idx + 1), text: String(instr.text || '') };
                         }
-                        return { id: String(idx + 1), text: String(instr || '') }; // Om det bara är en sträng
+                        return { id: String(idx + 1), text: String(instr || '') };
                     });
-                    if (processedReq.instructions.length === 0) console.warn(`Krav ${key} saknar instruktioner.`);
 
-
-                    // Säkerställ checks (array av objekt med condition och passCriteria)
+                    // ** START: KORRIGERING **
                     processedReq.checks = Array.isArray(processedReq.checks) ? processedReq.checks : [];
                     processedReq.checks = processedReq.checks.map((chk, idx) => {
-                        let condition = "", passCriteria = [];
-                        if (typeof chk === 'object' && chk !== null) {
-                            condition = String(chk.condition || '');
-                            passCriteria = Array.isArray(chk.passCriteria) ? chk.passCriteria : [];
-                        }
-                        passCriteria = passCriteria.map((crit, cIdx) => {
-                             if (typeof crit === 'object' && crit !== null) {
-                                 return { id: String(crit.id || `${idx+1}.${cIdx+1}`), requirement: String(crit.requirement || '')};
-                             }
-                             return {id: String(`${idx+1}.${cIdx+1}`), requirement: String(crit || '')};
+                        if (typeof chk !== 'object' || chk === null) return null;
+
+                        const cleanCheck = { ...chk, id: String(chk.id || idx + 1) };
+                        
+                        cleanCheck.passCriteria = (Array.isArray(chk.passCriteria) ? chk.passCriteria : []).map((crit, cIdx) => {
+                            if (typeof crit !== 'object' || crit === null) return { id: `${idx+1}.${cIdx+1}`, requirement: String(crit || ''), failureStatementTemplate: '' };
+                            return {
+                                id: String(crit.id || `${idx+1}.${cIdx+1}`),
+                                requirement: String(crit.requirement || ''),
+                                failureStatementTemplate: String(crit.failureStatementTemplate || '') // Säkerställ att fältet bevaras
+                            };
                         });
-                        return { ...chk, id: String(chk.id || idx + 1), condition, passCriteria };
-                    });
-                     if (processedReq.checks.length === 0) console.warn(`Krav ${key} saknar checks.`);
-                     else if (processedReq.checks.some(c => !c.condition || c.passCriteria.length === 0)) {
-                         console.warn(`Krav ${key} har checks med saknad condition eller passCriteria.`);
-                     }
+                        
+                        cleanCheck.ifNo = (Array.isArray(chk.ifNo) ? chk.ifNo : []).map((crit, cIdx) => {
+                             if (typeof crit !== 'object' || crit === null) return { id: `${idx+1}.no.${cIdx+1}`, requirement: String(crit || ''), failureStatementTemplate: '' };
+                            return {
+                                id: String(crit.id || `${idx+1}.no.${cIdx+1}`),
+                                requirement: String(crit.requirement || ''),
+                                failureStatementTemplate: String(crit.failureStatementTemplate || '') // Säkerställ att fältet bevaras
+                            };
+                        });
 
+                        return cleanCheck;
+                    }).filter(Boolean);
+                    // ** SLUT: KORRIGERING **
 
-                    // Säkerställ contentType (array av ID-strängar)
                     processedReq.contentType = Array.isArray(processedReq.contentType) ? processedReq.contentType : [];
                     processedReq.contentType = processedReq.contentType.map(ct => String(ct)).filter(Boolean);
-                    // Ytterligare validering: säkerställ att ID:n finns i metadata.contentTypes
                     const validContentTypeIds = new Set(dataToSave.metadata.contentTypes.map(ct => ct.id));
                     processedReq.contentType = processedReq.contentType.filter(id => {
                         if (!validContentTypeIds.has(id)) {
@@ -286,15 +270,13 @@ export function downloadJsonFile() {
                         }
                         return true;
                     });
-                     if (processedReq.contentType.length === 0) console.warn(`Krav ${key} saknar giltiga contentType.`);
 
-                    // Säkerställ att alla STANDARD_REQUIREMENT_KEYS finns (använder defaults)
                     STANDARD_REQUIREMENT_KEYS.forEach(stdKey => {
                         if (!Object.prototype.hasOwnProperty.call(processedReq, stdKey) || processedReq[stdKey] === null || processedReq[stdKey] === undefined) {
                             console.log(`Lägger till defaultvärde för saknad nyckel '${stdKey}' i krav '${key}'`);
                             const defaultValue = REQUIREMENT_KEY_DEFAULTS[stdKey];
                             processedReq[stdKey] = (typeof defaultValue === 'object' && defaultValue !== null)
-                                ? JSON.parse(JSON.stringify(defaultValue)) // Djup kopia för objekt/arrayer
+                                ? JSON.parse(JSON.stringify(defaultValue))
                                 : defaultValue;
                         }
                     });
@@ -305,7 +287,6 @@ export function downloadJsonFile() {
         dataToSave.requirements = processedRequirements;
 
 
-        // 5. Skapa JSON-sträng och trigga nedladdning
         const jsonString = JSON.stringify(dataToSave, null, 2);
         const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
 
