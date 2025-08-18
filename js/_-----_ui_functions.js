@@ -56,7 +56,7 @@ export function initializeUI() {
     contentDisplay?.classList.remove('form-view', 'requirement-detail', 'delete-confirmation-view');
 
     // Återställ sorteringsvalet till default
-    if (sortOrderSelect) sortOrderSelect.value = 'category-asc'; // Default sort
+    if (sortOrderSelect) sortOrderSelect.value = 'ref-asc'; // Default sort
 
     console.log("--- initializeUI Finished ---");
 }

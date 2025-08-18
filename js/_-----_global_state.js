@@ -18,7 +18,7 @@ export let isDataModified = false;
 // Den nuvarande sorteringsordningen för kravlistan.
 // Möjliga värden definieras där sorteringen hanteras (t.ex. i requirement_functions).
 // Default är 'category-asc'.
-export let currentSortOrder = 'category-asc';
+export let currentSortOrder = 'ref-asc';
 
 // Den nuvarande söktermen som används för att filtrera kravlistan.
 export let currentSearchTerm = '';

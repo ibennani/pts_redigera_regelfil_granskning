@@ -21,7 +21,7 @@ import { initializeUI, setupContentArea, showError, resetUI, displayConfirmation
 export function handleFileUpload(event) {
     const file = event.target.files[0];
     state.setState('jsonData', null); state.setState('currentRequirementKey', null); state.setState('lastFocusedReqKey', null);
-    state.setState('isDataModified', false); state.setState('currentSortOrder', 'category-asc'); state.setState('currentSearchTerm', '');
+    state.setState('isDataModified', false); state.setState('currentSortOrder', 'ref-asc'); state.setState('currentSearchTerm', '');
     if (sortOrderSelect) sortOrderSelect.value = state.currentSortOrder; if (searchInput) searchInput.value = '';
 
     if (!file) { console.log("Ingen fil vald."); resetFileInput(); return; }
