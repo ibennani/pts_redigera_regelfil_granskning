@@ -1,3 +1,4 @@
+
 // js/_---_requirement_functions.js
 
 // Importer
@@ -801,6 +802,19 @@ export function displayRequirementDetail(reqKey) {
     }
     dynamicContentArea.appendChild(stdRefP);
 
+    if (requirement.expectedObservation) {
+        const obsSection = document.createElement('div');
+        obsSection.classList.add('detail-section');
+        const obsHeading = document.createElement('h3');
+        obsHeading.textContent = 'Förväntad observation';
+        obsSection.appendChild(obsHeading);
+        const obsP = document.createElement('p');
+        let obsHTML = parseSimpleMarkdown(requirement.expectedObservation);
+        obsP.innerHTML = linkifyText(obsHTML); 
+        obsSection.appendChild(obsP);
+        dynamicContentArea.appendChild(obsSection);
+    }
+
     if (Array.isArray(requirement.instructions) && requirement.instructions.length > 0) {
         const instrSection = document.createElement('div');
         instrSection.classList.add('detail-section');
@@ -1072,6 +1086,7 @@ export function renderRequirementForm(reqKey) {
     stdRefFieldset.appendChild(createFormField('Länk till EN- eller WCAG-kriteriet', 'standardReference.url', refUrl, 'url', 'Ange en fullständig URL, t.ex. https://www.w3.org/WAI/...'));
     form.appendChild(stdRefFieldset);
 
+    
     const instrFieldset = document.createElement('fieldset');
     const instrLegend = document.createElement('legend');
     instrLegend.textContent = 'Instruktioner';
