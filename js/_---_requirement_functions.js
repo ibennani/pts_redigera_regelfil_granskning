@@ -807,21 +807,19 @@ export function displayRequirementDetail(reqKey) {
 
     if (Array.isArray(requirement.instructions) && requirement.instructions.length > 0) {
         const instrSection = document.createElement('div');
-        instrSection.classList.add('detail-section');
+        instrSection.classList.add('detail-section', 'instructions-section');
         const instrHeading = document.createElement('h3');
         instrHeading.textContent = 'Instruktioner';
         instrSection.appendChild(instrHeading);
-    
-        // Skapa vanliga textblock istället för punktlista
-        const container = document.createElement('div');
+
+        // Lägg <p>-elementen direkt i instrSection, ingen extra div
         requirement.instructions.forEach(instr => {
             const p = document.createElement('p');
             let htmlContent = parseSimpleMarkdown(instr.text);
             p.innerHTML = linkifyText(htmlContent);
-            container.appendChild(p);
+            instrSection.appendChild(p);
         });
-    
-        instrSection.appendChild(container);
+
         dynamicContentArea.appendChild(instrSection);
     }
     

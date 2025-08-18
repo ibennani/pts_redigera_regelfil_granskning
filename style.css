@@ -646,6 +646,13 @@ body.dark-theme #sortControls select {
     padding-top: 1rem;
     border-top: 1px solid var(--border-color);
 }
+
+#dynamicContentArea.requirement-detail .instructions-section {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+}
+
 #dynamicContentArea.requirement-detail .detail-section h3 { 
     border: none;
     margin-bottom: 0.5rem;
@@ -831,6 +838,18 @@ body.dark-theme #dynamicContentArea.form-view legend {
     color: var(--text-color);
     transition: border-color 0.2s, box-shadow 0.2s;
 }
+
+#dynamicContentArea.requirement-detail .instructions-section {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+#dynamicContentArea.requirement-detail .instructions-section p {
+    margin-left: 0;
+    padding-left: 0;
+}
+
 
 body.dark-theme #dynamicContentArea.form-view input[type="text"],
 body.dark-theme #dynamicContentArea.form-view input[type="email"],
