@@ -1,10 +1,3 @@
-// js/_-----_utils__helpers.js
-
-/**
- * Validerar om en sträng är en giltig e-postadress.
- * @param {string} email E-postadressen att validera.
- * @returns {boolean} True om giltig, annars false.
- */
 export function isValidEmail(email) {
     if (!email || typeof email !== 'string') return false;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -28,12 +21,10 @@ export function escapeHtml(unsafe) {
 
 /**
 * Tolkar en enkel variant av Markdown till HTML.
-* Hanterar **fet**, _kursiv_. Nyradstecken bevaras (förutsätter CSS `white-space: pre-line` eller `break-spaces`).
+* Hanterar **fet**, _kursiv_ och bevarar <br>-taggar.
 * @param {string} text Texten att tolka.
 * @returns {string} HTML-sträng.
 */
-
-// NY, KORRIGERAD KOD
 export function parseSimpleMarkdown(text) {
     if (typeof text !== 'string' || !text) {
         return text;
@@ -41,28 +32,32 @@ export function parseSimpleMarkdown(text) {
 
     let processedText = text;
 
-    // 1. Skydda medveten HTML vi vill bevara (t.ex. länkar) genom att tillfälligt ta bort dem.
+    // 1. Skydda medveten HTML vi vill bevara (länkar och radbrytningar) med en säker platshållare.
     const placeholders = {};
     let placeholderId = 0;
-    processedText = processedText.replace(/<a\b[^>]*>.*?<\/a>/gi, (match) => {
-        const id = `__MD_PLACEHOLDER_${placeholderId++}__`;
+    // Använder en platshållare som INTE kan tolkas som markdown, t.ex. "[--...--]".
+    processedText = processedText.replace(/<a\b[^>]*>.*?<\/a>|<br\s*\/?>/gi, (match) => {
+        const id = `[--MD_PLACEHOLDER_${placeholderId++}--]`;
         placeholders[id] = match;
         return id;
     });
 
     // 2. Escapa ALLT annat för att neutralisera oönskad HTML.
-    // Detta gör < och > till &lt; och &gt;
     processedText = escapeHtml(processedText);
 
     // 3. Applicera nu Markdown-regler på den SÄKRA texten.
-    // Detta skapar giltiga <strong> och <em> taggar.
-    processedText = processedText.replace(/\*\*(?=\S)(.+?[_*]*)(?<=\S)\*\*|__(?=\S)(.+?[_*]*)(?<=\S)__/gs, (match, p1, p2) => `<strong>${p1 || p2}</strong>`);
-    processedText = processedText.replace(/(?<!\w|\*|_)(\*|_)(?=\S)(.+?[_*]*)(?<=\S)\1(?!\w|\*|_)/gs, (match, marker, content) => `<em>${content}</em>`);
-
-    // 4. Återställ de skyddade HTML-elementen (länkarna).
-    for (let i = placeholderId - 1; i >= 0; i--) {
-        const id = `__MD_PLACEHOLDER_${i}__`;
-        processedText = processedText.replace(id, () => placeholders[id]);
+    processedText = processedText.replace(/\*\*(?=\S)(.+?)(?<=\S)\*\*|__(?=\S)(.+?)(?<=\S)__/gs, (match, p1, p2) => `<strong>${p1 || p2}</strong>`);
+    processedText = processedText.replace(/(?<!\w)(\*|_)(?=\S)(.+?)(?<=\S)\1(?!\w)/g, (match, marker, content) => `<em>${content}</em>`);
+    
+    // 4. Återställ de skyddade HTML-elementen.
+    for (const id in placeholders) {
+        // Ersätt alla förekomster av platshållaren med dess ursprungliga HTML-värde.
+        processedText = processedText.replace(new RegExp(escapeRegExp(id), 'g'), placeholders[id]);
+    }
+    
+    // Hjälpfunktion för att escapa strängar som ska användas i en RegExp.
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
     return processedText;

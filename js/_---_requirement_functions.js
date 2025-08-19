@@ -778,22 +778,36 @@ export function displayRequirementDetail(reqKey) {
     if (!dynamicContentArea) return;
     dynamicContentArea.classList.add('requirement-detail');
 
-    // Hjälpfunktion för att säkert rendera Markdown utan radbrytningsproblem
     const renderMarkdownToElement = (targetElement, markdownString) => {
         if (markdownString === null || markdownString === undefined) return;
-        
-        // Ersätt medvetna radbrytningar (\n) i textsträngar med <br> INNAN markdown-parsern körs.
-        // Detta respekterar avsiktliga radbrytningar i fält som "examples".
-        const withBreaks = markdownString.replace(/\n/g, '<br>');
-        
-        const processedHTML = linkifyText(parseSimpleMarkdown(withBreaks));
-        const template = document.createElement('template');
-        template.innerHTML = processedHTML.trim();
-        
-        // Använd en DocumentFragment för att undvika onödiga wrapper-element
-        const fragment = document.createDocumentFragment();
-        fragment.append(template.content);
-        targetElement.appendChild(fragment);
+
+        if (typeof marked === 'undefined') {
+            console.warn("marked.js not found. Using simple markdown parser as fallback.");
+            const processedHTML = linkifyText(parseSimpleMarkdown(markdownString.replace(/\n/g, '<br>')));
+            const template = document.createElement('template');
+            template.innerHTML = processedHTML.trim();
+            targetElement.appendChild(template.content);
+            return;
+        }
+
+        const renderer = new marked.Renderer();
+        const originalLinkRenderer = renderer.link.bind(renderer);
+        renderer.link = (href, title, text) => {
+            const link = originalLinkRenderer(href, title, text);
+            return link.replace('<a', '<a target="_blank" rel="noopener noreferrer"');
+        };
+
+        try {
+            let html = marked.parse(markdownString, { breaks: true, gfm: true, renderer: renderer });
+            html = linkifyText(html);
+            
+            const template = document.createElement('template');
+            template.innerHTML = html.trim();
+            targetElement.appendChild(template.content);
+        } catch (error) {
+            console.error("Error parsing Markdown in detail view:", error);
+            targetElement.textContent = markdownString;
+        }
     };
 
     const actionButtonContainer = document.createElement('div');
@@ -858,9 +872,10 @@ export function displayRequirementDetail(reqKey) {
         const obsHeading = document.createElement('h3');
         obsHeading.textContent = 'Förväntad observation';
         obsSection.appendChild(obsHeading);
-        const obsP = document.createElement('p');
-        renderMarkdownToElement(obsP, requirement.expectedObservation);
-        obsSection.appendChild(obsP);
+        // KORRIGERING: Använd DIV istället för P
+        const obsContainer = document.createElement('div');
+        renderMarkdownToElement(obsContainer, requirement.expectedObservation);
+        obsSection.appendChild(obsContainer);
         dynamicContentArea.appendChild(obsSection);
     }
 
@@ -872,9 +887,10 @@ export function displayRequirementDetail(reqKey) {
         instrSection.appendChild(instrHeading);
 
         requirement.instructions.forEach(instr => {
-            const p = document.createElement('p');
-            renderMarkdownToElement(p, instr.text);
-            instrSection.appendChild(p);
+            // KORRIGERING: Använd DIV istället för P
+            const instrContainer = document.createElement('div');
+            renderMarkdownToElement(instrContainer, instr.text);
+            instrSection.appendChild(instrContainer);
         });
 
         dynamicContentArea.appendChild(instrSection);
@@ -888,9 +904,10 @@ export function displayRequirementDetail(reqKey) {
             const heading = document.createElement('h3');
             heading.textContent = optionalSections[key];
             section.appendChild(heading);
-            const p = document.createElement('p');
-            renderMarkdownToElement(p, requirement[key]);
-            section.appendChild(p);
+            // KORRIGERING: Använd DIV istället för P
+            const contentContainer = document.createElement('div');
+            renderMarkdownToElement(contentContainer, requirement[key]);
+            section.appendChild(contentContainer);
             dynamicContentArea.appendChild(section);
         }
     }
@@ -909,11 +926,12 @@ export function displayRequirementDetail(reqKey) {
             const checkSubHeading = document.createElement('h4'); 
             checkSubHeading.textContent = `Påstående ${index + 1}`;
             checkItemDiv.appendChild(checkSubHeading);
-
-            const conditionP = document.createElement('p');
-            conditionP.classList.add('check-condition');
-            renderMarkdownToElement(conditionP, getVal(check, 'condition', '<em>Påstående saknas</em>'));
-            checkItemDiv.appendChild(conditionP);
+            
+            // KORRIGERING: Använd DIV istället för P
+            const conditionContainer = document.createElement('div');
+            conditionContainer.classList.add('check-condition');
+            renderMarkdownToElement(conditionContainer, getVal(check, 'condition', '<em>Påstående saknas</em>'));
+            checkItemDiv.appendChild(conditionContainer);
 
             const passCriteriaCount = getVal(check, 'passCriteria.length', 0);
             const logic = getVal(check, 'logic', 'AND');

@@ -168,7 +168,7 @@ body {
 
 h1, h2, h3, h4 {
     color: var(--heading-color);
-    margin-block-start: 1.5em;
+    margin-block-start: 0.5em;
     margin-block-end: 0.75em;
     font-weight: 600;
 }
@@ -642,7 +642,7 @@ body.dark-theme #sortControls select {
     margin-right: 0.3em;
 }
 #dynamicContentArea.requirement-detail .detail-section {
-    margin-top: 1.5rem;
+    margin-top: 1.1rem;
     padding-top: 1rem;
     border-top: 1px solid var(--border-color);
 }
@@ -754,6 +754,8 @@ body.dark-theme #sortControls select {
     white-space: break-spaces; 
     word-wrap: break-word; 
     overflow-wrap: break-word; 
+    line-height: 1.5;
+    margin-block-end: 0.0em; 
 }
 
 #dynamicContentArea.requirement-detail .pass-criteria-list li .failure-template-display {
