@@ -1,19 +1,19 @@
 // js/_-----_file_handling.js
 
-// Importer (som tidigare)
+// Importer
 import {
     fileInput, contentDisplay, postUploadControlsContainer,
     controlsDivider, dynamicContentArea, filterSortRow,
     searchInput, sortOrderSelect, uploadSection,
-    topBar, bottomBar // NYA IMPORTER
+    topBar, bottomBar // Importerar funktionsraderna
 } from './_-----_dom_element_references.js';
 import {
     MONITORING_TYPES, STANDARD_REQUIREMENT_KEYS, REQUIREMENT_KEY_DEFAULTS, ICONS
 } from './_-----_constants.js';
 import * as state from './_-----_global_state.js';
 import { escapeHtml, getVal, generateKeyFromName, generateRequirementKey } from './_-----_utils__helpers.js';
-import { initializeUI, setupContentArea, showError, resetUI, updateSaveButtonsState } from './_-----_ui_functions.js';
-
+// Importerar createSaveButton från ui_functions
+import { initializeUI, setupContentArea, showError, resetUI, updateSaveButtonsState, createSaveButton } from './_-----_ui_functions.js';
 
 /**
  * Hanterar händelsen när en fil väljs i filuppladdningsfältet.
@@ -41,12 +41,10 @@ export function handleFileUpload(event) {
                 const defaultType = MONITORING_TYPES.find(t => t.type === 'web') || MONITORING_TYPES[0];
                 parsedJson.metadata.monitoringType = defaultType ? { ...defaultType } : { type: "unknown", text: "Okänd" };
             }
-            // Konvertera pageTypes från sträng till array om den finns som sträng vid inladdning
             if (parsedJson.metadata.pageTypes && typeof parsedJson.metadata.pageTypes === 'string') {
-                console.log("Konverterar metadata.pageTypes från sträng till array vid inladdning.");
                 parsedJson.metadata.pageTypes = parsedJson.metadata.pageTypes.split(',').map(pt => pt.trim()).filter(Boolean);
             } else if (!parsedJson.metadata.pageTypes) {
-                parsedJson.metadata.pageTypes = []; // Säkerställ att det är en array om det saknas
+                parsedJson.metadata.pageTypes = [];
             }
 
 
@@ -58,10 +56,20 @@ export function handleFileUpload(event) {
             if (postUploadControlsContainer) postUploadControlsContainer.classList.remove('hidden');
             if (controlsDivider) controlsDivider.classList.remove('hidden');
             
-            // NYTT: Visa funktionsraderna
-            if (topBar) topBar.classList.remove('hidden');
+            // ÄNDRAT: Skapa och lägg till spara-knapparna dynamiskt
+            if (topBar && !document.getElementById('saveChangesButtonTop')) {
+                const saveButtonTop = createSaveButton('saveChangesButtonTop');
+                saveButtonTop.addEventListener('click', downloadJsonFile);
+                topBar.querySelector('.action-bar-content')?.prepend(saveButtonTop);
+            }
+            if (bottomBar && !document.getElementById('saveChangesButtonBottom')) {
+                const saveButtonBottom = createSaveButton('saveChangesButtonBottom');
+                saveButtonBottom.addEventListener('click', downloadJsonFile);
+                bottomBar.querySelector('.action-bar-content')?.prepend(saveButtonBottom);
+            }
+            
             if (bottomBar) bottomBar.classList.remove('hidden');
-            updateSaveButtonsState(); // Sätt initialt tillstånd för spara-knapparna
+            updateSaveButtonsState();
 
             if (filterSortRow) filterSortRow.classList.add('hidden');
 
@@ -99,67 +107,14 @@ export function resetFileInput() {
 }
 
 /**
- * Uppdaterar versionsnumret i metadata enligt formatet ÅÅÅÅ.M.rSeq.
- */
-function updateVersion() {
-    if (!state.jsonData?.metadata) return;
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth() + 1;
-    const existingVersion = state.jsonData.metadata.version || '0.0.r0';
-    let existingYear = 0, existingMonth = 0, existingSeq = 0;
-    const versionRegex = /^(\d{4})\.(\d{1,2})\.r(\d+)$/;
-    const match = existingVersion.match(versionRegex);
-    if (match) {
-        const yearPart = parseInt(match[1], 10);
-        const monthPart = parseInt(match[2], 10);
-        const seqPart = parseInt(match[3], 10);
-        if (!isNaN(yearPart) && !isNaN(monthPart) && !isNaN(seqPart) && monthPart >= 1 && monthPart <= 12) {
-            existingYear = yearPart; existingMonth = monthPart; existingSeq = seqPart;
-        } else {
-            console.warn(`Ogiltigt värde i befintligt versionsformat: "${existingVersion}". Återställer sekvens.`);
-            existingYear = 0; existingMonth = 0;
-        }
-    } else {
-        console.warn(`Oväntat befintligt versionsformat: "${existingVersion}". Försöker inte återanvända, återställer sekvens.`);
-        existingYear = 0; existingMonth = 0;
-    }
-    let newSeq = (currentYear === existingYear && currentMonth === existingMonth) ? existingSeq + 1 : 1;
-    state.jsonData.metadata.version = `${currentYear}.${currentMonth}.r${newSeq}`;
-    console.log(`Version uppdaterad till: ${state.jsonData.metadata.version}`);
-}
-
-/**
- * Uppdaterar datumet för senaste ändring i metadata till dagens datum (YYYY-MM-DD).
- */
-function updateDateModified() {
-    if (!state.jsonData?.metadata) return;
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    state.jsonData.metadata.dateModified = `${year}-${month}-${day}`;
-    console.log(`DateModified uppdaterad till: ${state.jsonData.metadata.dateModified}`);
-}
-
-/**
- * Förbereder JSON-datan för nedladdning, säkerställer att alla standardnycklar finns,
- * uppdaterar version/datum, och triggar nedladdningen.
- * UPPDATERAD för att följa de nya kraven på JSON-struktur.
+ * Förbereder JSON-datan för nedladdning och triggar nedladdningen.
  */
 export function downloadJsonFile() {
     if (!state.jsonData) { showError("Ingen data att spara.", dynamicContentArea || contentDisplay); return; }
 
     try {
-        // ÄNDRAT: Uppdatera version och datum ENDAST om det finns osparade ändringar.
-        if (state.isDataModified) {
-            console.log("Ändringar upptäckta, uppdaterar version och datum.");
-            updateVersion();
-            updateDateModified();
-        } else {
-            console.log("Inga ändringar upptäckta, sparar med befintlig version.");
-        }
-
+        // ÄNDRAT: Versions- och datumuppdatering sker nu i global_state, så ingen kod behövs här.
+        
         const currentVersion = state.jsonData.metadata.version || 'okänd-version';
         const title = state.jsonData.metadata?.title || 'kravdata';
         let safeTitle = title.toLowerCase().replace(/[åä]/g, 'a').replace(/ö/g, 'o');
@@ -189,25 +144,18 @@ export function downloadJsonFile() {
                 } else if (typeof ct === 'string') {
                     text = ct.trim();
                 }
-
                 if (!text) return null;
-
                 text = text.charAt(0).toUpperCase() + text.slice(1);
-                
                 if (!id || id !== generateKeyFromName(text)) {
                     id = generateKeyFromName(text);
                 }
-                
                 return { id: id, text: text };
             }).filter(Boolean);
         } else {
             dataToSave.metadata.contentTypes = [];
         }
 
-        if (!dataToSave.metadata.monitoringType ||
-            typeof dataToSave.metadata.monitoringType.type !== 'string' ||
-            typeof dataToSave.metadata.monitoringType.text !== 'string') {
-            console.warn("metadata.monitoringType har felaktig struktur eller saknas. Sätter default.");
+        if (!dataToSave.metadata.monitoringType || typeof dataToSave.metadata.monitoringType.type !== 'string' || typeof dataToSave.metadata.monitoringType.text !== 'string') {
             const defaultMonType = MONITORING_TYPES.find(t => t.type === 'web') || MONITORING_TYPES[0] || {type: "unknown", text: "Okänd"};
             dataToSave.metadata.monitoringType = { ...defaultMonType };
         }
@@ -217,23 +165,15 @@ export function downloadJsonFile() {
             for (const key in dataToSave.requirements) {
                 if (Object.prototype.hasOwnProperty.call(dataToSave.requirements, key)) {
                     const originalReq = dataToSave.requirements[key];
-                    if (typeof originalReq !== 'object' || originalReq === null) {
-                        console.warn(`Requirement with key "${key}" är inte ett objekt, skippar.`);
-                        continue;
-                    }
+                    if (typeof originalReq !== 'object' || originalReq === null) continue;
 
                     const processedReq = { ...originalReq };
-
                     processedReq.metadata = processedReq.metadata || {};
                     processedReq.metadata.mainCategory = processedReq.metadata.mainCategory || REQUIREMENT_KEY_DEFAULTS.metadata.mainCategory;
                     processedReq.title = processedReq.title || REQUIREMENT_KEY_DEFAULTS.title;
-
                     if (typeof processedReq.standardReference !== 'object' || processedReq.standardReference === null) {
                         processedReq.standardReference = { text: "", url: "" };
                     }
-                    processedReq.standardReference.text = processedReq.standardReference.text || "";
-                    processedReq.standardReference.url = processedReq.standardReference.url || "";
-
                     processedReq.instructions = Array.isArray(processedReq.instructions) ? processedReq.instructions : [];
                     processedReq.instructions = processedReq.instructions.map((instr, idx) => {
                         if (typeof instr === 'object' && instr !== null) {
@@ -241,50 +181,27 @@ export function downloadJsonFile() {
                         }
                         return { id: String(idx + 1), text: String(instr || '') };
                     });
-
-                    // ** START: KORRIGERING **
                     processedReq.checks = Array.isArray(processedReq.checks) ? processedReq.checks : [];
                     processedReq.checks = processedReq.checks.map((chk, idx) => {
                         if (typeof chk !== 'object' || chk === null) return null;
-
                         const cleanCheck = { ...chk, id: String(chk.id || idx + 1) };
-                        
                         cleanCheck.passCriteria = (Array.isArray(chk.passCriteria) ? chk.passCriteria : []).map((crit, cIdx) => {
                             if (typeof crit !== 'object' || crit === null) return { id: `${idx+1}.${cIdx+1}`, requirement: String(crit || ''), failureStatementTemplate: '' };
-                            return {
-                                id: String(crit.id || `${idx+1}.${cIdx+1}`),
-                                requirement: String(crit.requirement || ''),
-                                failureStatementTemplate: String(crit.failureStatementTemplate || '') // Säkerställ att fältet bevaras
-                            };
+                            return { id: String(crit.id || `${idx+1}.${cIdx+1}`), requirement: String(crit.requirement || ''), failureStatementTemplate: String(crit.failureStatementTemplate || '') };
                         });
-                        
                         cleanCheck.ifNo = (Array.isArray(chk.ifNo) ? chk.ifNo : []).map((crit, cIdx) => {
                              if (typeof crit !== 'object' || crit === null) return { id: `${idx+1}.no.${cIdx+1}`, requirement: String(crit || ''), failureStatementTemplate: '' };
-                            return {
-                                id: String(crit.id || `${idx+1}.no.${cIdx+1}`),
-                                requirement: String(crit.requirement || ''),
-                                failureStatementTemplate: String(crit.failureStatementTemplate || '') // Säkerställ att fältet bevaras
-                            };
+                            return { id: String(crit.id || `${idx+1}.no.${cIdx+1}`), requirement: String(crit.requirement || ''), failureStatementTemplate: String(crit.failureStatementTemplate || '') };
                         });
-
                         return cleanCheck;
                     }).filter(Boolean);
-                    // ** SLUT: KORRIGERING **
 
                     processedReq.contentType = Array.isArray(processedReq.contentType) ? processedReq.contentType : [];
-                    processedReq.contentType = processedReq.contentType.map(ct => String(ct)).filter(Boolean);
                     const validContentTypeIds = new Set(dataToSave.metadata.contentTypes.map(ct => ct.id));
-                    processedReq.contentType = processedReq.contentType.filter(id => {
-                        if (!validContentTypeIds.has(id)) {
-                            console.warn(`Krav ${key} refererar till ogiltigt contentType ID: ${id}. Tas bort.`);
-                            return false;
-                        }
-                        return true;
-                    });
+                    processedReq.contentType = processedReq.contentType.filter(id => validContentTypeIds.has(id));
 
                     STANDARD_REQUIREMENT_KEYS.forEach(stdKey => {
                         if (!Object.prototype.hasOwnProperty.call(processedReq, stdKey) || processedReq[stdKey] === null || processedReq[stdKey] === undefined) {
-                            console.log(`Lägger till defaultvärde för saknad nyckel '${stdKey}' i krav '${key}'`);
                             const defaultValue = REQUIREMENT_KEY_DEFAULTS[stdKey];
                             processedReq[stdKey] = (typeof defaultValue === 'object' && defaultValue !== null)
                                 ? JSON.parse(JSON.stringify(defaultValue))
@@ -303,7 +220,6 @@ export function downloadJsonFile() {
 
         if (typeof saveAs === 'function') {
             saveAs(blob, filename);
-            console.log(`FileSaver.js: Nedladdning av "${filename}" initierad.`);
         } else {
             console.warn("FileSaver.js (saveAs) hittades inte. Använder fallback-metod.");
             const url = URL.createObjectURL(blob);
@@ -314,27 +230,14 @@ export function downloadJsonFile() {
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
-            console.log(`Fallback Link Method: Nedladdning av "${filename}" initierad.`);
         }
 
-        // ÄNDRAT: Återställ flaggan och uppdatera knapparnas tillstånd
         state.setState('isDataModified', false);
         updateSaveButtonsState();
-
-        // Visa en bekräftelse i det dynamiska området istället för bredvid en knapp
-        const targetArea = dynamicContentArea || contentDisplay;
-        if (targetArea) {
-            let message = `Filen sparades med version ${escapeHtml(currentVersion)}.`;
-            if (state.isDataModified) {
-                // Detta block kommer inte köras nu eftersom flaggan är återställd, men logiken är här för framtiden
-            }
-            alert(message); // Använder alert för nu för tydlighet, kan bytas mot displayConfirmation
-        }
+        alert(`Filen "${filename}" har sparats.`);
 
     } catch (error) {
         console.error("Fel vid förberedelse eller start av JSON-nedladdning:", error);
         showError(`Kunde inte skapa filen för nedladdning. Fel: ${escapeHtml(error.message)}`, dynamicContentArea || contentDisplay);
     }
 }
-
-console.log("Module loaded: file_handling");

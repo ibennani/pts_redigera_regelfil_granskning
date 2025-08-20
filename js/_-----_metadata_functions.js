@@ -5,7 +5,7 @@ import { dynamicContentArea } from './_-----_dom_element_references.js';
 import { MONITORING_TYPES, ICONS, commonLanguages } from './_-----_constants.js';
 import * as state from './_-----_global_state.js';
 import { escapeHtml, getVal, isValidEmail, generateKeyFromName } from './_-----_utils__helpers.js';
-import { setupContentArea, showError, displayConfirmation, updateSaveButtonsState } from './_-----_ui_functions.js'; // Importerar updateSaveButtonsState
+import { setupContentArea, showError, displayConfirmation, updateSaveButtonsState } from './_-----_ui_functions.js';
 import { createFormField } from './_---_requirement_functions.js'; 
 import { manageContentTypeAssociations, displayRequirementsWithoutContentTypes } from './_---_requirement_functions.js'; 
 
@@ -51,14 +51,13 @@ export function displayMetadata() {
     actionContainer.className = 'action-button-container';
     const editButton = document.createElement('button');
     editButton.id = 'editMetadataButton';
-    editButton.innerHTML = `Redigera metadata <span class="icon" aria-hidden="true">${ICONS.edit}</span>`; // Ikon till höger
+    editButton.innerHTML = `Redigera metadata <span class="icon" aria-hidden="true">${ICONS.edit}</span>`;
     editButton.addEventListener('click', renderMetadataForm);
     actionContainer.appendChild(editButton);
     dynamicContentArea.insertBefore(actionContainer, heading);
 
     let itemCount = 0;
 
-    // 1. Visa 'monitoringType' 
     if (Object.prototype.hasOwnProperty.call(metadata, 'monitoringType')) {
         itemCount++;
         const key = 'monitoringType';
@@ -74,7 +73,6 @@ export function displayMetadata() {
         dynamicContentArea.appendChild(itemDiv);
     }
 
-    // 2. Loopa genom övriga metadata-nycklar
     const specialHandlingKeysDisplay = ['contentTypes', 'keywords', 'pageTypes', 'monitoringType'];
     for (const key in metadata) {
         if (Object.prototype.hasOwnProperty.call(metadata, key)) {
@@ -89,7 +87,6 @@ export function displayMetadata() {
                 const keyStrong = document.createElement('strong');
                 const readableKey = key.replace(/([A-Z]+)/g, " $1").replace(/([A-Z][a-z])/g, " $1").replace(/^./, function(str){ return str.toUpperCase(); });
                 keyStrong.textContent = `${readableKey}:`;
-
 
                 if (key === 'publisher' && typeof value === 'object' && value !== null) {
                     keyStrong.style.display = 'block';
@@ -142,15 +139,10 @@ export function displayMetadata() {
                 dynamicContentArea.appendChild(itemDiv);
             } catch (error) {
                 console.error(`Fel vid visning av metadata-nyckel "${key}":`, error);
-                const errorDiv = document.createElement('div');
-                errorDiv.textContent = `Fel vid visning av nyckel: ${key}`;
-                errorDiv.style.color = 'red';
-                dynamicContentArea.appendChild(errorDiv);
             }
         }
     }
 
-    // 3. Visa 'pageTypes' 
     if (Object.prototype.hasOwnProperty.call(metadata, 'pageTypes')) {
         itemCount++;
         const ptDiv = document.createElement('div'); ptDiv.classList.add('metadata-item');
@@ -164,23 +156,12 @@ export function displayMetadata() {
                 ptList.appendChild(li);
             });
             ptDiv.appendChild(ptList);
-        } else if (typeof pageTypesValue === 'string' && pageTypesValue.trim() !== '') { 
-            const pageTypesArray = pageTypesValue.split(',').map(s => s.trim()).filter(Boolean);
-             if (pageTypesArray.length > 0) {
-                const ptList = document.createElement('ul'); ptList.style.listStyle = 'disc'; ptList.style.marginLeft = '20px';
-                pageTypesArray.forEach(pt => { const li = document.createElement('li'); li.textContent = escapeHtml(pt); ptList.appendChild(li); });
-                ptDiv.appendChild(ptList);
-            } else {
-                 const valueSpan = document.createElement('span'); valueSpan.textContent = ' (inga angivna)'; valueSpan.style.fontStyle = 'italic'; ptDiv.appendChild(valueSpan);
-            }
         } else {
             const valueSpan = document.createElement('span'); valueSpan.textContent = ' (inga angivna)'; valueSpan.style.fontStyle = 'italic'; ptDiv.appendChild(valueSpan);
         }
         dynamicContentArea.appendChild(ptDiv);
     }
-
-    // 4. Hantera 'contentTypes'
-    // Skapa alltid detta block för att "Krav utan..."-länken ska kunna visas här.
+    
     itemCount++; 
     const ctDiv = document.createElement('div');
     ctDiv.classList.add('metadata-item'); 
@@ -203,14 +184,14 @@ export function displayMetadata() {
             const link = document.createElement('a');
             link.href = '#'; 
             const contentTypeName = getVal(ct, 'text', getVal(ct, 'id', 'Okänd typ'));
-            link.innerHTML = `${escapeHtml(contentTypeName)} (${count} ${siffraText}) <span class="icon" aria-hidden="true">${ICONS.edit}</span>`; // Ikon till höger
+            link.innerHTML = `${escapeHtml(contentTypeName)} (${count} ${siffraText}) <span class="icon" aria-hidden="true">${ICONS.edit}</span>`;
             link.dataset.contentTypeId = ct.id;
             link.dataset.contentTypeName = contentTypeName; 
             link.style.cursor = 'pointer';
             link.style.textDecoration = 'underline';
             link.addEventListener('click', (e) => {
                 e.preventDefault();
-                const idToManage = e.target.closest('a').dataset.contentTypeId; // Närmaste a-element
+                const idToManage = e.target.closest('a').dataset.contentTypeId;
                 const nameToManage = e.target.closest('a').dataset.contentTypeName;
                 if (idToManage && nameToManage) {
                     manageContentTypeAssociations(idToManage, nameToManage);
@@ -223,11 +204,10 @@ export function displayMetadata() {
         const noCtDefinedLi = document.createElement('li');
         noCtDefinedLi.textContent = '(Inga innehållstyper definierade i metadatan)';
         noCtDefinedLi.style.fontStyle = 'italic';
-        noCtDefinedLi.style.color = 'var(--neutral-color)'; // Gör den lite diskretare
+        noCtDefinedLi.style.color = 'var(--neutral-color)';
         ctList.appendChild(noCtDefinedLi);
     }
 
-    // Lägg till "Krav utan kopplade innehållstyper" som sista element i DENNA UL-lista
     if (state.jsonData && state.jsonData.requirements) {
         const reqsWithoutContentTypes = Object.values(state.jsonData.requirements).filter(req => {
             return !req.contentType || (Array.isArray(req.contentType) && req.contentType.length === 0);
@@ -235,21 +215,19 @@ export function displayMetadata() {
         const countNoCt = reqsWithoutContentTypes.length;
 
         const noCtLi = document.createElement('li');
-        // noCtLi.classList.add('no-ct-link-item'); // Om du vill ha specifik CSS för denna li
-
-        // Lägg till en separator om det finns andra listelement (förutom "inga definierade")
+        
         if (ctList.children.length > 0 && 
             !(ctList.children.length === 1 && ctList.firstChild.textContent.startsWith('(Inga innehållstyper'))) {
             const separator = document.createElement('hr');
             separator.style.border = 'none';
             separator.style.borderTop = '1px dotted var(--border-color)';
-            separator.style.margin = '0.5em 0'; // Justera vid behov
-            noCtLi.appendChild(separator); // Lägg separatorn inuti li för att hålla strukturen
+            separator.style.margin = '0.5em 0';
+            noCtLi.appendChild(separator);
         }
         
         const linkNoCt = document.createElement('a');
         linkNoCt.href = '#';
-        linkNoCt.innerHTML = `Krav utan kopplade innehållstyper (${countNoCt} st) <span class="icon" aria-hidden="true">${ICONS.list}</span>`; // Ikon till höger
+        linkNoCt.innerHTML = `Krav utan kopplade innehållstyper (${countNoCt} st) <span class="icon" aria-hidden="true">${ICONS.list}</span>`;
         linkNoCt.style.cursor = 'pointer';
         linkNoCt.style.textDecoration = 'underline';
         
@@ -265,8 +243,6 @@ export function displayMetadata() {
     ctDiv.appendChild(ctList); 
     dynamicContentArea.appendChild(ctDiv); 
 
-
-    // 5. Hantera 'keywords'
     if (Array.isArray(metadata.keywords)) {
         itemCount++;
         const kwDiv = document.createElement('div');
@@ -290,10 +266,7 @@ export function displayMetadata() {
         }
         dynamicContentArea.appendChild(kwDiv);
     }
-
-    console.log(`Visade ${itemCount} metadata-objekt.`);
 }
-
 
 function createMetadataSubItem(subKey, subValue, linkText = subValue) { 
     const p = document.createElement('p');
@@ -454,11 +427,11 @@ export function renderMetadataForm() {
     buttonDiv.classList.add('form-buttons');
     const saveBtn = document.createElement('button');
     saveBtn.type = 'submit';
-    saveBtn.innerHTML = `Spara ändringar <span class="icon" aria-hidden="true">${ICONS.save}</span>`; // Ikon till höger
+    saveBtn.innerHTML = `Spara ändringar <span class="icon" aria-hidden="true">${ICONS.save}</span>`;
     buttonDiv.appendChild(saveBtn);
     const cancelBtn = document.createElement('button');
     cancelBtn.type = 'button';
-    cancelBtn.innerHTML = `Avbryt <span class="icon" aria-hidden="true">${ICONS.cancel}</span>`; // Ikon till höger
+    cancelBtn.innerHTML = `Avbryt <span class="icon" aria-hidden="true">${ICONS.cancel}</span>`;
     cancelBtn.addEventListener('click', () => displayMetadata());
     buttonDiv.appendChild(cancelBtn);
     form.appendChild(buttonDiv);
@@ -533,17 +506,13 @@ export function saveMetadata(event) {
     const contentTypeTexts = contentTypesString.split(/\r?\n/).map(t => t.trim()).filter(Boolean);
     const newContentTypes = [];
     const seenIds = new Set();
-    const newIdMap = new Map();
     contentTypeTexts.forEach(text => {
         const id = generateKeyFromName(text);
         if (id && !seenIds.has(id)) {
             newContentTypes.push({ id: id, text: text });
             seenIds.add(id);
-            newIdMap.set(text, id);
         } else if (id && seenIds.has(id)) {
             console.warn(`Duplicate content type ID generated for "${text}", skipping.`);
-        } else {
-            console.warn(`Could not generate valid ID for content type "${text}", skipping.`);
         }
     });
     
@@ -555,12 +524,8 @@ export function saveMetadata(event) {
 
     let requirementsUpdated = false;
     if (changed && contentTypesChangedFlag && state.jsonData.requirements) {
-        console.log("Innehållstyper i metadata ändrades, synkroniserar till krav...");
-        const originalIdToTextMap = new Map(originalContentTypes.map(ct => [ct.id, ct.text]));
         const newIdSet = new Set(newContentTypes.map(ct => ct.id));
         const removedIds = originalContentTypes.filter(oldCt => !newIdSet.has(oldCt.id)).map(ct => ct.id);
-        if (removedIds.length > 0) console.log("Innehållstyper att ta bort från krav:", removedIds);
-
         const idUpdateMap = new Map();
         originalContentTypes.forEach(oldCt => {
             const newCtEntry = newContentTypes.find(nc => nc.text === oldCt.text);
@@ -568,33 +533,27 @@ export function saveMetadata(event) {
                 idUpdateMap.set(oldCt.id, newCtEntry.id);
             }
         });
-        if (idUpdateMap.size > 0) console.log("Uppdateringar av innehållstyp-ID (gammalt -> nytt):", idUpdateMap);
 
         for (const reqKey in state.jsonData.requirements) {
             if (Object.hasOwnProperty.call(state.jsonData.requirements, reqKey)) {
                 const req = state.jsonData.requirements[reqKey];
                 const currentReqTypes = req.contentType || [];
-                
                 let typesAfterUpdate = currentReqTypes
                     .filter(id => !removedIds.includes(id))
                     .map(id => idUpdateMap.get(id) || id);
-                
                 const uniqueFinalTypes = [...new Set(typesAfterUpdate)];
-
                 if (JSON.stringify(currentReqTypes) !== JSON.stringify(uniqueFinalTypes)) {
                     req.contentType = uniqueFinalTypes;
                     requirementsUpdated = true;
                 }
             }
         }
-         if (requirementsUpdated) console.log("Synkronisering av innehållstyper till krav slutförd.");
-         else console.log("Inga krav behövde uppdateras p.g.a ändrade innehållstyper.")
     }
 
     if (changed) {
         state.jsonData.metadata = updatedMetadata;
         state.setState('isDataModified', true);
-        updateSaveButtonsState(); // ANROPA för att uppdatera knapparna
+        updateSaveButtonsState();
         displayMetadata();
         const targetArea = document.getElementById('dynamicContentArea');
         if(targetArea) {
@@ -605,11 +564,7 @@ export function saveMetadata(event) {
             confMessage += ' Glöm inte att spara ner filen.';
             displayConfirmation(confMessage, 'save', targetArea);
         }
-        console.log("Metadata ändrades och state uppdaterades.");
     } else {
         displayMetadata();
-        console.log("Inga ändringar i metadata upptäcktes.");
     }
 }
-
-console.log("Module loaded: metadata_functions (with integrated no-CT link)");

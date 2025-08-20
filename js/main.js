@@ -6,7 +6,7 @@ import {
     fileInput, showMetadataButton, showRequirementsButton,
     addRequirementButton, sortOrderSelect, searchInput,
     uploadFileButton, dynamicContentArea, 
-    topBar, bottomBar, saveChangesButtonTop, saveChangesButtonBottom // NYA/ÄNDRADE importer
+    topBar, bottomBar // ÄNDRAD: Tog bort saveChangesButton-importer
 } from './_-----_dom_element_references.js';
 import { handleFileUpload, downloadJsonFile } from './_-----_file_handling.js';
 import { displayMetadata } from './_-----_metadata_functions.js';
@@ -14,7 +14,7 @@ import { displayRequirements, renderRequirementForm } from './_---_requirement_f
 import { initializeUI } from './_-----_ui_functions.js';
 import * as state from './_-----_global_state.js';
 
-// Importera den nya modulen för temaväxlaren
+// Importera modulen för temaväxlaren
 import { initializeThemeSwitcher } from './_theme_switcher.js'; 
 
 // ----- Event Listeners -----
@@ -26,71 +26,44 @@ function initializeApp() {
     console.log("Initializing application...");
     initializeUI(); // Sätt initialt UI-läge
 
-    // Anropa initieringsfunktionen för temaväxlaren
     initializeThemeSwitcher();
-
 
     // Händelselyssnare för filuppladdning
     if (uploadFileButton && fileInput) {
         uploadFileButton.addEventListener('click', () => {
             fileInput.click(); 
         });
-        console.log("Upload file button listener added.");
-
         fileInput.addEventListener('change', handleFileUpload);
-        console.log("File input 'change' listener added.");
-
     } else {
-        if (!uploadFileButton) console.error("Upload file button element not found!");
-        if (!fileInput) console.error("File input element (hidden) not found!");
+        console.error("Upload file button or file input element not found!");
     }
 
     // Händelselyssnare för huvudkontrollknappar
     if (showMetadataButton) {
         showMetadataButton.addEventListener('click', () => {
-            // Om vi kommer från en kravvy, kanske vi vill nollställa currentRequirementKey
-            // men lastFocusedReqKey kan vara kvar om vi vill återgå till ett specifikt krav senare.
-            // För nu, låt oss bara nollställa currentRequirementKey för metadata-vyn.
             state.setState('currentRequirementKey', null);
             displayMetadata();
         });
-        console.log("Metadata button listener added.");
-    } else {
-        console.error("Metadata button not found!");
     }
 
     if (showRequirementsButton) {
         showRequirementsButton.addEventListener('click', () => {
-            // Om vi kommer från en detalj- eller redigeringsvy för ett krav,
-            // sätt lastFocusedReqKey så att displayRequirements kan scrolla dit.
             if (state.currentRequirementKey) {
                 state.setState('lastFocusedReqKey', state.currentRequirementKey);
-                console.log(`[Show All] Set lastFocusedReqKey to: ${state.currentRequirementKey}`);
             }
-            // Nollställ currentRequirementKey eftersom vi nu går till en listvy.
             state.setState('currentRequirementKey', null);
-
             displayRequirements();
         });
-        console.log("Requirements button listener added (with focus logic).");
-    } else {
-        console.error("Requirements button not found!");
     }
 
     // Händelselyssnare för kravlistans kontroller
     if (addRequirementButton) {
         addRequirementButton.addEventListener('click', () => renderRequirementForm(null));
-        console.log("Add requirement button listener added.");
-    } else {
-        // console.warn("Add requirement button not found initially.");
     }
 
     if (sortOrderSelect) {
         sortOrderSelect.addEventListener('change', (event) => {
             state.setState('currentSortOrder', event.target.value);
-            console.log("Sort order changed:", state.currentSortOrder);
-            // Re-render the requirements list if it's currently displayed
-            // Använder den importerade dynamicContentArea
             if (state.jsonData?.requirements && dynamicContentArea && 
                 !dynamicContentArea.classList.contains('form-view') &&
                 !dynamicContentArea.classList.contains('requirement-detail') &&
@@ -99,9 +72,6 @@ function initializeApp() {
                 displayRequirements(); 
             }
         });
-         console.log("Sort order select listener added.");
-    } else {
-        // console.warn("Sort order select not found initially.");
     }
 
     if (searchInput) {
@@ -112,8 +82,6 @@ function initializeApp() {
 
             searchTimeout = setTimeout(() => {
                 state.setState('currentSearchTerm', searchTerm);
-                console.log(`Search term updated: "${state.currentSearchTerm}"`);
-                // Använder den importerade dynamicContentArea
                 if (state.jsonData?.requirements && dynamicContentArea &&
                     !dynamicContentArea.classList.contains('form-view') &&
                     !dynamicContentArea.classList.contains('requirement-detail') &&
@@ -125,38 +93,19 @@ function initializeApp() {
         }
         searchInput.addEventListener('input', handleSearchInput);
         searchInput.addEventListener('search', handleSearchInput); 
-        console.log("Search input listener added.");
-    } else {
-        // console.warn("Search input not found initially.");
     }
 
-
-    // NYTT: Händelselyssnare för båda globala spara-knapparna
-    if (saveChangesButtonTop) {
-        saveChangesButtonTop.addEventListener('click', downloadJsonFile);
-        console.log("Save changes button (TOP) listener added.");
-    } else {
-        console.error("Save changes button (TOP) not found!");
-    }
-    if (saveChangesButtonBottom) {
-        saveChangesButtonBottom.addEventListener('click', downloadJsonFile);
-        console.log("Save changes button (BOTTOM) listener added.");
-    } else {
-        console.error("Save changes button (BOTTOM) not found!");
-    }
-
+    // BORTTAGEN: Händelselyssnare för spara-knapparna.
+    // Detta hanteras nu dynamiskt i file_handling.js när knapparna skapas.
 
     // Varning vid försök att lämna sidan med osparade ändringar
     window.addEventListener('beforeunload', (event) => {
         if (state.isDataModified) {
-            console.log("Data är modifierad, visar beforeunload-prompt.");
             event.preventDefault(); 
             event.returnValue = ''; 
             return ''; 
         }
-         console.log("Inga modifierade data, lämnar sidan utan prompt.");
     });
-    console.log("Beforeunload listener added.");
 
     console.log("Application initialized.");
 }

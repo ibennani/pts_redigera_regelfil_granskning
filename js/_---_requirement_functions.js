@@ -1460,9 +1460,7 @@ function saveRequirement(event, reqKey) {
         const checkFieldsets = form.querySelectorAll('#checksContainer .check-fieldset');
         checkFieldsets.forEach((fieldset, checkIndex) => { 
             const condition = fieldset.querySelector(`textarea[name="check-${checkIndex}-condition"]`)?.value.trim();
-
-            if (!condition) return; 
-
+            if (!condition) return;
             const check = {
                 id: (checkIndex + 1).toString(), 
                 condition: condition,
@@ -1470,13 +1468,10 @@ function saveRequirement(event, reqKey) {
                 passCriteria: [],
                 ifNo: []
             };
-
-            // Process passCriteria
             const passCritListItems = fieldset.querySelectorAll(`.pass-criteria-list li.dynamic-list-item`);
             passCritListItems.forEach((li, critIndex) => {
                 const reqText = li.querySelector(`textarea[name$="-requirement"]`)?.value.trim();
                 if (reqText) {
-                    // *** HÄR ÄR DEN KORRIGERADE RADEN ***
                     const failText = li.querySelector(`textarea[name$="-failureStatementTemplate"]`)?.value.trim() || '';
                     check.passCriteria.push({
                         id: `${check.id}.${critIndex + 1}`,
@@ -1485,13 +1480,10 @@ function saveRequirement(event, reqKey) {
                     });
                 }
             });
-
-            // Process ifNo criteria
             const ifNoCritListItems = fieldset.querySelectorAll(`.if-no-criteria-list li.dynamic-list-item`);
             ifNoCritListItems.forEach((li, critIndex) => {
                 const reqText = li.querySelector(`textarea[name$="-requirement"]`)?.value.trim();
                 if (reqText) {
-                    // *** OCH HÄR ÄR DEN KORRIGERADE RADEN ***
                     const failText = li.querySelector(`textarea[name$="-failureStatementTemplate"]`)?.value.trim() || '';
                     check.ifNo.push({
                         id: `${check.id}.no.${critIndex + 1}`,
@@ -1500,7 +1492,6 @@ function saveRequirement(event, reqKey) {
                     });
                 }
             });
-            
             updatedRequirement.checks.push(check);
         });
 
@@ -1508,20 +1499,17 @@ function saveRequirement(event, reqKey) {
         let changed = !isEditing || (originalRequirementString !== updatedRequirementString);
 
         if (isEditing && reqKey !== currentReqKey) {
-            console.warn(`[Warn] saveRequirement: Kravnyckel har potentiellt ändrats under redigering från "${reqKey}" till "${currentReqKey}". Detta bör normalt inte ske för existerande krav.`);
+            console.warn(`[Warn] saveRequirement: Kravnyckel har ändrats. Gamla: "${reqKey}", Nya: "${currentReqKey}".`);
             delete state.jsonData.requirements[reqKey]; 
             changed = true; 
         }
 
-
         if (changed) {
             state.jsonData.requirements[currentReqKey] = updatedRequirement;
-            state.setState('isDataModified', true);
-            updateSaveButtonsState(); // ANROPA för att uppdatera knapparna
-
+            state.setState('isDataModified', true); // Detta anrop triggar nu versionsuppdatering
+            updateSaveButtonsState();
             state.setState('lastFocusedReqKey', currentReqKey);
             displayRequirementDetail(currentReqKey); 
-
             const targetArea = document.getElementById('dynamicContentArea');
             if (targetArea) {
                  const actionText = isEditing ? 'uppdaterat' : 'tillagt';
@@ -1535,7 +1523,6 @@ function saveRequirement(event, reqKey) {
                  displayRequirements(); 
             }
         }
-
     } catch (error) {
         console.error("[Error] saveRequirement: Fel vid spara av krav:", error);
         showError(`Kunde inte spara kravet. Se konsolen för detaljer. Fel: ${escapeHtml(error.message)}`, dynamicContentArea);
@@ -1657,14 +1644,14 @@ export function confirmDeleteRequirement(reqKey) {
 function deleteRequirement(reqKeyToDelete) {
     const requirement = state.jsonData?.requirements?.[reqKeyToDelete];
     if (!requirement) {
-        showError(`Kan inte radera: Krav med nyckel ${escapeHtml(reqKeyToDelete)} hittades inte.`, dynamicContentArea);
+        showError(`Kan inte radera: Krav med nyckel ${escapeHtml(reqKeyToDelete)} hittades inte.`);
         displayRequirements();
         return;
     }
     const deletedTitle = requirement.title || reqKeyToDelete;
     delete state.jsonData.requirements[reqKeyToDelete];
-    state.setState('isDataModified', true);
-    updateSaveButtonsState(); // ANROPA för att uppdatera knapparna
+    state.setState('isDataModified', true); // Detta anrop triggar nu versionsuppdatering
+    updateSaveButtonsState();
     state.setState('currentRequirementKey', null);
     state.setState('lastFocusedReqKey', null); 
     displayRequirements(); 
@@ -1739,8 +1726,8 @@ export function manageContentTypeAssociations(contentTypeId, contentTypeName) {
             }
         }
         if (actualChangesMadeToGlobalState) {
-            state.setState('isDataModified', true); 
-            updateSaveButtonsState(); // ANROPA för att uppdatera knapparna
+            state.setState('isDataModified', true); // Detta anrop triggar nu versionsuppdatering
+            updateSaveButtonsState();
             isDataModifiedInView = false; 
             const saveBtn = dynamicContentArea.querySelector('.save-ct-view-changes-button');
             if(saveBtn) saveBtn.disabled = true; 
@@ -1871,15 +1858,9 @@ export function manageContentTypeAssociations(contentTypeId, contentTypeName) {
     });
     buttonDiv.appendChild(backToMetaButton);
 
-
     if (!dynamicContentArea.contains(buttonDiv)) {
         dynamicContentArea.appendChild(buttonDiv);
     }
-
-    if (postUploadControlsContainer) postUploadControlsContainer.classList.remove('hidden');
-    if (showMetadataButton) showMetadataButton.style.display = ''; 
-    if (showRequirementsButton) showRequirementsButton.style.display = '';
-    if (filterSortRow) filterSortRow.classList.add('hidden'); 
 }
 
 function renderAssociationListItem(ulElement, req, contentTypeId, tempAssociations, onCheckboxChangeCallback, saveCheckboxStateCallback) {

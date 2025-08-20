@@ -15,16 +15,10 @@ export const showMetadataButton = document.getElementById('showMetadataButton');
 export const showRequirementsButton = document.getElementById('showRequirementsButton');
 export const addRequirementButton = document.getElementById('addRequirementButton');
 
-// ÄNDRAD: Den gamla referensen tas bort då knappen inte längre finns i #postUploadControlsContainer
-// export const saveChangesButton = document.getElementById('saveChangesButton');
-
-// NYTT: Referenser till de nya funktionsraderna och de nya spara-knapparna
+// ÄNDRAD: Referenser till de dynamiska spara-knapparna tas bort härifrån.
+// De kommer att skapas och refereras till vid behov.
 export const topBar = document.getElementById('top-bar');
 export const bottomBar = document.getElementById('bottom-bar');
-export const saveChangesButtonTop = document.getElementById('saveChangesButtonTop');
-export const saveChangesButtonBottom = document.getElementById('saveChangesButtonBottom');
-
-// NYTT: Referenser till båda temaknapparna
 export const themeToggleButtonTop = document.getElementById('themeToggleButtonTop');
 export const themeToggleButtonBottom = document.getElementById('themeToggleButtonBottom');
 
