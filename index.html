@@ -18,7 +18,16 @@
 
 </head>
 <body>
-    <button id="themeToggleButton" aria-live="polite">Byt till mörkt tema</button>
+    <!-- NYTT: Funktionsrad högst upp -->
+    <header id="top-bar" class="action-bar hidden">
+        <div class="action-bar-content">
+            <button id="saveChangesButtonTop" class="save-button">
+                Spara filen <span class="icon" aria-hidden="true">💾</span>
+            </button>
+            <button id="themeToggleButtonTop" class="theme-toggle-button" aria-live="polite">Byt till mörkt tema</button>
+        </div>
+    </header>
+
     <h1>JSON-editor för kravlistan</h1>
 
     <!-- Container för initial uppladdningsvy -->
@@ -65,9 +74,7 @@
                       Lägg till krav <span class="icon" aria-hidden="true">➕</span>
                   </button>
             </div>
-             <button id="saveChangesButton" class="hidden">
-                 Spara ändringar (JSON) <span class="icon" aria-hidden="true">💾</span>
-            </button>
+             <!-- BORTTAGEN: Den gamla spara-knappen flyttas till top/bottom bar -->
          </div>
     </div>
     <hr id="controlsDivider" class="hidden">
@@ -113,6 +120,16 @@
         });
     </script>
     <!-- SLUT: Tillägg för Markdown Toolbar -->
+    
+    <!-- NYTT: Funktionsrad längst ner -->
+    <footer id="bottom-bar" class="action-bar hidden">
+        <div class="action-bar-content">
+             <button id="saveChangesButtonBottom" class="save-button">
+                Spara filen <span class="icon" aria-hidden="true">💾</span>
+            </button>
+            <button id="themeToggleButtonBottom" class="theme-toggle-button" aria-live="polite">Byt till mörkt tema</button>
+        </div>
+    </footer>
 
 </body>
 </html>

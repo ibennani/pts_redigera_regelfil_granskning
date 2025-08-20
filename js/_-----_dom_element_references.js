@@ -14,8 +14,21 @@ export const controlsDivider = document.getElementById('controlsDivider');
 export const showMetadataButton = document.getElementById('showMetadataButton');
 export const showRequirementsButton = document.getElementById('showRequirementsButton');
 export const addRequirementButton = document.getElementById('addRequirementButton');
-export const saveChangesButton = document.getElementById('saveChangesButton');
-// export const sortControls = document.getElementById('sortControls'); // Omslutande div, behövs sällan direkt
+
+// ÄNDRAD: Den gamla referensen tas bort då knappen inte längre finns i #postUploadControlsContainer
+// export const saveChangesButton = document.getElementById('saveChangesButton');
+
+// NYTT: Referenser till de nya funktionsraderna och de nya spara-knapparna
+export const topBar = document.getElementById('top-bar');
+export const bottomBar = document.getElementById('bottom-bar');
+export const saveChangesButtonTop = document.getElementById('saveChangesButtonTop');
+export const saveChangesButtonBottom = document.getElementById('saveChangesButtonBottom');
+
+// NYTT: Referenser till båda temaknapparna
+export const themeToggleButtonTop = document.getElementById('themeToggleButtonTop');
+export const themeToggleButtonBottom = document.getElementById('themeToggleButtonBottom');
+
+
 export const sortOrderSelect = document.getElementById('sortOrderSelect');
 export const searchInput = document.getElementById('searchInput');
 export const filterSortRow = document.getElementById('filterSortRow'); // Raden som innehåller sök/filter/sort

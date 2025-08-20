@@ -2,13 +2,13 @@
 
 // Importer
 import {
-    dynamicContentArea, filterSortRow, sortOrderSelect, searchInput, saveChangesButton,
+    dynamicContentArea, filterSortRow, sortOrderSelect, searchInput,
     postUploadControlsContainer, showMetadataButton, showRequirementsButton
 } from './_-----_dom_element_references.js';
 import { ICONS } from './_-----_constants.js';
 import * as state from './_-----_global_state.js';
 import { escapeHtml, parseSimpleMarkdown, getVal, generateKeyFromName, generateRequirementKey, linkifyText } from './_-----_utils__helpers.js';
-import { setupContentArea, showError, displayConfirmation } from './_-----_ui_functions.js';
+import { setupContentArea, showError, displayConfirmation, updateSaveButtonsState } from './_-----_ui_functions.js'; // Importerar updateSaveButtonsState
 import { displayMetadata } from './_-----_metadata_functions.js'; // Importera för Tillbaka-knapp
 
 
@@ -1517,7 +1517,7 @@ function saveRequirement(event, reqKey) {
         if (changed) {
             state.jsonData.requirements[currentReqKey] = updatedRequirement;
             state.setState('isDataModified', true);
-            if(saveChangesButton) saveChangesButton.classList.remove('hidden');
+            updateSaveButtonsState(); // ANROPA för att uppdatera knapparna
 
             state.setState('lastFocusedReqKey', currentReqKey);
             displayRequirementDetail(currentReqKey); 
@@ -1664,7 +1664,7 @@ function deleteRequirement(reqKeyToDelete) {
     const deletedTitle = requirement.title || reqKeyToDelete;
     delete state.jsonData.requirements[reqKeyToDelete];
     state.setState('isDataModified', true);
-    if(saveChangesButton) saveChangesButton.classList.remove('hidden');
+    updateSaveButtonsState(); // ANROPA för att uppdatera knapparna
     state.setState('currentRequirementKey', null);
     state.setState('lastFocusedReqKey', null); 
     displayRequirements(); 
@@ -1740,7 +1740,7 @@ export function manageContentTypeAssociations(contentTypeId, contentTypeName) {
         }
         if (actualChangesMadeToGlobalState) {
             state.setState('isDataModified', true); 
-            if (saveChangesButton) saveChangesButton.classList.remove('hidden');
+            updateSaveButtonsState(); // ANROPA för att uppdatera knapparna
             isDataModifiedInView = false; 
             const saveBtn = dynamicContentArea.querySelector('.save-ct-view-changes-button');
             if(saveBtn) saveBtn.disabled = true; 

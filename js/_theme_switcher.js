@@ -1,7 +1,11 @@
 // js/_theme_switcher.js
 
-const themeToggleButton = document.getElementById('themeToggleButton'); // Ditt befintliga ID
+// ÄNDRAD: Hämta båda knapparna från DOM-referensfilen
+import { themeToggleButtonTop, themeToggleButtonBottom } from './_-----_dom_element_references.js';
+
 const bodyElement = document.body;
+// ÄNDRAD: Samla knapparna i en array för enklare hantering
+const themeToggleButtons = [themeToggleButtonTop, themeToggleButtonBottom].filter(Boolean); // .filter(Boolean) tar bort null/undefined om en knapp inte skulle hittas
 
 const THEME_KEY = 'user-preferred-theme'; // Nyckel för localStorage
 const LIGHT_THEME_CLASS = 'light-theme';
@@ -9,22 +13,31 @@ const DARK_THEME_CLASS = 'dark-theme';
 const DEFAULT_THEME = 'light'; // Sätt ditt önskade standardtema här (light eller dark)
 
 function applyTheme(theme) {
-    if (!bodyElement || !themeToggleButton) {
-        console.error("applyTheme: bodyElement eller themeToggleButton saknas!");
+    if (!bodyElement || themeToggleButtons.length === 0) {
+        console.error("applyTheme: bodyElement eller temaknappar saknas!");
         return;
     }
 
-    bodyElement.classList.remove(LIGHT_THEME_CLASS, DARK_THEME_CLASS); // Ta bort båda först
+    bodyElement.classList.remove(LIGHT_THEME_CLASS, DARK_THEME_CLASS);
+
+    let newText, newAriaLabel;
 
     if (theme === 'dark') {
         bodyElement.classList.add(DARK_THEME_CLASS);
-        themeToggleButton.textContent = 'Byt till ljust tema';
-        themeToggleButton.setAttribute('aria-label', 'Växla till ljust tema');
+        newText = 'Byt till ljust tema';
+        newAriaLabel = 'Växla till ljust tema';
     } else { // theme === 'light'
         bodyElement.classList.add(LIGHT_THEME_CLASS);
-        themeToggleButton.textContent = 'Byt till mörkt tema';
-        themeToggleButton.setAttribute('aria-label', 'Växla till mörkt tema');
+        newText = 'Byt till mörkt tema';
+        newAriaLabel = 'Växla till mörkt tema';
     }
+
+    // ÄNDRAD: Loopa igenom och uppdatera alla temaknappar
+    themeToggleButtons.forEach(button => {
+        button.textContent = newText;
+        button.setAttribute('aria-label', newAriaLabel);
+    });
+    
     console.log(`applyTheme: Tema satt till ${theme}. Body klasser: ${bodyElement.className}`);
 }
 
@@ -49,11 +62,10 @@ function toggleTheme() {
 
 /**
  * Initierar temat baserat på sparat val eller standardtema.
- * Ignorerar systeminställning om ett val redan är sparat.
  */
 export function initializeThemeSwitcher() {
-    if (!themeToggleButton || !bodyElement) {
-        console.warn("Temaväxlare kunde inte initieras: knapp eller body-element saknas.");
+    if (themeToggleButtons.length === 0 || !bodyElement) {
+        console.warn("Temaväxlare kunde inte initieras: knappar eller body-element saknas.");
         return;
     }
 
@@ -73,6 +85,10 @@ export function initializeThemeSwitcher() {
     
     applyTheme(currentTheme);
     
-    themeToggleButton.addEventListener('click', toggleTheme);
-    console.log(`Temaväxlare initierad. Knapptext initialt: "${themeToggleButton.textContent}"`);
+    // ÄNDRAD: Lägg till lyssnare på alla temaknappar
+    themeToggleButtons.forEach(button => {
+        button.addEventListener('click', toggleTheme);
+    });
+    
+    console.log(`Temaväxlare initierad för ${themeToggleButtons.length} knapp(ar).`);
 }

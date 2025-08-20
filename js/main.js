@@ -4,8 +4,9 @@
 // Importera nödvändiga funktioner och referenser från andra moduler
 import {
     fileInput, showMetadataButton, showRequirementsButton,
-    addRequirementButton, saveChangesButton, sortOrderSelect, searchInput,
-    filterSortRow, uploadFileButton, dynamicContentArea // Lade till dynamicContentArea här
+    addRequirementButton, sortOrderSelect, searchInput,
+    uploadFileButton, dynamicContentArea, 
+    topBar, bottomBar, saveChangesButtonTop, saveChangesButtonBottom // NYA/ÄNDRADE importer
 } from './_-----_dom_element_references.js';
 import { handleFileUpload, downloadJsonFile } from './_-----_file_handling.js';
 import { displayMetadata } from './_-----_metadata_functions.js';
@@ -130,13 +131,20 @@ function initializeApp() {
     }
 
 
-    // Händelselyssnare för global spara-knapp
-    if (saveChangesButton) {
-        saveChangesButton.addEventListener('click', downloadJsonFile);
-        console.log("Save changes button listener added.");
+    // NYTT: Händelselyssnare för båda globala spara-knapparna
+    if (saveChangesButtonTop) {
+        saveChangesButtonTop.addEventListener('click', downloadJsonFile);
+        console.log("Save changes button (TOP) listener added.");
     } else {
-        console.error("Save changes button not found!");
+        console.error("Save changes button (TOP) not found!");
     }
+    if (saveChangesButtonBottom) {
+        saveChangesButtonBottom.addEventListener('click', downloadJsonFile);
+        console.log("Save changes button (BOTTOM) listener added.");
+    } else {
+        console.error("Save changes button (BOTTOM) not found!");
+    }
+
 
     // Varning vid försök att lämna sidan med osparade ändringar
     window.addEventListener('beforeunload', (event) => {

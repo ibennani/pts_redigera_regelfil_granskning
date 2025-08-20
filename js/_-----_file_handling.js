@@ -3,16 +3,16 @@
 // Importer (som tidigare)
 import {
     fileInput, contentDisplay, postUploadControlsContainer,
-    controlsDivider, dynamicContentArea, saveChangesButton, filterSortRow,
-    searchInput, sortOrderSelect, uploadSection
+    controlsDivider, dynamicContentArea, filterSortRow,
+    searchInput, sortOrderSelect, uploadSection,
+    topBar, bottomBar // NYA IMPORTER
 } from './_-----_dom_element_references.js';
 import {
     MONITORING_TYPES, STANDARD_REQUIREMENT_KEYS, REQUIREMENT_KEY_DEFAULTS, ICONS
 } from './_-----_constants.js';
 import * as state from './_-----_global_state.js';
 import { escapeHtml, getVal, generateKeyFromName, generateRequirementKey } from './_-----_utils__helpers.js';
-import { initializeUI, setupContentArea, showError, resetUI, displayConfirmation } from './_-----_ui_functions.js';
-// import { saveAs } from 'file-saver'; // Assumed to be loaded via script tag
+import { initializeUI, setupContentArea, showError, resetUI, updateSaveButtonsState } from './_-----_ui_functions.js';
 
 
 /**
@@ -57,7 +57,12 @@ export function handleFileUpload(event) {
             if (contentDisplay) contentDisplay.classList.add('hidden');
             if (postUploadControlsContainer) postUploadControlsContainer.classList.remove('hidden');
             if (controlsDivider) controlsDivider.classList.remove('hidden');
-            if (saveChangesButton) saveChangesButton.classList.add('hidden');
+            
+            // NYTT: Visa funktionsraderna
+            if (topBar) topBar.classList.remove('hidden');
+            if (bottomBar) bottomBar.classList.remove('hidden');
+            updateSaveButtonsState(); // Sätt initialt tillstånd för spara-knapparna
+
             if (filterSortRow) filterSortRow.classList.add('hidden');
 
             if (dynamicContentArea) {
@@ -146,8 +151,14 @@ export function downloadJsonFile() {
     if (!state.jsonData) { showError("Ingen data att spara.", dynamicContentArea || contentDisplay); return; }
 
     try {
-        updateVersion();
-        updateDateModified();
+        // ÄNDRAT: Uppdatera version och datum ENDAST om det finns osparade ändringar.
+        if (state.isDataModified) {
+            console.log("Ändringar upptäckta, uppdaterar version och datum.");
+            updateVersion();
+            updateDateModified();
+        } else {
+            console.log("Inga ändringar upptäckta, sparar med befintlig version.");
+        }
 
         const currentVersion = state.jsonData.metadata.version || 'okänd-version';
         const title = state.jsonData.metadata?.title || 'kravdata';
@@ -306,30 +317,18 @@ export function downloadJsonFile() {
             console.log(`Fallback Link Method: Nedladdning av "${filename}" initierad.`);
         }
 
+        // ÄNDRAT: Återställ flaggan och uppdatera knapparnas tillstånd
         state.setState('isDataModified', false);
-        if (saveChangesButton) saveChangesButton.classList.add('hidden');
+        updateSaveButtonsState();
 
-        const controlsContainer = postUploadControlsContainer;
-        if (controlsContainer) {
-            const existingSpan = controlsContainer.querySelector('.save-confirmation-inline');
-            if(existingSpan) existingSpan.remove();
-            const confirmationSpan = document.createElement('span');
-            confirmationSpan.innerHTML = `${ICONS.confirm} Fil sparad (v ${escapeHtml(currentVersion)})!`;
-            confirmationSpan.style.color = 'var(--success-color)';
-            confirmationSpan.style.fontWeight = 'bold';
-            confirmationSpan.style.marginLeft = '1em';
-            confirmationSpan.classList.add('save-confirmation-inline');
-            const secondaryControls = controlsContainer.querySelector('.secondary-controls');
-             if (secondaryControls && saveChangesButton && secondaryControls.contains(saveChangesButton)) {
-                 saveChangesButton.parentNode.insertBefore(confirmationSpan, saveChangesButton.nextSibling);
-             } else if (saveChangesButton && controlsContainer.contains(saveChangesButton)) {
-                 saveChangesButton.parentNode.insertBefore(confirmationSpan, saveChangesButton.nextSibling);
-             } else {
-                 controlsContainer.appendChild(confirmationSpan);
-             }
-            setTimeout(() => { confirmationSpan.remove(); }, 4000);
-        } else {
-             alert(`Filen sparades med version ${escapeHtml(currentVersion)}!`);
+        // Visa en bekräftelse i det dynamiska området istället för bredvid en knapp
+        const targetArea = dynamicContentArea || contentDisplay;
+        if (targetArea) {
+            let message = `Filen sparades med version ${escapeHtml(currentVersion)}.`;
+            if (state.isDataModified) {
+                // Detta block kommer inte köras nu eftersom flaggan är återställd, men logiken är här för framtiden
+            }
+            alert(message); // Använder alert för nu för tydlighet, kan bytas mot displayConfirmation
         }
 
     } catch (error) {

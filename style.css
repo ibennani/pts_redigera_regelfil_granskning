@@ -36,7 +36,7 @@
     --focus-ring-color: #38bdf8;
     --disabled-bg: #e2e8f0;
     --disabled-text: #94a3b8;
-    --placeholder-text: #94a3b8; /* Behålls om den skulle användas någonstans */
+    --placeholder-text: #94a3b8; /* Behålls om den skulle användas någonans */
     --fieldset-bg-light: #f8fafc; 
     --input-bg-dark: #293548;    
 }
@@ -144,11 +144,32 @@ body {
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-#themeToggleButton {
-    position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-    z-index: 1000;
+/* ÄNDRAD: Styling för funktionsraderna (action-bar) */
+.action-bar {
+    width: 95%; /* Matchar övrigt innehåll */
+    max-width: 1300px; /* Matchar övrigt innehåll */
+    background-color: var(--section-bg);
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+}
+#top-bar {
+    margin-bottom: 1.5rem;
+}
+#bottom-bar {
+    margin-top: 2rem;
+}
+.action-bar-content {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* ÄNDRAD: Använder klass-selektor istället för ID */
+.theme-toggle-button {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
     border: 1px solid var(--border-color);
@@ -158,10 +179,10 @@ body {
     cursor: pointer;
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
-#themeToggleButton:hover {
+.theme-toggle-button:hover {
     opacity: 0.8;
 }
-#themeToggleButton:focus-visible {
+.theme-toggle-button:focus-visible {
     outline: 3px solid var(--focus-ring-color);
     outline-offset: 2px;
 }
@@ -272,13 +293,35 @@ button:disabled {
     background-color: var(--neutral-hover);
 }
 
-#saveChangesButton,
+/* NYTT: Styling för Spara-knapparna */
+@keyframes glow {
+    0% { box-shadow: 0 0 3px var(--success-color); }
+    50% { box-shadow: 0 0 10px var(--success-color); }
+    100% { box-shadow: 0 0 3px var(--success-color); }
+}
+.save-button {
+    background-color: var(--primary-color);
+    color: var(--primary-text);
+}
+.save-button:hover {
+    background-color: var(--primary-hover);
+}
+/* Klass som läggs på när det finns osparade ändringar */
+.save-button.has-unsaved-changes {
+    background-color: var(--success-color);
+    color: var(--success-text);
+    animation: glow 1.5s infinite ease-in-out;
+}
+.save-button.has-unsaved-changes:hover {
+    background-color: var(--success-hover);
+    animation: none; /* Stäng av glöd vid hover för bättre respons */
+}
+
 #dynamicContentArea.form-view .form-buttons button[type="submit"]
 {
     background-color: var(--success-color);
     color: var(--success-text);
 }
-#saveChangesButton:hover,
 #dynamicContentArea.form-view .form-buttons button[type="submit"]:hover
 {
     background-color: var(--success-hover);
@@ -356,6 +399,7 @@ button:disabled {
     gap: 0.5rem;
     align-items: center;
 }
+/* BORTTAGEN: Gamla spara-knappen fanns här */
 #controlsDivider {
     border: none;
     border-top: 1px solid var(--border-color); 
@@ -1415,10 +1459,14 @@ body.dark-theme .confirmation-message.info-confirmation {
     #dynamicContentArea h2 { font-size: 1.5rem; }
     #dynamicContentArea h3 { font-size: 1.2rem; }
 
+    .action-bar, /* NYTT */
     #postUploadControlsContainer {
         flex-direction: column;
         align-items: stretch;
         max-width: 95%;
+    }
+    .action-bar-content { /* NYTT */
+        justify-content: space-between;
     }
     #postUploadControlsContainer .main-controls,
     #postUploadControlsContainer .secondary-controls {
@@ -1509,7 +1557,8 @@ body.dark-theme .confirmation-message.info-confirmation {
     h1 { font-size: 1.5rem; max-width: 100%; border-bottom-width: 2px; }
     #dynamicContentArea h2 { font-size: 1.3rem; }
     #dynamicContentArea h3 { font-size: 1.15rem; margin-top: 1.5rem;}
-
+    
+    .action-bar, /* NYTT */
     .content-container,
     #postUploadControlsContainer,
     #controlsDivider,
@@ -1529,6 +1578,13 @@ body.dark-theme .confirmation-message.info-confirmation {
         border-bottom: none;
         margin-bottom: 1rem; 
     }
+    #top-bar { /* NYTT */
+        margin-bottom: 0;
+    }
+    #bottom-bar { /* NYTT */
+        margin-top: 0;
+    }
+
     #postUploadControlsContainer { margin-top: 1rem; padding-bottom: 1rem;}
     #controlsDivider { margin: 0 auto; width: 100%; border-top-width: 1px;}
     #dynamicContentArea { margin-top: 0; padding-top: 1.5rem;}

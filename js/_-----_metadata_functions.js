@@ -1,11 +1,11 @@
 // js/_-----_metadata_functions.js
 
 // Importer
-import { dynamicContentArea, saveChangesButton } from './_-----_dom_element_references.js';
+import { dynamicContentArea } from './_-----_dom_element_references.js';
 import { MONITORING_TYPES, ICONS, commonLanguages } from './_-----_constants.js';
 import * as state from './_-----_global_state.js';
 import { escapeHtml, getVal, isValidEmail, generateKeyFromName } from './_-----_utils__helpers.js';
-import { setupContentArea, showError, displayConfirmation } from './_-----_ui_functions.js';
+import { setupContentArea, showError, displayConfirmation, updateSaveButtonsState } from './_-----_ui_functions.js'; // Importerar updateSaveButtonsState
 import { createFormField } from './_---_requirement_functions.js'; 
 import { manageContentTypeAssociations, displayRequirementsWithoutContentTypes } from './_---_requirement_functions.js'; 
 
@@ -594,7 +594,7 @@ export function saveMetadata(event) {
     if (changed) {
         state.jsonData.metadata = updatedMetadata;
         state.setState('isDataModified', true);
-        if (saveChangesButton) saveChangesButton.classList.remove('hidden');
+        updateSaveButtonsState(); // ANROPA för att uppdatera knapparna
         displayMetadata();
         const targetArea = document.getElementById('dynamicContentArea');
         if(targetArea) {

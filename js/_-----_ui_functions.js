@@ -4,7 +4,7 @@
 import {
     contentDisplay, uploadSection, postUploadControlsContainer,
     controlsDivider, dynamicContentArea, filterSortRow, sortOrderSelect,
-    searchInput, saveChangesButton
+    searchInput, topBar, bottomBar, saveChangesButtonTop, saveChangesButtonBottom // Uppdaterade importer
 } from './_-----_dom_element_references.js';
 import { escapeHtml } from './_-----_utils__helpers.js';
 import { ICONS } from './_-----_constants.js';
@@ -23,7 +23,7 @@ export function initializeUI() {
     if (!postUploadControlsContainer) console.error("initializeUI: postUploadControlsContainer not found!");
     if (!controlsDivider) console.error("initializeUI: controlsDivider not found!");
     if (!dynamicContentArea) console.error("initializeUI: dynamicContentArea not found!");
-    if (!filterSortRow) console.warn("initializeUI: filterSortRow not found."); // Kan vara ok om designen ändras
+    if (!filterSortRow) console.warn("initializeUI: filterSortRow not found.");
 
     // Visa uppladdningsvyn inuti contentDisplay
     if (contentDisplay) {
@@ -51,6 +51,10 @@ export function initializeUI() {
         dynamicContentArea.classList.remove('form-view', 'requirement-detail', 'delete-confirmation-view', 'grouped-list-view', 'flat-list-view');
     }
     if (filterSortRow) filterSortRow.classList.add('hidden'); // Göm filter/sorteringsraden explicit
+
+    // NYTT: Göm funktionsraderna initialt
+    if (topBar) topBar.classList.add('hidden');
+    if (bottomBar) bottomBar.classList.add('hidden');
 
     // Återställ klasser på contentDisplay ifall de finns kvar
     contentDisplay?.classList.remove('form-view', 'requirement-detail', 'delete-confirmation-view');
@@ -106,6 +110,11 @@ export function showError(message, container = dynamicContentArea) {
         if (postUploadControlsContainer) postUploadControlsContainer.classList.add('hidden');
         if (controlsDivider) controlsDivider.classList.add('hidden');
         if (filterSortRow) filterSortRow.classList.add('hidden');
+        
+        // NYTT: Göm även funktionsraderna vid ett allvarligt fel
+        if (topBar) topBar.classList.add('hidden');
+        if (bottomBar) bottomBar.classList.add('hidden');
+
         // Dölj dynamicContentArea om felet visas i contentDisplay
         if (dynamicContentArea && container === contentDisplay) {
             dynamicContentArea.classList.add('hidden');
@@ -192,8 +201,8 @@ export function resetUI() {
     if (sortOrderSelect) sortOrderSelect.value = state.currentSortOrder;
     if (searchInput) searchInput.value = '';
 
-    // Göm spara-knappen
-    if (saveChangesButton) saveChangesButton.classList.add('hidden');
+    // Göm spara-knappen (denna funktion kommer inte längre finnas, men för säkerhets skull)
+    // updateSaveButtonsState(); // Anropa den nya funktionen för att återställa text och stil
 
     // Ta bort eventuella query parametrar från URL:en (om de använts tidigare)
     if (window.history.replaceState) {
@@ -201,6 +210,29 @@ export function resetUI() {
     }
 
     console.log("--- resetUI Finished ---");
+}
+
+/**
+ * NY FUNKTION: Uppdaterar text och stil på båda spara-knapparna.
+ * Ska anropas när `isDataModified` ändras.
+ */
+export function updateSaveButtonsState() {
+    const buttons = [saveChangesButtonTop, saveChangesButtonBottom];
+    if (!buttons[0] || !buttons[1]) {
+        console.warn("One or both save buttons not found, cannot update state.");
+        return;
+    }
+
+    const hasUnsavedChanges = state.isDataModified;
+    const text = hasUnsavedChanges ? "Spara nya ändringar" : "Spara filen";
+    const iconHTML = `<span class="icon" aria-hidden="true">${ICONS.save}</span>`;
+
+    buttons.forEach(button => {
+        if (button) {
+            button.innerHTML = `${text} ${iconHTML}`;
+            button.classList.toggle('has-unsaved-changes', hasUnsavedChanges);
+        }
+    });
 }
 
 
