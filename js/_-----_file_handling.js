@@ -13,7 +13,7 @@ import {
 import * as state from './_-----_global_state.js';
 import { escapeHtml, getVal, generateKeyFromName, generateRequirementKey } from './_-----_utils__helpers.js';
 // Importerar createSaveButton från ui_functions
-import { initializeUI, setupContentArea, showError, resetUI, updateSaveButtonsState, createSaveButton } from './_-----_ui_functions.js';
+import { initializeUI, setupContentArea, showError, resetUI, updateSaveButtonsState, createSaveButton, displayConfirmation } from './_-----_ui_functions.js';
 
 /**
  * Hanterar händelsen när en fil väljs i filuppladdningsfältet.
@@ -234,7 +234,11 @@ export function downloadJsonFile() {
 
         state.setState('isDataModified', false);
         updateSaveButtonsState();
-        alert(`Filen "${filename}" har sparats.`);
+        // Använd den inbyggda funktionen för att visa en bekräftelse
+        const targetArea = document.getElementById('postUploadControlsContainer') || dynamicContentArea;
+        if (targetArea) {
+            displayConfirmation(`Filen "${filename}" har sparats.`, 'save', targetArea);
+        }
 
     } catch (error) {
         console.error("Fel vid förberedelse eller start av JSON-nedladdning:", error);
