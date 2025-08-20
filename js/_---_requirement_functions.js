@@ -293,7 +293,12 @@ function createCriterionListItem(criterion, checkIndex, type, critIndex) {
     if (failureTextarea) {
         failureTextarea.setAttribute('aria-label', `Mall för avvikelsetext för ${typeText.toLowerCase()} ${critIndex + 1}, påstående ${checkIndex + 1}`);
     }
-    fieldsWrapper.appendChild(failureContainer);
+    
+    // Omslut "Mall för avvikelsetext" i en egen div för styling
+    const failureStatementWrapper = document.createElement('div');
+    failureStatementWrapper.className = 'failure-statement-group';
+    failureStatementWrapper.appendChild(failureContainer);
+    fieldsWrapper.appendChild(failureStatementWrapper);
 
     li.appendChild(fieldsWrapper);
 

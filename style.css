@@ -1152,8 +1152,17 @@ body.dark-theme #dynamicContentArea.form-view .check-fieldset {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    gap: 0.5rem;
+    gap: 1rem; /* Ökat avstånd mellan Kriterietext och Mall */
+    padding: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--secondary-color);
 }
+
+body.dark-theme .criterion-fields-wrapper {
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
 
 .criterion-remove-wrapper {
     flex-shrink: 0;
@@ -1176,6 +1185,28 @@ body.dark-theme #dynamicContentArea.form-view .check-fieldset {
 #dynamicContentArea.form-view .criterion-fields-wrapper .field-instruction {
     font-size: 0.8em;
 }
+
+/* In Form View */
+.failure-statement-group {
+    margin-top: 0; /* Tas bort, föräldern hanterar avstånd med gap */
+    margin-left: 1.5rem; /* Behåll indragning */
+    /* Ram, padding och bakgrund borttaget, flyttat till .criterion-fields-wrapper */
+}
+
+
+.failure-statement-group .form-field {
+    margin-bottom: 0;
+}
+
+.failure-statement-group label {
+    font-weight: 500;
+    opacity: 1;
+}
+
+.failure-statement-group .field-instruction {
+    margin-top: 0.2rem;
+}
+
 /* END: New styles */
 
 #dynamicContentArea.form-view .criteria-group .add-item-button {
