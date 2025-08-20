@@ -1159,8 +1159,8 @@ export function renderRequirementForm(reqKey) {
     } else if (typeof requirement.standardReference === 'string') {
         refText = requirement.standardReference;
     }
-    stdRefFieldset.appendChild(createFormField('EN-referens (nummer och rubrik)', 'standardReference.text', refText, 'text', 'T.ex. EN 301 549 – 9.1.4.2 Audio Control'));
-    stdRefFieldset.appendChild(createFormField('Länk till EN- eller WCAG-kriteriet', 'standardReference.url', refUrl, 'url', 'Ange en fullständig URL, t.ex. https://www.w3.org/WAI/...'));
+    stdRefFieldset.appendChild(createFormField('Referens till dokumentation', 'standardReference.text', refText, 'text', 'Ange en tydlig referens, t.ex. "SFS 2018:1937 – 9 §" eller "Intern Riktlinje 2.4".'));
+    stdRefFieldset.appendChild(createFormField('Direktlänk till referens', 'standardReference.url', refUrl, 'url', 'Klistra in en webbadress till källan, t.ex. https://organisation.se/policy#sektion-3.1'));
     form.appendChild(stdRefFieldset);
 
     
