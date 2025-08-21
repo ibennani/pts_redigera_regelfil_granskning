@@ -1189,7 +1189,7 @@ body.dark-theme .criterion-fields-wrapper {
 /* In Form View */
 .failure-statement-group {
     margin-top: 0; /* Tas bort, föräldern hanterar avstånd med gap */
-    margin-left: 1.5rem; /* Behåll indragning */
+    margin-left: 5rem; /* Behåll indragning */
     /* Ram, padding och bakgrund borttaget, flyttat till .criterion-fields-wrapper */
 }
 
@@ -1718,6 +1718,11 @@ body.dark-theme .confirmation-message.info-confirmation {
     .manage-ct-assoc-list .checkbox-container { margin-bottom: 0.3rem; }
     .manage-ct-view-buttons { flex-direction: column; }
     .manage-ct-view-buttons button { width: 100%; }
+}
+
+/* JUSTERING FÖR SYNLIGARE RAM I MÖRKT TEMA */
+body.dark-theme .criterion-fields-wrapper {
+    border-color: #64748b; /* En ljusare gråblå färg för bättre kontrast */
 }
 
 /* END OF FILE style.css */
