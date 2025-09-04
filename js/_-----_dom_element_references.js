@@ -11,7 +11,8 @@ export const uploadFileButton = document.getElementById('uploadFileButton');
 export const postUploadControlsContainer = document.getElementById('postUploadControlsContainer');
 export const dynamicContentArea = document.getElementById('dynamicContentArea');
 export const controlsDivider = document.getElementById('controlsDivider');
-export const showMetadataButton = document.getElementById('showMetadataButton');
+export const manageContentTypesButton = document.getElementById('manageContentTypesButton');
+export const manageSampleCategoriesButton = document.getElementById('manageSampleCategoriesButton');
 export const showRequirementsButton = document.getElementById('showRequirementsButton');
 export const addRequirementButton = document.getElementById('addRequirementButton');
 

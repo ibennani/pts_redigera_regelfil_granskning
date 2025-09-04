@@ -1,48 +1,52 @@
 // js/main.js
-// Huvudapplikationens startpunkt
+/*
+    MODIFIED:
+    - Removed the old 'showMetadataButton' and its corresponding import.
+    - Added imports for the new 'manageContentTypesButton' and 'manageSampleCategoriesButton'.
+    - Removed the faulty import for the now-deleted 'displayMetadata' function.
+    - Added event listeners for the new buttons to call 'renderMetadataForm' with the
+      correct parameters ('contentTypes' or 'samples').
+*/
 
 // Importera nödvändiga funktioner och referenser från andra moduler
 import {
-    fileInput, showMetadataButton, showRequirementsButton,
+    fileInput, showRequirementsButton,
     addRequirementButton, sortOrderSelect, searchInput,
     uploadFileButton, dynamicContentArea, 
-    topBar, bottomBar // ÄNDRAD: Tog bort saveChangesButton-importer
+    // MODIFIED: Replaced button reference
+    manageContentTypesButton, manageSampleCategoriesButton
 } from './_-----_dom_element_references.js';
-import { handleFileUpload, downloadJsonFile } from './_-----_file_handling.js';
-import { displayMetadata } from './_-----_metadata_functions.js';
-import { displayRequirements, renderRequirementForm } from './_---_requirement_functions.js';
+import { handleFileUpload } from './_-----_file_handling.js';
+// MODIFIED: Removed displayMetadata, kept renderMetadataForm
+import { renderMetadataForm } from './_-----_metadata_functions.js';
+import { renderRequirementForm as renderNewRequirementForm } from './_---_requirement_functions.js';
+import { displayRequirements } from './_---_requirement_functions.js';
 import { initializeUI } from './_-----_ui_functions.js';
 import * as state from './_-----_global_state.js';
-
-// Importera modulen för temaväxlaren
 import { initializeThemeSwitcher } from './_theme_switcher.js'; 
 
 // ----- Event Listeners -----
 
-/**
- * Initierar gränssnittet och sätter upp globala händelselyssnare.
- */
 function initializeApp() {
-    console.log("Initializing application...");
-    initializeUI(); // Sätt initialt UI-läge
-
+    initializeUI();
     initializeThemeSwitcher();
 
-    // Händelselyssnare för filuppladdning
     if (uploadFileButton && fileInput) {
-        uploadFileButton.addEventListener('click', () => {
-            fileInput.click(); 
-        });
+        uploadFileButton.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', handleFileUpload);
-    } else {
-        console.error("Upload file button or file input element not found!");
     }
 
-    // Händelselyssnare för huvudkontrollknappar
-    if (showMetadataButton) {
-        showMetadataButton.addEventListener('click', () => {
-            state.setState('currentRequirementKey', null);
-            displayMetadata();
+    if (manageContentTypesButton) {
+        manageContentTypesButton.addEventListener('click', () => {
+            state.setState('currentView', 'manageContentTypes');
+            renderMetadataForm('contentTypes'); // Anropar redigeringsvyn
+        });
+    }
+
+    if (manageSampleCategoriesButton) {
+        manageSampleCategoriesButton.addEventListener('click', () => {
+            state.setState('currentView', 'manageSampleCategories');
+            renderMetadataForm('samples'); // Anropar redigeringsvyn
         });
     }
 
@@ -56,18 +60,16 @@ function initializeApp() {
         });
     }
 
-    // Händelselyssnare för kravlistans kontroller
     if (addRequirementButton) {
-        addRequirementButton.addEventListener('click', () => renderRequirementForm(null));
+        addRequirementButton.addEventListener('click', () => renderNewRequirementForm(null));
     }
 
     if (sortOrderSelect) {
         sortOrderSelect.addEventListener('change', (event) => {
             state.setState('currentSortOrder', event.target.value);
             if (state.jsonData?.requirements && dynamicContentArea && 
-                !dynamicContentArea.classList.contains('form-view') &&
-                !dynamicContentArea.classList.contains('requirement-detail') &&
-                !dynamicContentArea.classList.contains('delete-confirmation-view'))
+                !dynamicContentArea.classList.contains('form-container') &&
+                !dynamicContentArea.classList.contains('requirement-detail'))
             {
                 displayRequirements(); 
             }
@@ -83,9 +85,8 @@ function initializeApp() {
             searchTimeout = setTimeout(() => {
                 state.setState('currentSearchTerm', searchTerm);
                 if (state.jsonData?.requirements && dynamicContentArea &&
-                    !dynamicContentArea.classList.contains('form-view') &&
-                    !dynamicContentArea.classList.contains('requirement-detail') &&
-                    !dynamicContentArea.classList.contains('delete-confirmation-view'))
+                    !dynamicContentArea.classList.contains('form-container') &&
+                    !dynamicContentArea.classList.contains('requirement-detail'))
                 {
                     displayRequirements();
                 }
@@ -95,10 +96,6 @@ function initializeApp() {
         searchInput.addEventListener('search', handleSearchInput); 
     }
 
-    // BORTTAGEN: Händelselyssnare för spara-knapparna.
-    // Detta hanteras nu dynamiskt i file_handling.js när knapparna skapas.
-
-    // Varning vid försök att lämna sidan med osparade ändringar
     window.addEventListener('beforeunload', (event) => {
         if (state.isDataModified) {
             event.preventDefault(); 
@@ -106,9 +103,6 @@ function initializeApp() {
             return ''; 
         }
     });
-
-    console.log("Application initialized.");
 }
 
-// ----- Starta applikationen när DOM är laddat -----
 document.addEventListener('DOMContentLoaded', initializeApp);

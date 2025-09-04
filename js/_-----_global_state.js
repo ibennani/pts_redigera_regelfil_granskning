@@ -14,6 +14,7 @@ export let isDataModified = false;
 export let currentSortOrder = 'ref-asc';
 // Den nuvarande söktermen som används för att filtrera kravlistan.
 export let currentSearchTerm = '';
+export let currentView = 'home';
 
 // --- NYTT: Versionshantering flyttad hit ---
 
@@ -89,6 +90,7 @@ export function setState(key, value) {
         case 'lastFocusedReqKey': lastFocusedReqKey = value; break;
         case 'currentSortOrder': currentSortOrder = value; break;
         case 'currentSearchTerm': currentSearchTerm = value; break;
+        case 'currentView': currentView = value; break; 
         default:
             console.warn(`Attempted to set unknown state: ${key}`);
     }
