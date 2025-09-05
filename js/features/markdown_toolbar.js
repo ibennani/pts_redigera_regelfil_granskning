@@ -284,22 +284,57 @@
             previewDiv.innerHTML = '<p style="color: red;">Error: marked.js library not loaded.</p>';
             return;
         }
+
         let markdownText = textarea.value;
-        // Fix: Add a newline after a list if the next line is not part of the list,
-        // to prevent it from being merged into the last list item.
-        const listEndRegex = /(^(\s*(\*|\-|\+)\s|[0-9]+\.\s).*\n)(?!\s*(\*|\-|\+)\s|[0-9]+\.\s|\s*$)/gm;
-        markdownText = markdownText.replace(listEndRegex, '$1\n');
+
+        // --- DEFINITIV SÄKERHETSLÖSNING ---
+        function preSanitizeMarkdown(text) {
+            const placeholders = [];
+            let i = 0;
+
+            // Steg 1: Hitta och skydda alla avsiktliga kodblock (`...` och ```...```)
+            // Detta säkerställer att koden inuti dem inte rörs.
+            const protectedText = text.replace(/(`{1,3})([\s\S]+?)\1/g, (match) => {
+                placeholders.push(match);
+                return `__MD_PLACEHOLDER_${i++}__`;
+            });
+
+            // Steg 2: Escapa alla kvarvarande HTML-tecken i resten av strängen.
+            const escapedText = protectedText
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+
+            // Steg 3: Återställ de skyddade kodblocken.
+            let finalText = escapedText;
+            for (let j = 0; j < placeholders.length; j++) {
+                finalText = finalText.replace(`__MD_PLACEHOLDER_${j}__`, placeholders[j]);
+            }
+
+            return finalText;
+        }
+
+        // Sanera texten INNAN den skickas till marked.js
+        const sanitizedMarkdown = preSanitizeMarkdown(markdownText);
         
+        // Fix för listor (körs på den redan sanerade texten)
+        const listEndRegex = /(^(\s*(\*|\-|\+)\s|[0-9]+\.\s).*\n)(?!\s*(\*|\-|\+)\s|[0-9]+\.\s|\s*$)/gm;
+        const finalTextForParsing = sanitizedMarkdown.replace(listEndRegex, '$1\n');
+
         const renderer = new marked.Renderer();
         const originalLinkRenderer = renderer.link.bind(renderer);
         renderer.link = (href, title, text) => {
             const link = originalLinkRenderer(href, title, text);
-            // Lägg till target="_blank" för att öppna länkar i en ny flik
             return link.replace('<a', '<a target="_blank" rel="noopener noreferrer"');
         };
 
         try {
-            previewDiv.innerHTML = marked.parse(markdownText, { breaks: true, gfm: true, renderer: renderer });
+            // Nu kan vi säkert parsa den förberedda texten utan några sanitizer-alternativ.
+            previewDiv.innerHTML = marked.parse(finalTextForParsing, {
+                breaks: true,
+                gfm: true,
+                renderer: renderer
+            });
         } catch (error) {
             console.error("Error parsing Markdown:", error);
             previewDiv.innerHTML = `<p style="color: red;">Error rendering preview. Check console for details.</p>`;

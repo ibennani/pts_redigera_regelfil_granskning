@@ -776,6 +776,35 @@ export function displayRequirementDetail(reqKey) {
             return;
         }
 
+        // --- DEFINITIV SÄKERHETSLÖSNING ---
+        function preSanitizeMarkdown(text) {
+            const placeholders = [];
+            let i = 0;
+
+            // Steg 1: Hitta och skydda alla avsiktliga kodblock.
+            const protectedText = text.replace(/(`{1,3})([\s\S]+?)\1/g, (match) => {
+                placeholders.push(match);
+                return `__MD_PLACEHOLDER_${i++}__`;
+            });
+
+            // Steg 2: Escapa alla kvarvarande HTML-tecken.
+            const escapedText = protectedText
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+
+            // Steg 3: Återställ de skyddade kodblocken.
+            let finalText = escapedText;
+            for (let j = 0; j < placeholders.length; j++) {
+                finalText = finalText.replace(`__MD_PLACEHOLDER_${j}__`, placeholders[j]);
+            }
+
+            return finalText;
+        }
+
+        // Sanera texten INNAN den skickas till marked.js
+        const sanitizedMarkdown = preSanitizeMarkdown(markdownString);
+
         const renderer = new marked.Renderer();
         const originalLinkRenderer = renderer.link.bind(renderer);
         renderer.link = (href, title, text) => {
@@ -784,7 +813,13 @@ export function displayRequirementDetail(reqKey) {
         };
 
         try {
-            let html = marked.parse(markdownString, { breaks: true, gfm: true, renderer: renderer });
+            // Nu kan vi säkert parsa den förberedda texten.
+            let html = marked.parse(sanitizedMarkdown, {
+                breaks: true,
+                gfm: true,
+                renderer: renderer
+            });
+            
             html = linkifyText(html);
             
             const template = document.createElement('template');
