@@ -864,7 +864,8 @@ body.dark-theme .form-container legend {
 }
 
 /* MODIFIED: New dedicated rule for select elements */
-.form-container select {
+.form-container select,
+#sortControls select {
     width: auto;
     min-width: 250px;
     padding: 0.7rem 0.9rem;
@@ -891,12 +892,14 @@ body.dark-theme .form-container input[type="email"],
 body.dark-theme .form-container input[type="url"],
 body.dark-theme .form-container input[type="date"],
 body.dark-theme .form-container input[type="number"],
+body.dark-theme #sortControls select,
 body.dark-theme .form-container select,
 body.dark-theme .form-container textarea {
     background-color: var(--input-bg-dark); 
 }
 
-body.dark-theme .form-container select {
+body.dark-theme .form-container select,
+body.dark-theme #sortControls select {
     background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%23cbd5e1%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%20clip-rule%3D%22evenodd%22%20%2F%3E%3C%2Fsvg%3E');
 }
 

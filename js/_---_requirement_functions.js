@@ -508,19 +508,30 @@ export function displayRequirements() {
     let filteredRequirements = requirementsArray;
     if (searchTerm) {
         filteredRequirements = requirementsArray.filter(req => {
-            const searchableText = [
-                getVal(req, 'title', ''), getVal(req, 'key', ''), getVal(req, 'standardReference.text', ''),
-                getVal(req, 'metadata.mainCategory.text', ''), getVal(req, 'metadata.subCategory.text', ''),
-                ...(req.instructions || []).map(instr => getVal(instr, 'text', '')),
-                ...(req.checks || []).flatMap(check => [
-                    getVal(check, 'condition', ''),
-                    ...(check.passCriteria || []).map(crit => getVal(crit, 'requirement', '')),
-                    ...(check.ifNo || []).map(crit => getVal(crit, 'requirement', ''))
-                ]),
-                getVal(req, 'examples', ''), getVal(req, 'exceptions', ''),
-                getVal(req, 'tips', ''), getVal(req, 'commonErrors', ''), getVal(req, 'expectedObservation', '')
-            ].join(' ').toLowerCase();
-            return searchableText.includes(searchTerm);
+            const includesTerm = (str) => str && typeof str === 'string' && str.toLowerCase().includes(searchTerm);
+
+            // Safe access to array properties and then check for includesTerm
+            const instructionsMatch = Array.isArray(req.instructions) && req.instructions.some(instr => includesTerm(getVal(instr, 'text', '')));
+            const checksMatch = Array.isArray(req.checks) && req.checks.some(check => 
+                includesTerm(getVal(check, 'condition', '')) ||
+                (Array.isArray(check.passCriteria) && check.passCriteria.some(crit => includesTerm(getVal(crit, 'requirement', '')))) ||
+                (Array.isArray(check.ifNo) && check.ifNo.some(crit => includesTerm(getVal(crit, 'requirement', ''))))
+            );
+
+            return (
+                includesTerm(getVal(req, 'title', '')) ||
+                includesTerm(getVal(req, 'key', '')) ||
+                includesTerm(getVal(req, 'standardReference.text', '')) ||
+                includesTerm(getVal(req, 'metadata.mainCategory.text', '')) ||
+                includesTerm(getVal(req, 'metadata.subCategory.text', '')) ||
+                instructionsMatch ||
+                checksMatch ||
+                includesTerm(getVal(req, 'examples', '')) ||
+                includesTerm(getVal(req, 'exceptions', '')) ||
+                includesTerm(getVal(req, 'tips', '')) ||
+                includesTerm(getVal(req, 'commonErrors', '')) ||
+                includesTerm(getVal(req, 'expectedObservation', ''))
+            );
         });
     }
     heading.textContent = `Krav (${filteredRequirements.length} st)`;
